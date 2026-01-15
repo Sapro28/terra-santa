@@ -1,0 +1,110 @@
+{
+  "Nav": {
+    "schoolName": "School Name",
+    "home": "Home",
+    "about": "About",
+    "sections": "Sections",
+    "gallery": "Gallery",
+    "moodle": "Moodle"
+  },
+
+  "Footer": {
+    "schoolName": "School Name",
+    "addressLine1": "Address line, City, Country",
+    "phone": "Phone: +000 000 000",
+    "tagline": "A Christ-centered community for learning and growth.",
+    "hours": "Hours",
+    "hoursLine1": "Sun-Thu: 8:00-14:00",
+    "hoursLine2": "Fri-Sat: Closed",
+    "newsletter": {
+      "title": "Newsletter",
+      "subtitle": "Get updates & announcements",
+      "placeholder": "Email address",
+      "button": "Join"
+    },
+    "rights": "All rights reserved."
+  },
+
+  "Home": {
+    "badge": "Official Website",
+    "welcome": "Welcome to",
+    "schoolName": "School Name",
+    "subtitle": "A modern learning environment that supports students, families, and teachers.",
+    "ctaAbout": "Learn more",
+    "ctaGallery": "View gallery",
+    "stats": {
+      "students": "Students",
+      "teachers": "Teachers",
+      "years": "Years"
+    },
+    "nextEvent": {
+      "title": "Next event",
+      "desc": "Announcements and events will appear here."
+    },
+    "cards": {
+      "missionTitle": "Our Mission",
+      "missionText": "To provide high-quality education and build strong values.",
+      "visionTitle": "Our Vision",
+      "visionText": "To inspire confident learners ready for the future.",
+      "valuesTitle": "Our Values",
+      "valuesText": "Respect, responsibility, teamwork, and excellence."
+    }
+  },
+
+  "About": {
+    "title": "About Us",
+    "intro": "Learn about our school, our goals, and how we support our students.",
+    "cards": {
+      "missionTitle": "Mission",
+      "missionText": "We focus on learning, character, and real-world skills.",
+      "visionTitle": "Vision",
+      "visionText": "We aim to create an inclusive and high-achieving community.",
+      "valuesTitle": "Values",
+      "valuesText": "Respect, honesty, collaboration, and growth."
+    },
+    "leadership": {
+      "title": "Leadership",
+      "subtitle": "Meet the team working to guide and support the school.",
+      "personName": "Staff Member",
+      "personRole": "Role / Title",
+      "personBio": "Short description about this person and their responsibilities."
+    }
+  },
+
+  "Gallery": {
+    "title": "Gallery",
+    "subtitle": "A look at moments from school life, activities, and events.",
+    "itemTitle": "Photo #{n}",
+    "itemDesc": "Description of the photo goes here."
+  },
+
+  "Sections": {
+    "title": "School Sections",
+    "subtitle": "Explore the different stages and sections available at our school.",
+    "list": {
+      "primary": {
+        "title": "Primary Section",
+        "age": "Ages: 6-10",
+        "desc": "Build strong foundations in reading, writing, math, and discovery."
+      },
+      "middle": {
+        "title": "Middle Section",
+        "age": "Ages: 11-13",
+        "desc": "Develop deeper understanding, teamwork, and independent learning."
+      },
+      "secondary": {
+        "title": "Secondary Section",
+        "age": "Ages: 14-18",
+        "desc": "Prepare students for exams, university, and future careers."
+      }
+    }
+  },
+
+  "Moodle": {
+    "title": "Moodle",
+    "subtitle": "Access courses, materials, and assignments.",
+    "placeholder": "This page is a placeholder. You can link to your Moodle platform here.",
+    "backHome": "Back to home",
+    "openLater": "Open Moodle"
+  }
+}

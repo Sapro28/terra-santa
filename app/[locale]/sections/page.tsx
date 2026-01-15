@@ -1,29 +1,36 @@
-const sections = [
-  {
-    title: 'Primary',
-    age: 'Grades 1-6 (example)',
-    desc: 'Focus on foundations: literacy, numeracy, curiosity, and social development.',
-  },
-  {
-    title: 'Middle',
-    age: 'Grades 7-9 (example)',
-    desc: 'Build independence, critical thinking, and stronger academic habits.',
-  },
-  {
-    title: 'Secondary',
-    age: 'Grades 10-12 (example)',
-    desc: 'Preparation for exams, university, and future pathways.',
-  },
-];
+import { getTranslations } from 'next-intl/server';
 
-export default function SectionsPage() {
+export default async function SectionsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Sections' });
+
+  const sections = [
+    {
+      title: t('list.primary.title'),
+      age: t('list.primary.age'),
+      desc: t('list.primary.desc'),
+    },
+    {
+      title: t('list.middle.title'),
+      age: t('list.middle.age'),
+      desc: t('list.middle.desc'),
+    },
+    {
+      title: t('list.secondary.title'),
+      age: t('list.secondary.age'),
+      desc: t('list.secondary.desc'),
+    },
+  ];
+
   return (
     <div className="space-y-10">
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold">School Sections</h1>
-        <p className="max-w-3xl text-(--muted)">
-          Overview of each stage and what students learn and experience.
-        </p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="max-w-3xl text-(--muted)">{t('subtitle')}</p>
       </header>
 
       <div className="grid gap-4">

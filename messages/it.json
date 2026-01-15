@@ -1,0 +1,110 @@
+{
+  "Nav": {
+    "schoolName": "Nome della Scuola",
+    "home": "Home",
+    "about": "Chi siamo",
+    "sections": "Sezioni",
+    "gallery": "Galleria",
+    "moodle": "Moodle"
+  },
+
+  "Footer": {
+    "schoolName": "Nome della Scuola",
+    "addressLine1": "Indirizzo, Città, Paese",
+    "phone": "Telefono: +000 000 000",
+    "tagline": "Una comunità cristiana per apprendere e crescere.",
+    "hours": "Orari",
+    "hoursLine1": "Dom-Gio: 8:00-14:00",
+    "hoursLine2": "Ven-Sab: Chiuso",
+    "newsletter": {
+      "title": "Newsletter",
+      "subtitle": "Ricevi aggiornamenti e avvisi",
+      "placeholder": "Indirizzo email",
+      "button": "Iscriviti"
+    },
+    "rights": "Tutti i diritti riservati."
+  },
+
+  "Home": {
+    "badge": "Sito Ufficiale",
+    "welcome": "Benvenuti a",
+    "schoolName": "Nome della Scuola",
+    "subtitle": "Un ambiente di apprendimento moderno per studenti, famiglie e insegnanti.",
+    "ctaAbout": "Scopri di più",
+    "ctaGallery": "Vedi galleria",
+    "stats": {
+      "students": "Studenti",
+      "teachers": "Insegnanti",
+      "years": "Anni"
+    },
+    "nextEvent": {
+      "title": "Prossimo evento",
+      "desc": "Avvisi ed eventi appariranno qui."
+    },
+    "cards": {
+      "missionTitle": "La nostra missione",
+      "missionText": "Offrire istruzione di qualità e valori solidi.",
+      "visionTitle": "La nostra visione",
+      "visionText": "Ispirare studenti pronti per il futuro.",
+      "valuesTitle": "I nostri valori",
+      "valuesText": "Rispetto, responsabilità e collaborazione."
+    }
+  },
+
+  "About": {
+    "title": "Chi siamo",
+    "intro": "Scopri la nostra scuola e i nostri obiettivi educativi.",
+    "cards": {
+      "missionTitle": "Missione",
+      "missionText": "Apprendimento, carattere e competenze.",
+      "visionTitle": "Visione",
+      "visionText": "Una comunità inclusiva e di qualità.",
+      "valuesTitle": "Valori",
+      "valuesText": "Rispetto, onestà e crescita."
+    },
+    "leadership": {
+      "title": "Direzione",
+      "subtitle": "Il team che guida la scuola.",
+      "personName": "Membro dello staff",
+      "personRole": "Ruolo",
+      "personBio": "Breve descrizione della persona."
+    }
+  },
+
+  "Gallery": {
+    "title": "Galleria",
+    "subtitle": "Attività ed eventi della scuola.",
+    "itemTitle": "Foto #{n}",
+    "itemDesc": "Descrizione della foto."
+  },
+
+  "Sections": {
+    "title": "Sezioni Scolastiche",
+    "subtitle": "Le diverse fasi dell'istruzione.",
+    "list": {
+      "primary": {
+        "title": "Scuola Primaria",
+        "age": "Età: 6-10",
+        "desc": "Fondamenti di lettura, scrittura e matematica."
+      },
+      "middle": {
+        "title": "Scuola Media",
+        "age": "Età: 11-13",
+        "desc": "Sviluppo dell'autonomia e collaborazione."
+      },
+      "secondary": {
+        "title": "Scuola Superiore",
+        "age": "Età: 14-18",
+        "desc": "Preparazione per università e carriera."
+      }
+    }
+  },
+
+  "Moodle": {
+    "title": "Moodle",
+    "subtitle": "Accesso ai materiali didattici.",
+    "placeholder": "Pagina segnaposto per Moodle.",
+    "backHome": "Torna alla home",
+    "openLater": "Apri Moodle"
+  }
+}

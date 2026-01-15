@@ -1,25 +1,32 @@
-export default function AboutPage() {
+import { getTranslations } from 'next-intl/server';
+
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'About' });
+
   return (
     <div className="space-y-10">
       <header className="space-y-3">
-        <h1 className="text-3xl font-bold">About</h1>
-        <p className="max-w-3xl text-(--muted)">
-          Write a clear summary of the school: mission, values, teaching
-          approach, and what makes it special.
-        </p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="max-w-3xl text-(--muted)">{t('intro')}</p>
       </header>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <InfoCard title="Mission" text="One sentence mission statement." />
-        <InfoCard title="Vision" text="One sentence vision statement." />
-        <InfoCard title="Values" text="Faith • Excellence • Character" />
+        <InfoCard
+          title={t('cards.missionTitle')}
+          text={t('cards.missionText')}
+        />
+        <InfoCard title={t('cards.visionTitle')} text={t('cards.visionText')} />
+        <InfoCard title={t('cards.valuesTitle')} text={t('cards.valuesText')} />
       </section>
 
       <section className="rounded-3xl border border-(--border) bg-white p-6 md:p-8">
-        <h2 className="text-2xl font-bold">Leadership</h2>
-        <p className="mt-2 text-(--muted)">
-          Add principal and key staff information here.
-        </p>
+        <h2 className="text-2xl font-bold">{t('leadership.title')}</h2>
+        <p className="mt-2 text-(--muted)">{t('leadership.subtitle')}</p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -29,12 +36,14 @@ export default function AboutPage() {
             >
               <div className="aspect-square w-full rounded-xl bg-(--paper)" />
               <div className="mt-4">
-                <div className="font-semibold">Full Name</div>
+                <div className="font-semibold">
+                  {t('leadership.personName')}
+                </div>
                 <div className="text-sm font-semibold text-(--muted)">
-                  Role title
+                  {t('leadership.personRole')}
                 </div>
                 <p className="mt-2 text-sm text-(--muted)">
-                  Short bio about responsibilities and experience.
+                  {t('leadership.personBio')}
                 </p>
               </div>
             </div>

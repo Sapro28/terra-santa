@@ -1,7 +1,12 @@
 import '../globals.css';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+import { locales, type Locale } from '@/i18n/config';
 
 export const metadata: Metadata = {
   title: {
@@ -11,13 +16,19 @@ export const metadata: Metadata = {
   description: 'Official school website.',
 };
 
-const LOCALES = ['en', 'ar', 'it'];
-
 export function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }));
+  return locales.map((locale) => ({ locale }));
 }
 
 export const dynamicParams = false;
+
+async function getMessages(locale: Locale) {
+  try {
+    return (await import(`../../messages/${locale}.json`)).default;
+  } catch {
+    notFound();
+  }
+}
 
 export default async function LocaleLayout({
   children,
@@ -28,14 +39,19 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
+  if (!locales.includes(locale as Locale)) notFound();
+
+  const messages = await getMessages(locale as Locale);
+  const isArabic = locale === 'ar';
+
   return (
-    <html lang={locale}>
+    <html lang={locale} dir={isArabic ? 'rtl' : 'ltr'}>
       <body className="min-h-screen bg-(--bg) text-(--fg)">
-        <Header locale={locale} />
-
-        <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
-
-        <Footer />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Header locale={locale} />
+          <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+          <Footer />
+        </NextIntlClientProvider>
       </body>
     </html>
   );
