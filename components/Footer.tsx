@@ -1,6 +1,5 @@
-'use client';
-
 import { useTranslations } from 'next-intl';
+import NewsletterForm from './NewsletterForm';
 
 export default function Footer() {
   const t = useTranslations('Footer');
@@ -30,23 +29,7 @@ export default function Footer() {
             {t('hoursLine2')}
           </p>
 
-          <div className="mt-5 rounded-2xl bg-white p-4 ring-1 ring-[color:var(--border)]">
-            <p className="text-xs font-semibold text-(--muted)">
-              {t('newsletter.title')}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-(--fg)">
-              {t('newsletter.subtitle')}
-            </p>
-            <div className="mt-3 flex gap-2">
-              <input
-                className="w-full rounded-xl border border-(--border) bg-white px-3 py-2 text-sm outline-none placeholder:text-(--muted) focus:border-(--accent)"
-                placeholder={t('newsletter.placeholder')}
-              />
-              <button className="rounded-xl bg-(--accent) px-3 py-2 text-sm font-semibold text-white hover:bg-(--accent-hover)">
-                {t('newsletter.button')}
-              </button>
-            </div>
-          </div>
+          <NewsletterForm />
         </div>
       </div>
 
