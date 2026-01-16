@@ -15,10 +15,11 @@ export default function LocaleSwitcher({
   locale: string;
   currentPath: string;
 }) {
+  const pathWithoutLocale = currentPath.replace(`/${locale}`, '') || '/';
+
   return (
     <div className="flex items-center gap-1 rounded-xl border border-(--border) bg-white p-1">
       {localeOptions.map((opt) => {
-        const pathWithoutLocale = currentPath.replace(`/${locale}`, '') || '/';
         const target = `/${opt.code}${
           pathWithoutLocale === '/' ? '' : pathWithoutLocale
         }`;
