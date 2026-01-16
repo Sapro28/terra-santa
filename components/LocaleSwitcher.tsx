@@ -18,7 +18,10 @@ export default function LocaleSwitcher({
   return (
     <div className="flex items-center gap-1 rounded-xl border border-(--border) bg-white p-1">
       {localeOptions.map((opt) => {
-        const target = `/${opt.code}${currentPath === '/' ? '' : currentPath}`;
+        const pathWithoutLocale = currentPath.replace(`/${locale}`, '') || '/';
+        const target = `/${opt.code}${
+          pathWithoutLocale === '/' ? '' : pathWithoutLocale
+        }`;
         const active = opt.code === locale;
 
         return (

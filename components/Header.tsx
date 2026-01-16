@@ -1,15 +1,20 @@
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import LocaleSwitcher from './LocaleSwitcher';
+'use client';
 
-export default function Header({
-  locale,
-  currentPath,
-}: {
-  locale: string;
-  currentPath: string;
-}) {
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+
+const localeOptions = [
+  { code: 'ar', label: 'AR' },
+  { code: 'en', label: 'EN' },
+  { code: 'it', label: 'IT' },
+] as const;
+
+export default function Header({ locale }: { locale: string }) {
   const t = useTranslations('Nav');
+  const pathname = usePathname();
+
+  const restPath = pathname?.replace(`/${locale}`, '') || '/';
 
   const nav = [
     { href: '', label: t('home') },
@@ -42,7 +47,26 @@ export default function Header({
             })}
           </nav>
 
-          <LocaleSwitcher locale={locale} currentPath={currentPath} />
+          <div className="flex items-center gap-1 rounded-xl border border-(--border) bg-white p-1">
+            {localeOptions.map((opt) => {
+              const target = `/${opt.code}${restPath === '/' ? '' : restPath}`;
+              const active = opt.code === locale;
+
+              return (
+                <Link
+                  key={opt.code}
+                  href={target}
+                  className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+                    active
+                      ? 'bg-(--accent) text-white'
+                      : 'text-(--muted) hover:text-(--fg)'
+                  }`}
+                >
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </header>
