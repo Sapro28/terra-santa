@@ -2,10 +2,8 @@ import '../globals.css';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
 import { locales, type Locale } from '@/i18n/config';
 
 export const metadata: Metadata = {

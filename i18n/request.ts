@@ -1,4 +1,3 @@
-// i18n/request.ts
 import { getRequestConfig } from 'next-intl/server';
 import { locales, defaultLocale } from './config';
 
