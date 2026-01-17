@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 
-export default function Header({ locale }: { locale: string }) {
-  const t = useTranslations('Nav');
+export default async function Header({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'Nav' });
 
   const nav = [
     { href: '', label: t('home') },
@@ -11,6 +11,7 @@ export default function Header({ locale }: { locale: string }) {
     { href: 'sections', label: t('sections') },
     { href: 'gallery', label: t('gallery') },
     { href: 'moodle', label: t('moodle') },
+    { href: 'news', label: t('news') },
   ];
 
   return (
