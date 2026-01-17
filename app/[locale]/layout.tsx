@@ -1,11 +1,10 @@
 import { notFound } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, setRequestLocale } from 'next-intl/server';
+
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { locales, type Locale } from '@/i18n/config';
-
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
-
-export const dynamicParams = false;
 
 export default async function LocaleLayout({
   children,
@@ -18,5 +17,18 @@ export default async function LocaleLayout({
 
   if (!locales.includes(locale as Locale)) notFound();
 
-  return children;
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+  const isArabic = locale === 'ar';
+
+  return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <div lang={locale} dir={isArabic ? 'rtl' : 'ltr'}>
+        <Header locale={locale} />
+        {children}
+        <Footer />
+      </div>
+    </NextIntlClientProvider>
+  );
 }
