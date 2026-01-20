@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { sanityClient } from '@/sanity/lib/client';
 import { PortableText } from '@portabletext/react';
+import { newsPostBySlugQuery } from '@/sanity/lib/queries';
 
 type NewsPost = {
   title: string;
@@ -10,21 +11,6 @@ type NewsPost = {
   body?: any;
 };
 
-const NEWS_POST_QUERY = /* groq */ `
-*[
-  _type == "newsPost"
-  && slug.current == $slug
-  && hidden != true
-  && (!defined(publishAt) || publishAt <= now())
-][0]{
-  title,
-  publishedAt,
-  urgent,
-  excerpt,
-  body
-}
-`;
-
 export default async function NewsPostPage({
   params,
 }: {
@@ -32,7 +18,7 @@ export default async function NewsPostPage({
 }) {
   const { slug } = await params;
 
-  const post = await sanityClient.fetch<NewsPost | null>(NEWS_POST_QUERY, {
+  const post = await sanityClient.fetch<NewsPost | null>(newsPostBySlugQuery, {
     slug,
   });
 

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { sanityClient } from '@/sanity/lib/client';
+import { newsListQuery } from '@/sanity/lib/queries';
 
 type NewsListItem = {
   _id: string;
@@ -10,22 +11,6 @@ type NewsListItem = {
   urgent?: boolean;
 };
 
-const NEWS_LIST_QUERY = /* groq */ `
-*[
-  _type == "newsPost"
-  && hidden != true
-  && (!defined(publishAt) || publishAt <= now())
-]
-| order(publishedAt desc) {
-  _id,
-  title,
-  "slug": slug.current,
-  excerpt,
-  publishedAt,
-  urgent
-}
-`;
-
 export default async function NewsPage({
   params,
 }: {
@@ -33,7 +18,7 @@ export default async function NewsPage({
 }) {
   const { locale } = await params;
 
-  const posts = await sanityClient.fetch<NewsListItem[]>(NEWS_LIST_QUERY);
+  const posts = await sanityClient.fetch<NewsListItem[]>(newsListQuery);
 
   return (
     <main style={{ padding: 24 }}>
