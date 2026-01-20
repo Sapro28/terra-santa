@@ -2,15 +2,15 @@ import { defineField } from 'sanity';
 
 export const languageField = defineField({
   name: 'language',
-  title: 'Language',
+  title: 'اللغة',
   type: 'string',
   initialValue: 'ar',
   validation: (Rule) => Rule.required(),
   options: {
     list: [
-      { title: 'Arabic', value: 'ar' },
-      { title: 'English', value: 'en' },
-      { title: 'Italian', value: 'it' },
+      { title: 'العربية', value: 'ar' },
+      { title: 'الإنجليزية', value: 'en' },
+      { title: 'الإيطالية', value: 'it' },
     ],
     layout: 'radio',
     direction: 'horizontal',

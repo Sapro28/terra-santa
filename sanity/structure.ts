@@ -1,12 +1,10 @@
 import type { StructureResolver } from 'sanity/structure';
 
-// https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('School CMS')
+    .title('نظام إدارة محتوى المدرسة')
     .items([
-      S.documentTypeListItem('newsPost').title('News / Announcements'),
-      S.documentTypeListItem('category').title('Categories'),
+      S.documentTypeListItem('newsPost').title('الأخبار / الإعلانات'),
 
       S.divider(),
 

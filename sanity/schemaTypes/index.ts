@@ -1,15 +1,8 @@
 import { blockContentType } from './blockContentType';
-import { categoryType } from './categoryType';
 import { newsPostType } from './newsPostType';
 import { eventType } from './eventType';
-import { mediaItemType } from './mediaItemType';
+import { albumType } from './albumType';
 
 export const schema = {
-  types: [
-    blockContentType,
-    categoryType,
-    newsPostType,
-    eventType,
-    mediaItemType,
-  ],
+  types: [blockContentType, newsPostType, eventType, albumType],
 };

@@ -1,114 +1,152 @@
-import { DocumentTextIcon } from '@sanity/icons';
-import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
+import { defineField, defineType } from 'sanity';
 
 export const newsPostType = defineType({
   name: 'newsPost',
-  title: 'News / Announcements',
+  title: 'إعلان / خبر',
   type: 'document',
-  icon: DocumentTextIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
       type: 'string',
+      title: 'العنوان',
       validation: (Rule) => Rule.required(),
     }),
 
-    languageField,
-
     defineField({
       name: 'slug',
-      title: 'Slug',
       type: 'slug',
-      options: { source: 'title' },
+      title: 'الرابط المختصر',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: 'publishedAt',
+      type: 'datetime',
+      title: 'تاريخ النشر',
       validation: (Rule) => Rule.required(),
     }),
 
     defineField({
       name: 'excerpt',
-      title: 'Short summary',
       type: 'text',
+      title: 'ملخص',
       rows: 3,
-      validation: (Rule) => Rule.required().max(250),
-      description: 'Used for homepage cards/listing pages.',
+    }),
+
+    defineField({
+      name: 'body',
+      title: 'المحتوى',
+      type: 'array',
+      of: [{ type: 'block' }],
     }),
 
     defineField({
       name: 'mainImage',
-      title: 'Main image',
+      title: 'الصورة الرئيسية',
       type: 'image',
-      options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative text',
-        }),
-      ],
-    }),
-
-    defineField({
-      name: 'publishedAt',
-      title: 'Published at',
-      type: 'datetime',
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
-      name: 'publishAt',
-      title: 'Schedule publish (optional)',
-      type: 'datetime',
-      description:
-        'If set in the future, you can hide it until that time in your website query.',
+      options: {
+        hotspot: true,
+      },
     }),
 
     defineField({
       name: 'urgent',
-      title: 'Urgent announcement',
       type: 'boolean',
+      title: 'عاجل',
+      description:
+        'يحدد هذا الإعلان كإعلان عاجل (مثل: إلغاء الدوام). قد يتغير الشكل في الموقع.',
       initialValue: false,
     }),
 
     defineField({
       name: 'hidden',
-      title: 'Hidden (do not show on website)',
       type: 'boolean',
+      title: 'مخفي',
+      description: 'عند التفعيل، لن يظهر هذا الإعلان في الموقع.',
       initialValue: false,
+      hidden: true,
     }),
 
     defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      of: [defineArrayMember({ type: 'reference', to: { type: 'category' } })],
+      name: 'language',
+      type: 'string',
+      title: 'اللغة',
+      initialValue: 'ar',
+      options: {
+        list: [
+          { title: 'الإنجليزية', value: 'en' },
+          { title: 'العربية', value: 'ar' },
+        ],
+      },
+      hidden: true,
     }),
 
     defineField({
-      name: 'body',
-      title: 'Full content',
-      type: 'blockContent',
+      name: 'placement',
+      type: 'string',
+      title: 'مكان الظهور',
+      description:
+        'يتحكم بمكان ظهور هذا الإعلان. الإعلانات المنبثقة يجب أن يكون لها تاريخ انتهاء.',
+      initialValue: 'list',
+      options: {
+        list: [
+          { title: 'القائمة فقط', value: 'list' },
+          { title: 'منبثق فقط', value: 'popup' },
+          { title: 'القائمة + منبثق', value: 'both' },
+          { title: 'لا شيء (مخفي)', value: 'none' },
+        ],
+        layout: 'radio',
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: 'expiresAt',
+      type: 'datetime',
+      title: 'ينتهي الإعلان المنبثق في',
+      description:
+        'مطلوب للإعلانات المنبثقة. مثال: إذا تم إلغاء الدوام، ضع التاريخ عند عودة الدوام.',
+      hidden: ({ document }) => {
+        const placement = (document as any)?.placement;
+        return placement !== 'popup' && placement !== 'both';
+      },
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const placement = (context.document as any)?.placement;
+
+          if (placement === 'popup' || placement === 'both') {
+            if (!value) return 'يجب أن يحتوي الإعلان المنبثق على تاريخ انتهاء.';
+          }
+
+          return true;
+        }),
     }),
   ],
 
   preview: {
     select: {
       title: 'title',
-      lang: 'language',
-      media: 'mainImage',
-      hidden: 'hidden',
+      placement: 'placement',
       urgent: 'urgent',
+      language: 'language',
+      hidden: 'hidden',
+      media: 'mainImage',
     },
-    prepare({ title, lang, hidden, urgent, media }) {
-      const flags = [
-        lang ? lang.toUpperCase() : null,
-        urgent ? 'URGENT' : null,
-        hidden ? 'HIDDEN' : null,
-      ].filter(Boolean);
+    prepare(selection) {
+      const { title, placement, urgent, language, hidden, media } = selection;
+
+      const urgency = urgent ? '🚨' : '';
+      const placementLabel = placement ? `[${placement}]` : '';
+      const langLabel = language ? `(${language})` : '';
+      const hiddenLabel = hidden ? '🙈 مخفي' : '';
 
       return {
-        title,
-        subtitle: flags.join(' • '),
+        title: `${urgency} ${title}`,
+        subtitle: `${placementLabel} ${langLabel} ${hiddenLabel}`.trim(),
         media,
       };
     },

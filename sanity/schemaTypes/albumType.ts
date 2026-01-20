@@ -1,16 +1,16 @@
-import { CalendarIcon } from '@sanity/icons';
+import { ImageIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { languageField } from './languageField';
 
-export const eventType = defineType({
-  name: 'event',
-  title: 'الفعاليات',
+export const albumType = defineType({
+  name: 'album',
+  title: 'الألبومات',
   type: 'document',
-  icon: CalendarIcon,
+  icon: ImageIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'عنوان الفعالية',
+      title: 'عنوان الألبوم',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -26,23 +26,10 @@ export const eventType = defineType({
     }),
 
     defineField({
-      name: 'eventDate',
-      title: 'تاريخ الفعالية',
-      type: 'date',
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
-      name: 'location',
-      title: 'الموقع',
-      type: 'string',
-    }),
-
-    defineField({
       name: 'description',
-      title: 'الوصف',
+      title: 'الوصف (اختياري)',
       type: 'text',
-      rows: 4,
+      rows: 3,
     }),
 
     defineField({
@@ -63,7 +50,8 @@ export const eventType = defineType({
       name: 'media',
       title: 'الوسائط (صور / فيديوهات)',
       type: 'array',
-      description: 'أضف صورًا أو فيديوهات خاصة بهذه الفعالية.',
+      validation: (Rule) =>
+        Rule.min(1).error('أضف على الأقل صورة أو فيديو واحد.'),
       of: [
         defineArrayMember({
           name: 'photo',
@@ -125,22 +113,17 @@ export const eventType = defineType({
   preview: {
     select: {
       title: 'title',
-      date: 'eventDate',
       lang: 'language',
       media: 'coverImage',
     },
-    prepare({ title, date, lang, media }) {
+    prepare({ title, lang, media }) {
       const langMap: Record<string, string> = {
         ar: 'العربية',
         en: 'الإنجليزية',
         it: 'الإيطالية',
       };
-
-      const subtitleParts = [
-        lang ? (langMap[lang] ?? lang) : null,
-        date,
-      ].filter(Boolean);
-      return { title, subtitle: subtitleParts.join(' • '), media };
+      const subtitle = lang ? (langMap[lang] ?? lang) : '';
+      return { title, subtitle, media };
     },
   },
 });

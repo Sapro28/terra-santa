@@ -4,9 +4,10 @@
     "home": "Home",
     "about": "Chi siamo",
     "sections": "Sezioni",
-    "gallery": "Galleria",
-    "moodle": "Moodle",
-    "news": "Notizie"
+    "album": "Album",
+    "news": "Notizie",
+    "events": "Eventi",
+    "moodle": "Moodle"
   },
 
   "Footer": {
@@ -32,7 +33,7 @@
     "schoolName": "Nome della Scuola",
     "subtitle": "Un ambiente di apprendimento moderno per studenti, famiglie e insegnanti.",
     "ctaAbout": "Scopri di più",
-    "ctaGallery": "Vedi galleria",
+    "ctaalbum": "Vedi album",
     "stats": {
       "students": "Studenti",
       "teachers": "Insegnanti",
@@ -72,9 +73,10 @@
     }
   },
 
-  "Gallery": {
-    "title": "Galleria",
+  "Album": {
+    "title": "Album",
     "subtitle": "Attività ed eventi della scuola.",
+    "empty": "Nessun album trovato.",
     "itemTitle": "Foto #{n}",
     "itemDesc": "Descrizione della foto."
   },

@@ -4,9 +4,10 @@
     "home": "Home",
     "about": "About",
     "sections": "Sections",
-    "gallery": "Gallery",
-    "moodle": "Moodle",
-    "news": "News"
+    "album": "Album",
+    "news": "News",
+    "events": "Events",
+    "moodle": "Moodle"
   },
 
   "Footer": {
@@ -27,12 +28,11 @@
   },
 
   "Home": {
-    "badge": "Official Website",
     "welcome": "Welcome to",
     "schoolName": "School Name",
     "subtitle": "A modern learning environment that supports students, families, and teachers.",
     "ctaAbout": "Learn more",
-    "ctaGallery": "View gallery",
+    "ctaalbum": "View album",
     "stats": {
       "students": "Students",
       "teachers": "Teachers",
@@ -72,9 +72,10 @@
     }
   },
 
-  "Gallery": {
-    "title": "Gallery",
+  "Album": {
+    "title": "Album",
     "subtitle": "A look at moments from school life, activities, and events.",
+    "empty": "No albums found.",
     "itemTitle": "Photo #{n}",
     "itemDesc": "Description of the photo goes here."
   },

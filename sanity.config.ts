@@ -5,12 +5,16 @@ import { visionTool } from '@sanity/vision';
 import { apiVersion, dataset, projectId } from './sanity/env';
 import { schema } from './sanity/schemaTypes';
 import { structure } from './sanity/structure';
+import { myTheme } from './sanity/theme';
 
 export default defineConfig({
   basePath: '/studio',
   projectId,
   dataset,
   schema,
+
+  theme: myTheme,
+
   plugins: [
     structureTool({ structure }),
     visionTool({ defaultApiVersion: apiVersion }),

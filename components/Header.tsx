@@ -9,8 +9,9 @@ export default async function Header({ locale }: { locale: string }) {
     { href: '', label: t('home') },
     { href: 'about', label: t('about') },
     { href: 'sections', label: t('sections') },
-    { href: 'gallery', label: t('gallery') },
+    { href: 'album', label: t('album') },
     { href: 'news', label: t('news') },
+    { href: 'events', label: t('events') },
     { href: 'moodle', label: t('moodle') },
   ];
 

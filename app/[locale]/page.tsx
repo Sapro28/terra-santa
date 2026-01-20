@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { sanityClient } from '@/sanity/lib/client';
 import { latestAnnouncementsQuery } from '@/sanity/lib/queries';
+import AnnouncementsPopup from '@/components/AnnouncementsPopup';
 
 type Announcement = {
   _id: string;
@@ -22,18 +23,41 @@ export default async function HomePage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Home' });
 
-  const announcements: Announcement[] = await sanityClient.fetch(
-    latestAnnouncementsQuery,
-  );
+  const POPUP_LOCALES = ['ar'];
+  // const POPUP_LOCALES = ['ar', 'en'];
+  const shouldShowPopup = POPUP_LOCALES.includes(locale);
+
+  const announcements: Announcement[] = shouldShowPopup
+    ? await sanityClient.fetch(latestAnnouncementsQuery)
+    : [];
+
+  const popupAnnouncement =
+    announcements.find((a) => a.urgent && a.title && a.slug) ??
+    announcements.find((a) => a.title && a.slug) ??
+    null;
 
   return (
     <div className="space-y-16">
+      <AnnouncementsPopup
+        locale={locale}
+        announcement={
+          shouldShowPopup && popupAnnouncement
+            ? {
+                _id: popupAnnouncement._id,
+                title: popupAnnouncement.title!,
+                slug: popupAnnouncement.slug!,
+                excerpt: popupAnnouncement.excerpt,
+                publishedAt: popupAnnouncement.publishedAt,
+                urgent: popupAnnouncement.urgent,
+                mainImageUrl: popupAnnouncement.mainImageUrl,
+                mainImageAlt: popupAnnouncement.mainImageAlt,
+              }
+            : null
+        }
+      />
+
       <section className="grid items-center gap-10 md:grid-cols-2">
         <div>
-          <p className="inline-flex rounded-full border border-(--border) bg-(--paper) px-3 py-1 text-xs font-semibold text-(--muted)">
-            {t('badge')}
-          </p>
-
           <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
             {t('welcome')}{' '}
             <span className="text-(--fg)">{t('schoolName')}</span>
@@ -52,10 +76,10 @@ export default async function HomePage({
             </Link>
 
             <Link
-              href={`/${locale}/gallery`}
+              href={`/${locale}/album`}
               className="rounded-xl border border-(--border) bg-white px-5 py-3 text-sm font-semibold text-(--fg) hover:bg-(--paper)"
             >
-              {t('ctaGallery')}
+              {t('ctaalbum')}
             </Link>
           </div>
 
@@ -110,12 +134,6 @@ export default async function HomePage({
                         <h3 className="line-clamp-1 text-base font-semibold">
                           {post.title}
                         </h3>
-
-                        {post.urgent ? (
-                          <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">
-                            Urgent
-                          </span>
-                        ) : null}
                       </div>
 
                       {post.excerpt ? (
