@@ -82,15 +82,14 @@ export const newsPostBySlugQuery = groq`
 export const eventsListQuery = groq`
   *[
     _type == "event" &&
-    hidden != true &&
-    (!defined(language) || language == $lang)
+    hidden != true
   ]
   | order(eventDate desc){
     _id,
-    title,
+    "title": coalesce(title.ar, title),
     eventDate,
-    location,
-    description,
+    "location": coalesce(location.ar, location),
+    "description": coalesce(description.ar, description),
     "slug": slug.current,
 
     "coverImageUrl": coverImage.asset->url,
@@ -99,7 +98,6 @@ export const eventsListQuery = groq`
     "photoCount": count(media[_type == "photo"]),
     "videoCount": count(media[_type == "video"]),
 
-    // used for a "collage" preview on the list page (optional)
     "thumbnails": media[_type == "photo"][0...6]{
       "url": asset->url,
       alt
@@ -111,14 +109,13 @@ export const eventBySlugQuery = groq`
   *[
     _type == "event" &&
     hidden != true &&
-    slug.current == $slug &&
-    (!defined(language) || language == $lang)
+    slug.current == $slug
   ][0]{
     _id,
-    title,
+    "title": coalesce(title.ar, title),
     eventDate,
-    location,
-    description,
+    "location": coalesce(location.ar, location),
+    "description": coalesce(description.ar, description),
     "slug": slug.current,
 
     "coverImageUrl": coverImage.asset->url,
@@ -126,13 +123,11 @@ export const eventBySlugQuery = groq`
 
     media[]{
       _type,
-      // photo fields
       alt,
       caption,
       capturedAt,
       "imageUrl": asset->url,
 
-      // video fields
       title,
       "videoUrl": asset->url
     }
@@ -142,13 +137,12 @@ export const eventBySlugQuery = groq`
 export const albumsListQuery = groq`
   *[
     _type == "album" &&
-    hidden != true &&
-    (!defined(language) || language == $lang)
+    hidden != true
   ]
   | order(_createdAt desc){
     _id,
-    title,
-    description,
+    "title": coalesce(title.ar, title),
+    "description": coalesce(description.ar, description),
     "slug": slug.current,
     "coverImageUrl": coverImage.asset->url,
     "coverImageAlt": coverImage.alt,
@@ -161,12 +155,11 @@ export const albumBySlugQuery = groq`
   *[
     _type == "album" &&
     hidden != true &&
-    slug.current == $slug &&
-    (!defined(language) || language == $lang)
+    slug.current == $slug
   ][0]{
     _id,
-    title,
-    description,
+    "title": coalesce(title.ar, title),
+    "description": coalesce(description.ar, description),
     "slug": slug.current,
     "coverImageUrl": coverImage.asset->url,
     "coverImageAlt": coverImage.alt,

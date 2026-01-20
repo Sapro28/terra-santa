@@ -1,6 +1,5 @@
 import { CalendarIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
 
 export const eventType = defineType({
   name: 'event',
@@ -14,8 +13,6 @@ export const eventType = defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-
-    languageField,
 
     defineField({
       name: 'slug',
@@ -126,21 +123,10 @@ export const eventType = defineType({
     select: {
       title: 'title',
       date: 'eventDate',
-      lang: 'language',
       media: 'coverImage',
     },
-    prepare({ title, date, lang, media }) {
-      const langMap: Record<string, string> = {
-        ar: 'العربية',
-        en: 'الإنجليزية',
-        it: 'الإيطالية',
-      };
-
-      const subtitleParts = [
-        lang ? (langMap[lang] ?? lang) : null,
-        date,
-      ].filter(Boolean);
-      return { title, subtitle: subtitleParts.join(' • '), media };
+    prepare({ title, date, media }) {
+      return { title, subtitle: date, media };
     },
   },
 });

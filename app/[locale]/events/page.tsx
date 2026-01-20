@@ -23,20 +23,14 @@ type EventCard = {
   thumbnails?: { url: string; alt?: string }[];
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 export default async function EventsPage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const lang = localeToLang(params.locale);
+  const { locale } = await params;
 
-  const events = await client.fetch<EventCard[]>(eventsListQuery, { lang });
+  const events = await client.fetch<EventCard[]>(eventsListQuery);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -47,7 +41,7 @@ export default async function EventsPage({
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((ev) => {
-          const href = `/${params.locale}/events/${ev.slug}`;
+          const href = `/${locale}/events/${ev.slug}`;
 
           return (
             <Link
@@ -55,12 +49,10 @@ export default async function EventsPage({
               href={href}
               className="group overflow-hidden rounded-2xl border border-(--border) bg-white shadow-sm hover:shadow-md"
             >
-              {/* Collage / cover */}
               <div className="aspect-[16/10] w-full bg-(--bg)">
                 {ev.thumbnails?.length ? (
                   <div className="grid h-full grid-cols-3 grid-rows-2 gap-1 p-1">
                     {ev.thumbnails.slice(0, 6).map((t, idx) => (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         key={idx}
                         src={t.url}

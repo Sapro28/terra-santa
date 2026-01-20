@@ -1,6 +1,5 @@
 import { ImageIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
 
 export const albumType = defineType({
   name: 'album',
@@ -14,8 +13,6 @@ export const albumType = defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-
-    languageField,
 
     defineField({
       name: 'slug',
@@ -113,17 +110,10 @@ export const albumType = defineType({
   preview: {
     select: {
       title: 'title',
-      lang: 'language',
       media: 'coverImage',
     },
-    prepare({ title, lang, media }) {
-      const langMap: Record<string, string> = {
-        ar: 'العربية',
-        en: 'الإنجليزية',
-        it: 'الإيطالية',
-      };
-      const subtitle = lang ? (langMap[lang] ?? lang) : '';
-      return { title, subtitle, media };
+    prepare({ title, media }) {
+      return { title, media };
     },
   },
 });
