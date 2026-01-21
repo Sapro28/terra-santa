@@ -11,7 +11,8 @@ export default async function Header({ locale }: { locale: string }) {
     { href: 'sections', label: t('sections') },
     { href: 'album', label: t('album') },
     { href: 'news', label: t('news') },
-    { href: 'events', label: t('events') },
+    { href: 'fees', label: t('fees') },
+
     { href: 'moodle', label: t('moodle') },
   ];
 

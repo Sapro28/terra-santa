@@ -6,7 +6,7 @@
     "sections": "Sections",
     "album": "Album",
     "news": "News",
-    "events": "Events",
+    "fees": "Fees",
     "moodle": "Moodle"
   },
 
@@ -77,7 +77,10 @@
     "subtitle": "A look at moments from school life, activities, and events.",
     "empty": "No albums found.",
     "itemTitle": "Photo #{n}",
-    "itemDesc": "Description of the photo goes here."
+    "itemDesc": "Description of the photo goes here.",
+    "noCover": "No Cover",
+    "photos": "Photos",
+    "videos": "Videos"
   },
 
   "Sections": {
@@ -100,6 +103,34 @@
         "desc": "Prepare students for exams, university, and future careers."
       }
     }
+  },
+
+  "Fees": {
+    "title": "Fees",
+    "subtitle": "A quick overview of school fees and payment information.",
+    "intro": "The amounts below are provided as general guidance. Final fees may vary by grade level and services selected.",
+    "items": {
+      "registration": {
+        "title": "Registration",
+        "desc": "A one-time fee paid at the beginning of the academic year."
+      },
+      "tuition": {
+        "title": "Tuition",
+        "desc": "Monthly/term payments covering learning materials and academic services."
+      },
+      "transport": {
+        "title": "Transportation",
+        "desc": "Optional bus service depending on route availability."
+      },
+      "activities": {
+        "title": "Activities",
+        "desc": "Optional extracurricular programs and school events."
+      }
+    },
+    "noteTitle": "Payment note",
+    "noteBody": "For detailed fees per grade and the latest deadlines, please contact the school administration.",
+    "backHome": "Back to home",
+    "contactUs": "Contact us"
   },
 
   "Moodle": {

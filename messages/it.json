@@ -6,7 +6,7 @@
     "sections": "Sezioni",
     "album": "Album",
     "news": "Notizie",
-    "events": "Eventi",
+    "fees": "Commissioni",
     "moodle": "Moodle"
   },
 
@@ -78,7 +78,10 @@
     "subtitle": "Attività ed eventi della scuola.",
     "empty": "Nessun album trovato.",
     "itemTitle": "Foto #{n}",
-    "itemDesc": "Descrizione della foto."
+    "itemDesc": "Descrizione della foto.",
+    "noCover": "لا يوجد",
+    "photos": "صور",
+    "videos": "فيديوهات"
   },
 
   "Sections": {
@@ -101,6 +104,34 @@
         "desc": "Preparazione per università e carriera."
       }
     }
+  },
+
+  "Fees": {
+    "title": "Tasse scolastiche",
+    "subtitle": "Una breve panoramica delle tasse e delle informazioni di pagamento.",
+    "intro": "Gli importi riportati di seguito sono indicativi. Le tasse finali possono variare in base alla classe e ai servizi selezionati.",
+    "items": {
+      "registration": {
+        "title": "Iscrizione",
+        "desc": "Quota una tantum da pagare all’inizio dell’anno scolastico."
+      },
+      "tuition": {
+        "title": "Retta",
+        "desc": "Pagamenti mensili/periodici che coprono servizi didattici e materiali scolastici."
+      },
+      "transport": {
+        "title": "Trasporto",
+        "desc": "Servizio scuolabus opzionale in base alla disponibilità delle tratte."
+      },
+      "activities": {
+        "title": "Attività",
+        "desc": "Programmi extracurriculari ed eventi scolastici (opzionali)."
+      }
+    },
+    "noteTitle": "Nota sui pagamenti",
+    "noteBody": "Per i dettagli delle tasse per classe e le scadenze aggiornate, contatta l’amministrazione della scuola.",
+    "backHome": "Torna alla home",
+    "contactUs": "Contattaci"
   },
 
   "Moodle": {
