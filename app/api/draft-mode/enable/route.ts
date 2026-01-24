@@ -1,15 +1,15 @@
-import { draftMode } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { defineEnableDraftMode } from 'next-sanity/draft-mode';
+import { previewClient } from '@/sanity/lib/client';
+
+const handler = defineEnableDraftMode({ client: previewClient });
 
 export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const secret = url.searchParams.get('secret');
-  const redirectTo = url.searchParams.get('redirect') || '/';
+  const { searchParams } = new URL(req.url);
+  const secret = searchParams.get('secret');
 
-  if (secret !== process.env.DRAFT_MODE_SECRET) {
-    return new NextResponse('Invalid secret', { status: 401 });
+  if (!secret || secret !== process.env.SANITY_STUDIO_PREVIEW_SECRET) {
+    return new Response('Invalid secret', { status: 401 });
   }
 
-  (await draftMode()).enable();
-  return NextResponse.redirect(new URL(redirectTo, url.origin));
+  return handler.GET(req);
 }
