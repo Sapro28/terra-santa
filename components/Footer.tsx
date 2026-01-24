@@ -1,32 +1,50 @@
-import { useTranslations } from 'next-intl';
 import NewsletterForm from './NewsletterForm';
 
-export default function Footer() {
-  const t = useTranslations('Footer');
+type SiteSettings = {
+  schoolName?: string;
+  footer?: {
+    addressLine1?: string;
+    phone?: string;
+    tagline?: string;
+    hoursTitle?: string;
+    hoursLine1?: string;
+    hoursLine2?: string;
+    rights?: string;
+  };
+};
+
+export default function Footer({
+  settings,
+}: {
+  settings: SiteSettings | null;
+}) {
+  const f = settings?.footer;
 
   return (
     <footer className="border-t border-(--border) bg-(--paper)">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-2">
         <div>
           <div className="text-sm font-semibold text-(--fg)">
-            {t('schoolName')}
+            {settings?.schoolName ?? 'School'}
           </div>
           <p className="mt-3 text-sm leading-relaxed text-(--muted)">
-            {t('addressLine1')}
-            <br />
-            {t('phone')}
+            {f?.addressLine1}
+            {f?.addressLine1 ? <br /> : null}
+            {f?.phone}
           </p>
           <p className="mt-4 text-xs font-semibold text-(--muted)">
-            {t('tagline')}
+            {f?.tagline}
           </p>
         </div>
 
         <div>
-          <div className="text-sm font-semibold text-(--fg)">{t('hours')}</div>
+          <div className="text-sm font-semibold text-(--fg)">
+            {f?.hoursTitle}
+          </div>
           <p className="mt-3 text-sm leading-relaxed text-(--muted)">
-            {t('hoursLine1')}
-            <br />
-            {t('hoursLine2')}
+            {f?.hoursLine1}
+            {f?.hoursLine1 ? <br /> : null}
+            {f?.hoursLine2}
           </p>
 
           <NewsletterForm />
@@ -34,7 +52,8 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-(--border) py-5 text-center text-xs font-semibold text-(--muted)">
-        © {new Date().getFullYear()} {t('schoolName')}. {t('rights')}
+        © {new Date().getFullYear()} {settings?.schoolName ?? 'School'}.{' '}
+        {f?.rights ?? ''}
       </div>
     </footer>
   );

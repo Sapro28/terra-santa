@@ -1,5 +1,25 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getSanityClient } from '@/sanity/lib/getClient';
+
+import { feesPageQuery } from '@/sanity/lib/queries';
+
+type FeesPageContent = {
+  title?: string;
+  subtitle?: string;
+  intro?: string;
+  items?: Array<{ title?: string; desc?: string }>;
+  noteTitle?: string;
+  noteBody?: string;
+  backHomeLabel?: string;
+  contactUsLabel?: string;
+  contactUsUrl?: string;
+};
+
+function localeToLang(locale: string) {
+  if (locale === 'ar') return 'ar';
+  if (locale === 'it') return 'it';
+  return 'en';
+}
 
 export default async function FeesPage({
   params,
@@ -7,57 +27,62 @@ export default async function FeesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Fees' });
+  const lang = localeToLang(locale);
+
+  const client = await getSanityClient();
+  const page = await client.fetch<FeesPageContent | null>(feesPageQuery, {
+    lang,
+  });
 
   return (
     <div className="space-y-6">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-(--muted)">{t('subtitle')}</p>
+        <h1 className="text-3xl font-bold">{page?.title ?? '—'}</h1>
+        {page?.subtitle ? (
+          <p className="text-(--muted)">{page.subtitle}</p>
+        ) : null}
       </header>
 
       <div className="rounded-3xl border border-(--border) bg-white p-6 space-y-4">
-        <p className="text-sm text-(--muted)">{t('intro')}</p>
+        {page?.intro ? (
+          <p className="text-sm text-(--muted)">{page.intro}</p>
+        ) : null}
 
-        <div className="space-y-2 text-sm">
-          <p>
-            <span className="font-semibold">
-              {t('items.registration.title')}
-            </span>{' '}
-            — {t('items.registration.desc')}
-          </p>
-          <p>
-            <span className="font-semibold">{t('items.tuition.title')}</span> —{' '}
-            {t('items.tuition.desc')}
-          </p>
-          <p>
-            <span className="font-semibold">{t('items.transport.title')}</span>{' '}
-            — {t('items.transport.desc')}
-          </p>
-          <p>
-            <span className="font-semibold">{t('items.activities.title')}</span>{' '}
-            — {t('items.activities.desc')}
-          </p>
-        </div>
+        {page?.items?.length ? (
+          <div className="space-y-2 text-sm">
+            {page.items.map((it, idx) => (
+              <p key={`${it.title ?? 'item'}-${idx}`}>
+                <span className="font-semibold">{it.title ?? '—'}</span>
+                {it.desc ? <> — {it.desc}</> : null}
+              </p>
+            ))}
+          </div>
+        ) : null}
 
-        <div className="rounded-2xl border border-(--border) bg-(--paper) p-4">
-          <p className="text-sm font-semibold">{t('noteTitle')}</p>
-          <p className="text-sm text-(--muted) mt-1">{t('noteBody')}</p>
-        </div>
+        {page?.noteTitle || page?.noteBody ? (
+          <div className="rounded-2xl border border-(--border) bg-(--paper) p-4">
+            {page?.noteTitle ? (
+              <p className="text-sm font-semibold">{page.noteTitle}</p>
+            ) : null}
+            {page?.noteBody ? (
+              <p className="text-sm text-(--muted) mt-1">{page.noteBody}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="mt-2 flex gap-3">
           <Link
             href={`/${locale}`}
             className="rounded-xl border border-(--border) bg-white px-4 py-2 text-sm font-semibold hover:bg-(--paper)"
           >
-            {t('backHome')}
+            {page?.backHomeLabel ?? 'Back home'}
           </Link>
 
           <a
-            href="#"
+            href={page?.contactUsUrl ?? '#'}
             className="rounded-xl bg-(--accent) px-4 py-2 text-sm font-semibold text-white hover:bg-(--accent-hover)"
           >
-            {t('contactUs')}
+            {page?.contactUsLabel ?? 'Contact us'}
           </a>
         </div>
       </div>

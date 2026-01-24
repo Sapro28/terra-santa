@@ -1,5 +1,6 @@
 import { ImageIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { languageField } from './languageField';
 
 export const albumType = defineType({
   name: 'album',
@@ -7,6 +8,8 @@ export const albumType = defineType({
   type: 'document',
   icon: ImageIcon,
   fields: [
+    languageField,
+
     defineField({
       name: 'title',
       title: 'عنوان الألبوم',
@@ -56,11 +59,7 @@ export const albumType = defineType({
           type: 'image',
           options: { hotspot: true },
           fields: [
-            defineField({
-              name: 'alt',
-              type: 'string',
-              title: 'نص بديل',
-            }),
+            defineField({ name: 'alt', type: 'string', title: 'نص بديل' }),
             defineField({
               name: 'caption',
               type: 'string',
@@ -108,10 +107,7 @@ export const albumType = defineType({
   ],
 
   preview: {
-    select: {
-      title: 'title',
-      media: 'coverImage',
-    },
+    select: { title: 'title', media: 'coverImage' },
     prepare({ title, media }) {
       return { title, media };
     },

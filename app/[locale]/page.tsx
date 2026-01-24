@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
-import { sanityClient } from '@/sanity/lib/client';
-import { latestAnnouncementsQuery } from '@/sanity/lib/queries';
+import { getSanityClient } from '@/sanity/lib/getClient';
+
+import { homePageQuery, latestAnnouncementsQuery } from '@/sanity/lib/queries';
 import AnnouncementsPopup from '@/components/AnnouncementsPopup';
 
 type Announcement = {
@@ -15,20 +15,41 @@ type Announcement = {
   mainImageAlt?: string;
 };
 
+type HomePageContent = {
+  title?: string;
+  schoolName?: string;
+  subtitle?: string;
+
+  ctaAboutLabel?: string;
+  ctaAlbumLabel?: string;
+
+  stats?: Array<{ label?: string; value?: string }>;
+  cards?: Array<{ title?: string; text?: string }>;
+
+  announcementsHeading?: string;
+  announcementsEmpty?: string;
+  viewAllNewsLabel?: string;
+};
+
 export default async function HomePage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Home' });
+
+  const lang = locale;
+  const client = await getSanityClient();
+
+  const page: HomePageContent | null = await client.fetch(homePageQuery, {
+    lang,
+  });
 
   const POPUP_LOCALES = ['ar'];
-  // const POPUP_LOCALES = ['ar', 'en'];
   const shouldShowPopup = POPUP_LOCALES.includes(locale);
 
   const announcements: Announcement[] = shouldShowPopup
-    ? await sanityClient.fetch(latestAnnouncementsQuery)
+    ? await client.fetch(latestAnnouncementsQuery, { lang })
     : [];
 
   const popupAnnouncement =
@@ -59,51 +80,54 @@ export default async function HomePage({
       <section className="grid items-center gap-10 md:grid-cols-2">
         <div>
           <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-            {t('welcome')}{' '}
-            <span className="text-(--fg)">{t('schoolName')}</span>
+            {page?.title ?? '—'}{' '}
+            <span className="text-(--fg)">{page?.schoolName ?? ''}</span>
           </h1>
 
-          <p className="mt-4 text-lg leading-relaxed text-(--muted)">
-            {t('subtitle')}
-          </p>
+          {page?.subtitle ? (
+            <p className="mt-4 text-lg leading-relaxed text-(--muted)">
+              {page.subtitle}
+            </p>
+          ) : null}
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={`/${locale}/about`}
               className="rounded-xl bg-(--accent) px-5 py-3 text-sm font-semibold text-white hover:bg-(--accent-hover)"
             >
-              {t('ctaAbout')}
+              {page?.ctaAboutLabel ?? 'About'}
             </Link>
 
             <Link
               href={`/${locale}/album`}
               className="rounded-xl border border-(--border) bg-white px-5 py-3 text-sm font-semibold text-(--fg) hover:bg-(--paper)"
             >
-              {t('ctaalbum')}
+              {page?.ctaAlbumLabel ?? 'Albums'}
             </Link>
           </div>
 
-          <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-(--border) bg-white p-4">
-            <Stat label={t('stats.students')} value="—" />
-            <Stat label={t('stats.teachers')} value="—" />
-            <Stat label={t('stats.years')} value="—" />
-          </div>
+          {page?.stats?.length ? (
+            <div className="mt-6 grid grid-cols-3 gap-4 rounded-2xl border border-(--border) bg-white p-4">
+              {page.stats.slice(0, 3).map((s, idx) => (
+                <Stat key={idx} label={s.label ?? '—'} value={s.value ?? '—'} />
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <InfoCard
-          title={t('cards.missionTitle')}
-          text={t('cards.missionText')}
-        />
-        <InfoCard title={t('cards.visionTitle')} text={t('cards.visionText')} />
-        <InfoCard title={t('cards.valuesTitle')} text={t('cards.valuesText')} />
-      </section>
+      {page?.cards?.length ? (
+        <section className="grid gap-4 md:grid-cols-3">
+          {page.cards.slice(0, 3).map((c, idx) => (
+            <InfoCard key={idx} title={c.title ?? '—'} text={c.text ?? ''} />
+          ))}
+        </section>
+      ) : null}
 
       <section>
         <div className="mb-6">
           <h2 className="text-2xl font-semibold">
-            Announcements &amp; Latest News
+            {page?.announcementsHeading ?? 'Announcements & Latest News'}
           </h2>
         </div>
 
@@ -157,7 +181,7 @@ export default async function HomePage({
             </ul>
           ) : (
             <div className="p-6 text-sm text-(--muted)">
-              No announcements yet.
+              {page?.announcementsEmpty ?? 'No announcements yet.'}
             </div>
           )}
 
@@ -166,7 +190,7 @@ export default async function HomePage({
               href={`/${locale}/news`}
               className="text-sm font-semibold text-(--fg) hover:underline"
             >
-              View all news →
+              {page?.viewAllNewsLabel ?? 'View all news →'}
             </Link>
           </div>
         </div>

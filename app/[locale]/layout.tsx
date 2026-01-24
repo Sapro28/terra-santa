@@ -1,10 +1,18 @@
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
+
+import { draftMode } from 'next/headers';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { locales, type Locale } from '@/i18n/config';
+
+import { siteSettingsQuery } from '@/sanity/lib/queries';
+import { getSanityClient } from '@/sanity/lib/getClient';
+
+const locales = ['ar', 'en', 'it'] as const;
+type Locale = (typeof locales)[number];
 
 export default async function LocaleLayout({
   children,
@@ -16,18 +24,22 @@ export default async function LocaleLayout({
   const { locale } = await params;
 
   if (!locales.includes(locale as Locale)) notFound();
-
   setRequestLocale(locale);
 
-  const messages = await getMessages();
-  const isArabic = locale === 'ar';
+  const dm = await draftMode();
+  if (dm.isEnabled) noStore();
+
+  const messages = (await import(`../../messages/${locale}.json`)).default;
+
+  const client = await getSanityClient();
+  const siteSettings = await client.fetch(siteSettingsQuery, { lang: locale });
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <div lang={locale} dir={isArabic ? 'rtl' : 'ltr'}>
-        <Header locale={locale} />
-        {children}
-        <Footer />
+      <div lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+        <Header locale={locale} settings={siteSettings} />
+        <main>{children}</main>
+        <Footer settings={siteSettings} />
       </div>
     </NextIntlClientProvider>
   );

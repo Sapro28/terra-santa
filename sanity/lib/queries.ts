@@ -5,7 +5,7 @@ export const latestAnnouncementsQuery = groq`
     _type == "newsPost" &&
     hidden != true &&
     ( !defined(placement) || placement in ["list", "both"] ) &&
-    ( !defined(language) || language == "ar") &&
+    language == $lang &&
     ( !defined(publishedAt) || publishedAt <= now() )
   ]
   | order(urgent desc, publishedAt desc)[0...4]{
@@ -26,7 +26,7 @@ export const popupAnnouncementQuery = groq`
     _type == "newsPost" &&
     hidden != true &&
     placement in ["popup", "both"] &&
-    (!defined(language) || language == "ar") &&
+    language == $lang &&
     (!defined(publishedAt) || publishedAt <= now()) &&
     (!defined(expiresAt) || expiresAt > now())
   ]
@@ -49,6 +49,7 @@ export const newsListQuery = groq`
     _type == "newsPost" &&
     hidden != true &&
     ( !defined(placement) || placement != "none" ) &&
+    language == $lang &&
     ( !defined(publishedAt) || publishedAt <= now() )
   ]
   | order(publishedAt desc) {
@@ -68,6 +69,7 @@ export const newsPostBySlugQuery = groq`
     slug.current == $slug &&
     hidden != true &&
     ( !defined(placement) || placement != "none" ) &&
+    language == $lang &&
     ( !defined(publishedAt) || publishedAt <= now() )
   ][0]{
     title,
@@ -82,14 +84,15 @@ export const newsPostBySlugQuery = groq`
 export const eventsListQuery = groq`
   *[
     _type == "event" &&
-    hidden != true
+    hidden != true &&
+    language == $lang
   ]
   | order(eventDate desc){
     _id,
-    "title": coalesce(title.ar, title),
+    title,
     eventDate,
-    "location": coalesce(location.ar, location),
-    "description": coalesce(description.ar, description),
+    location,
+    description,
     "slug": slug.current,
 
     "coverImageUrl": coverImage.asset->url,
@@ -109,13 +112,14 @@ export const eventBySlugQuery = groq`
   *[
     _type == "event" &&
     hidden != true &&
+    language == $lang &&
     slug.current == $slug
   ][0]{
     _id,
-    "title": coalesce(title.ar, title),
+    title,
     eventDate,
-    "location": coalesce(location.ar, location),
-    "description": coalesce(description.ar, description),
+    location,
+    description,
     "slug": slug.current,
 
     "coverImageUrl": coverImage.asset->url,
@@ -137,12 +141,13 @@ export const eventBySlugQuery = groq`
 export const albumsListQuery = groq`
   *[
     _type == "album" &&
-    hidden != true
+    hidden != true &&
+    language == $lang
   ]
   | order(_createdAt desc){
     _id,
-    "title": coalesce(title.ar, title),
-    "description": coalesce(description.ar, description),
+    title,
+    description,
     "slug": slug.current,
     "coverImageUrl": coverImage.asset->url,
     "coverImageAlt": coverImage.alt,
@@ -155,11 +160,12 @@ export const albumBySlugQuery = groq`
   *[
     _type == "album" &&
     hidden != true &&
+    language == $lang &&
     slug.current == $slug
   ][0]{
     _id,
-    "title": coalesce(title.ar, title),
-    "description": coalesce(description.ar, description),
+    title,
+    description,
     "slug": slug.current,
     "coverImageUrl": coverImage.asset->url,
     "coverImageAlt": coverImage.alt,
@@ -173,6 +179,90 @@ export const albumBySlugQuery = groq`
 
       title,
       "videoUrl": asset->url
+    }
+  }
+`;
+
+// --- NEW: page queries ---
+
+export const homePageQuery = groq`
+  *[_type == "homePage" && language == $lang][0]{
+    title,
+    schoolName,
+    subtitle,
+    ctaAboutLabel,
+    ctaAlbumLabel,
+
+    stats[]{ label, value },
+
+    cards[]{ title, text },
+
+    announcementsHeading,
+    announcementsEmpty,
+    viewAllNewsLabel
+  }
+`;
+
+export const aboutPageQuery = groq`
+  *[_type == "aboutPage" && language == $lang][0]{
+    title,
+    intro,
+    cards[]{ title, text },
+    leadershipTitle,
+    leadershipSubtitle,
+    leadershipPeople[]{
+      name,
+      role,
+      bio,
+      "imageUrl": image.asset->url,
+      "imageAlt": image.alt
+    }
+  }
+`;
+
+export const sectionsPageQuery = groq`
+  *[_type == "sectionsPage" && language == $lang][0]{
+    title,
+    subtitle,
+    sections[]{ title, age, desc }
+  }
+`;
+
+export const feesPageQuery = groq`
+  *[_type == "feesPage" && language == $lang][0]{
+    title,
+    subtitle,
+    intro,
+    items[]{ title, desc },
+    noteTitle,
+    noteBody,
+    backHomeLabel,
+    contactUsLabel,
+    contactUsUrl
+  }
+`;
+
+export const moodlePageQuery = groq`
+  *[_type == "moodlePage" && language == $lang][0]{
+    title,
+    subtitle,
+    placeholder,
+    backHomeLabel
+  }
+`;
+
+export const siteSettingsQuery = groq`
+  *[_type == "siteSettings" && language == $lang][0]{
+    schoolName,
+    navigation[]{ href, label },
+    footer{
+      addressLine1,
+      phone,
+      tagline,
+      hoursTitle,
+      hoursLine1,
+      hoursLine2,
+      rights
     }
   }
 `;

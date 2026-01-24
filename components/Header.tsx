@@ -1,26 +1,33 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 
-export default async function Header({ locale }: { locale: string }) {
-  const t = await getTranslations({ locale, namespace: 'Nav' });
+type SiteSettings = {
+  schoolName?: string;
+  navigation?: { href: string; label: string }[];
+};
 
-  const nav = [
-    { href: '', label: t('home') },
-    { href: 'about', label: t('about') },
-    { href: 'sections', label: t('sections') },
-    { href: 'album', label: t('album') },
-    { href: 'news', label: t('news') },
-    { href: 'fees', label: t('fees') },
-
-    { href: 'moodle', label: t('moodle') },
+export default async function Header({
+  locale,
+  settings,
+}: {
+  locale: string;
+  settings: SiteSettings | null;
+}) {
+  const nav = settings?.navigation ?? [
+    { href: '', label: 'Home' },
+    { href: 'about', label: 'About' },
+    { href: 'sections', label: 'Sections' },
+    { href: 'album', label: 'Album' },
+    { href: 'news', label: 'News' },
+    { href: 'fees', label: 'Fees' },
+    { href: 'moodle', label: 'Moodle' },
   ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-(--border) bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href={`/${locale}`} className="font-semibold text-(--fg)">
-          {t('schoolName')}
+          {settings?.schoolName ?? 'School'}
         </Link>
 
         <div className="flex items-center gap-4">

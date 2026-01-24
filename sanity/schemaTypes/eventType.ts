@@ -1,5 +1,6 @@
 import { CalendarIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { languageField } from './languageField';
 
 export const eventType = defineType({
   name: 'event',
@@ -7,6 +8,8 @@ export const eventType = defineType({
   type: 'document',
   icon: CalendarIcon,
   fields: [
+    languageField,
+
     defineField({
       name: 'title',
       title: 'عنوان الفعالية',
@@ -29,31 +32,16 @@ export const eventType = defineType({
       validation: (Rule) => Rule.required(),
     }),
 
-    defineField({
-      name: 'location',
-      title: 'الموقع',
-      type: 'string',
-    }),
+    defineField({ name: 'location', title: 'الموقع', type: 'string' }),
 
-    defineField({
-      name: 'description',
-      title: 'الوصف',
-      type: 'text',
-      rows: 4,
-    }),
+    defineField({ name: 'description', title: 'الوصف', type: 'text', rows: 4 }),
 
     defineField({
       name: 'coverImage',
       title: 'صورة الغلاف (اختياري)',
       type: 'image',
       options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          type: 'string',
-          title: 'نص بديل',
-        }),
-      ],
+      fields: [defineField({ name: 'alt', type: 'string', title: 'نص بديل' })],
     }),
 
     defineField({
@@ -68,11 +56,7 @@ export const eventType = defineType({
           type: 'image',
           options: { hotspot: true },
           fields: [
-            defineField({
-              name: 'alt',
-              type: 'string',
-              title: 'نص بديل',
-            }),
+            defineField({ name: 'alt', type: 'string', title: 'نص بديل' }),
             defineField({
               name: 'caption',
               type: 'string',
@@ -120,11 +104,7 @@ export const eventType = defineType({
   ],
 
   preview: {
-    select: {
-      title: 'title',
-      date: 'eventDate',
-      media: 'coverImage',
-    },
+    select: { title: 'title', date: 'eventDate', media: 'coverImage' },
     prepare({ title, date, media }) {
       return { title, subtitle: date, media };
     },

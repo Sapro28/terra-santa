@@ -1,10 +1,13 @@
 import { defineField, defineType } from 'sanity';
+import { languageField } from './languageField';
 
 export const newsPostType = defineType({
   name: 'newsPost',
   title: 'إعلان / خبر',
   type: 'document',
   fields: [
+    languageField,
+
     defineField({
       name: 'title',
       type: 'string',
@@ -16,10 +19,7 @@ export const newsPostType = defineType({
       name: 'slug',
       type: 'slug',
       title: 'الرابط المختصر',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
+      options: { source: 'title', maxLength: 96 },
       validation: (Rule) => Rule.required(),
     }),
 
@@ -40,25 +40,22 @@ export const newsPostType = defineType({
     defineField({
       name: 'body',
       title: 'المحتوى',
-      type: 'array',
-      of: [{ type: 'block' }],
+      type: 'blockContent',
     }),
 
     defineField({
       name: 'mainImage',
       title: 'الصورة الرئيسية',
       type: 'image',
-      options: {
-        hotspot: true,
-      },
+      options: { hotspot: true },
+      fields: [defineField({ name: 'alt', type: 'string', title: 'نص بديل' })],
     }),
 
     defineField({
       name: 'urgent',
       type: 'boolean',
       title: 'عاجل',
-      description:
-        'يحدد هذا الإعلان كإعلان عاجل (مثل: إلغاء الدوام). قد يتغير الشكل في الموقع.',
+      description: 'يحدد هذا الإعلان كإعلان عاجل (مثل: إلغاء الدوام).',
       initialValue: false,
     }),
 
@@ -68,21 +65,6 @@ export const newsPostType = defineType({
       title: 'مخفي',
       description: 'عند التفعيل، لن يظهر هذا الإعلان في الموقع.',
       initialValue: false,
-      hidden: true,
-    }),
-
-    defineField({
-      name: 'language',
-      type: 'string',
-      title: 'اللغة',
-      initialValue: 'ar',
-      options: {
-        list: [
-          { title: 'الإنجليزية', value: 'en' },
-          { title: 'العربية', value: 'ar' },
-        ],
-      },
-      hidden: true,
     }),
 
     defineField({
@@ -108,8 +90,7 @@ export const newsPostType = defineType({
       name: 'expiresAt',
       type: 'datetime',
       title: 'ينتهي الإعلان المنبثق في',
-      description:
-        'مطلوب للإعلانات المنبثقة. مثال: إذا تم إلغاء الدوام، ضع التاريخ عند عودة الدوام.',
+      description: 'مطلوب للإعلانات المنبثقة.',
       hidden: ({ document }) => {
         const placement = (document as any)?.placement;
         return placement !== 'popup' && placement !== 'both';
@@ -117,11 +98,9 @@ export const newsPostType = defineType({
       validation: (Rule) =>
         Rule.custom((value, context) => {
           const placement = (context.document as any)?.placement;
-
           if (placement === 'popup' || placement === 'both') {
             if (!value) return 'يجب أن يحتوي الإعلان المنبثق على تاريخ انتهاء.';
           }
-
           return true;
         }),
     }),

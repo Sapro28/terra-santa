@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { sanityClient } from '@/sanity/lib/client';
+import { getSanityClient } from '@/sanity/lib/getClient';
+
 import { newsListQuery } from '@/sanity/lib/queries';
 
 type NewsListItem = {
@@ -11,37 +12,55 @@ type NewsListItem = {
   urgent?: boolean;
 };
 
+function localeToLang(locale: string) {
+  if (locale === 'ar') return 'ar';
+  if (locale === 'it') return 'it';
+  return 'en';
+}
+
 export default async function NewsPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const lang = localeToLang(locale);
 
-  const posts = await sanityClient.fetch<NewsListItem[]>(newsListQuery);
+  const client = await getSanityClient();
+  const posts = await client.fetch<NewsListItem[]>(newsListQuery, { lang });
 
   return (
-    <main style={{ padding: 24 }}>
-      <h1>News</h1>
+    <main className="space-y-6">
+      <h1 className="text-3xl font-bold">News</h1>
 
       {posts.length === 0 ? (
-        <p>No news posts yet.</p>
+        <p className="text-(--muted)">No news posts yet.</p>
       ) : (
-        <ul style={{ display: 'grid', gap: 16, padding: 0, listStyle: 'none' }}>
+        <ul className="grid gap-4 p-0 list-none">
           {posts.map((post) => (
             <li
               key={post._id}
-              style={{ border: '1px solid #ddd', padding: 16 }}
+              className="rounded-2xl border border-(--border) bg-white p-5"
             >
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <Link href={`/${locale}/news/${post.slug}`}>
-                  <strong>{post.title}</strong>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/${locale}/news/${post.slug}`}
+                  className="font-semibold hover:underline"
+                >
+                  {post.title}
                 </Link>
-                {post.urgent ? <span>(urgent)</span> : null}
+                {post.urgent ? (
+                  <span className="text-xs font-semibold">(urgent)</span>
+                ) : null}
               </div>
 
-              {post.excerpt ? <p>{post.excerpt}</p> : null}
-              <small>{new Date(post.publishedAt).toLocaleDateString()}</small>
+              {post.excerpt ? (
+                <p className="mt-2 text-sm text-(--muted)">{post.excerpt}</p>
+              ) : null}
+
+              <p className="mt-3 text-xs text-(--muted)">
+                {new Date(post.publishedAt).toLocaleDateString()}
+              </p>
             </li>
           ))}
         </ul>

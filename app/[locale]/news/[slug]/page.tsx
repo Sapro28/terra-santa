@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { sanityClient } from '@/sanity/lib/client';
+import { getSanityClient } from '@/sanity/lib/getClient';
+
 import { PortableText } from '@portabletext/react';
 import { newsPostBySlugQuery } from '@/sanity/lib/queries';
 
@@ -11,34 +12,46 @@ type NewsPost = {
   body?: any;
 };
 
+function localeToLang(locale: string) {
+  if (locale === 'ar') return 'ar';
+  if (locale === 'it') return 'it';
+  return 'en';
+}
+
 export default async function NewsPostPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const lang = localeToLang(locale);
 
-  const post = await sanityClient.fetch<NewsPost | null>(newsPostBySlugQuery, {
+  const client = await getSanityClient();
+  const post = await client.fetch<NewsPost | null>(newsPostBySlugQuery, {
     slug,
+    lang,
   });
 
   if (!post) notFound();
 
   return (
-    <main style={{ padding: 24, maxWidth: 900, margin: '0 auto' }}>
-      <h1>
-        {post.title} {post.urgent ? <span>(urgent)</span> : null}
+    <main className="mx-auto max-w-3xl space-y-5">
+      <h1 className="text-3xl font-bold">
+        {post.title}{' '}
+        {post.urgent ? <span className="text-sm">(urgent)</span> : null}
       </h1>
 
-      <p>
-        <small>{new Date(post.publishedAt).toLocaleDateString()}</small>
+      <p className="text-xs text-(--muted)">
+        {new Date(post.publishedAt).toLocaleDateString()}
       </p>
 
-      {post.excerpt ? <p>{post.excerpt}</p> : null}
+      {post.excerpt ? (
+        <p className="text-sm text-(--muted)">{post.excerpt}</p>
+      ) : null}
 
-      <hr style={{ margin: '24px 0' }} />
-
-      {post.body ? <PortableText value={post.body} /> : <p>No content.</p>}
+      <div className="rounded-2xl border border-(--border) bg-white p-6 prose max-w-none">
+        {post.body ? <PortableText value={post.body} /> : <p>No content.</p>}
+      </div>
     </main>
   );
 }
