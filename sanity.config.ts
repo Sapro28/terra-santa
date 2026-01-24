@@ -6,6 +6,7 @@ import { dataset, projectId } from './sanity/env';
 import { schema } from './sanity/schemaTypes';
 import { myTheme } from './sanity/theme';
 import { presentationTool } from 'sanity/presentation';
+import { structure } from './sanity/structure';
 
 export default defineConfig({
   basePath: '/studio',
@@ -44,7 +45,7 @@ export default defineConfig({
   },
 
   plugins: [
-    structureTool(/*...*/),
+    structureTool({ structure }),
     visionTool(),
     presentationTool({
       previewUrl: {
