@@ -1,9 +1,14 @@
 import Link from 'next/link';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 
+type NavItem = {
+  href?: string | null;
+  label?: string | null;
+};
+
 type SiteSettings = {
   schoolName?: string;
-  navigation?: { href: string; label: string }[];
+  navigation?: NavItem[];
 };
 
 export default async function Header({
@@ -13,7 +18,7 @@ export default async function Header({
   locale: string;
   settings: SiteSettings | null;
 }) {
-  const nav = settings?.navigation ?? [
+  const nav: NavItem[] = settings?.navigation ?? [
     { href: '', label: 'Home' },
     { href: 'about', label: 'About' },
     { href: 'sections', label: 'Sections' },
@@ -21,6 +26,8 @@ export default async function Header({
     { href: 'news', label: 'News' },
     { href: 'fees', label: 'Fees' },
     { href: 'moodle', label: 'Moodle' },
+
+    { href: '/studio', label: 'Studio' },
   ];
 
   return (
@@ -32,15 +39,22 @@ export default async function Header({
 
         <div className="flex items-center gap-4">
           <nav className="hidden items-center gap-6 md:flex">
-            {nav.map((item) => {
-              const href = item.href ? `/${locale}/${item.href}` : `/${locale}`;
+            {nav.map((item, index) => {
+              const rawHref = item?.href ?? '';
+              const label = item?.label ?? 'Link';
+              const href = rawHref.startsWith('/')
+                ? rawHref
+                : rawHref
+                  ? `/${locale}/${rawHref}`
+                  : `/${locale}`;
+
               return (
                 <Link
-                  key={item.href || 'home'}
+                  key={`${label}-${index}`}
                   href={href}
                   className="text-sm font-semibold text-(--muted) hover:text-(--fg)"
                 >
-                  {item.label}
+                  {label}
                 </Link>
               );
             })}

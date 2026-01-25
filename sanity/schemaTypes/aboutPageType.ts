@@ -5,21 +5,42 @@ export const aboutPageType = defineType({
   name: 'aboutPage',
   title: 'صفحة عن المدرسة',
   type: 'document',
+  groups: [
+    { name: 'builder', title: 'Page Builder (Sections)' },
+    { name: 'legacy', title: 'Legacy (Old fields)' },
+  ],
   fields: [
     languageField,
+
+    // ✅ New flexible model
+    defineField({
+      name: 'sections',
+      title: 'الأقسام (Page Builder)',
+      group: 'builder',
+      type: 'array',
+      of: [
+        defineArrayMember({ type: 'sectionHero' }),
+        defineArrayMember({ type: 'sectionRichText' }),
+        defineArrayMember({ type: 'sectionCards' }),
+        defineArrayMember({ type: 'sectionPeople' }),
+        defineArrayMember({ type: 'sectionSpacer' }),
+      ],
+    }),
 
     defineField({
       name: 'title',
       title: 'العنوان',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      group: 'legacy',
     }),
-    defineField({ name: 'intro', title: 'المقدمة', type: 'text', rows: 4 }),
+    defineField({ name: 'intro', title: 'المقدمة', type: 'text', rows: 4, group: 'legacy' }),
 
     defineField({
       name: 'cards',
       title: 'بطاقات (رسالة/رؤية/قيم)',
       type: 'array',
+      group: 'legacy',
       of: [
         defineArrayMember({
           type: 'object',
@@ -41,17 +62,20 @@ export const aboutPageType = defineType({
       name: 'leadershipTitle',
       title: 'عنوان قسم الإدارة',
       type: 'string',
+      group: 'legacy',
     }),
     defineField({
       name: 'leadershipSubtitle',
       title: 'وصف قسم الإدارة',
       type: 'string',
+      group: 'legacy',
     }),
 
     defineField({
       name: 'leadershipPeople',
       title: 'أشخاص الإدارة',
       type: 'array',
+      group: 'legacy',
       of: [
         defineArrayMember({
           type: 'object',

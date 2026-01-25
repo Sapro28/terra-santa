@@ -5,21 +5,42 @@ export const sectionsPageType = defineType({
   name: 'sectionsPage',
   title: 'صفحة المراحل',
   type: 'document',
+  groups: [
+    { name: 'builder', title: 'Page Builder (Sections)' },
+    { name: 'legacy', title: 'Legacy (Old fields)' },
+  ],
   fields: [
     languageField,
+
+    // ✅ New flexible model (kept as `pageSections` because this schema already uses `sections`)
+    defineField({
+      name: 'pageSections',
+      title: 'الأقسام (Page Builder)',
+      group: 'builder',
+      type: 'array',
+      of: [
+        defineArrayMember({ type: 'sectionHero' }),
+        defineArrayMember({ type: 'sectionRichText' }),
+        defineArrayMember({ type: 'sectionList' }),
+        defineArrayMember({ type: 'sectionCards' }),
+        defineArrayMember({ type: 'sectionSpacer' }),
+      ],
+    }),
 
     defineField({
       name: 'title',
       title: 'العنوان',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      group: 'legacy',
     }),
-    defineField({ name: 'subtitle', title: 'النص التعريفي', type: 'string' }),
+    defineField({ name: 'subtitle', title: 'النص التعريفي', type: 'string', group: 'legacy' }),
 
     defineField({
       name: 'sections',
       title: 'المراحل',
       type: 'array',
+      group: 'legacy',
       of: [
         defineArrayMember({
           type: 'object',

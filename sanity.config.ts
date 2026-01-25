@@ -25,7 +25,7 @@ export default defineConfig({
 
       const doc = context.document as any;
 
-      const locale = doc?.lang || doc?.locale || 'ar';
+      const locale = doc?.language || 'ar';
 
       const isNewsPost = doc?._type === 'newsPost';
       const slug = doc?.slug?.current;

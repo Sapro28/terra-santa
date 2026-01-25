@@ -15,7 +15,6 @@ export default async function RootLayout({
       <body>
         {children}
 
-        {/* Enables live updates for sanityFetch() */}
         <SanityLive />
 
         {isEnabled ? <VisualEditingComponent /> : null}

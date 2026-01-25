@@ -10,9 +10,13 @@ import { feesPageType } from './feesPageType';
 import { moodlePageType } from './moodlePageType';
 import { siteSettingsType } from './siteSettingsType';
 
+import { pageSections } from './pageSections';
+
 export const schema = {
   types: [
     blockContentType,
+
+    ...pageSections,
     newsPostType,
     eventType,
     albumType,
