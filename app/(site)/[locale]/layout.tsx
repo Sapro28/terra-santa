@@ -9,7 +9,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 import { siteSettingsQuery } from '@/sanity/lib/queries';
-import { sanityFetch } from '@/sanity/lib/live';
+import { sanityFetch, SanityLive } from '@/sanity/lib/live';
+import VisualEditingComponent from '@/app/VisualEditing';
 
 const locales = ['ar', 'en', 'it'] as const;
 type Locale = (typeof locales)[number];
@@ -42,6 +43,13 @@ export default async function LocaleLayout({
         <Header locale={locale} settings={siteSettings} />
         <main>{children}</main>
         <Footer settings={siteSettings} />
+
+        {dm.isEnabled ? (
+          <>
+            <SanityLive />
+            <VisualEditingComponent />
+          </>
+        ) : null}
       </div>
     </NextIntlClientProvider>
   );
