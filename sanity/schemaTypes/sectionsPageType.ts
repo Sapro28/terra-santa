@@ -5,7 +5,6 @@ export const sectionsPageType = defineType({
   name: 'sectionsPage',
   title: 'صفحة الأقسام',
   type: 'document',
-  groups: [{ name: 'builder', title: 'Page Builder (Sections)' }],
 
   fields: [
     languageField,
@@ -13,7 +12,6 @@ export const sectionsPageType = defineType({
     defineField({
       name: 'sections',
       title: 'الأقسام (Page Builder)',
-      group: 'builder',
       type: 'array',
       of: [
         defineArrayMember({ type: 'sectionHero' }),

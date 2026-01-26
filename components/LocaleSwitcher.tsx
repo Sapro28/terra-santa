@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { Globe } from '@mynaui/icons-react';
 
@@ -16,6 +17,18 @@ const localeOptions = [
   { code: 'en', label: 'EN' },
   { code: 'it', label: 'IT' },
 ] as const;
+
+function ClientOnly({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return <>{children}</>;
+}
 
 function stripLeadingLocale(path: string) {
   const pathname = path.startsWith('/') ? path : `/${path}`;
@@ -47,39 +60,43 @@ export default function LocaleSwitcher({
     `/${code}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-xl border border-border bg-white"
-          aria-label="Change language"
-        >
-          <Globe className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+    <ClientOnly>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-xl border border-border bg-white"
+            aria-label="Change language"
+          >
+            <Globe className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="min-w-28">
-        {localeOptions.map((opt) => {
-          const active = opt.code === locale;
-          const href = makeTarget(opt.code);
+        <DropdownMenuContent align="end" className="min-w-28">
+          {localeOptions.map((opt) => {
+            const active = opt.code === locale;
+            const href = makeTarget(opt.code);
 
-          return (
-            <DropdownMenuItem key={opt.code} asChild>
-              <Link
-                href={href}
-                className={`flex items-center justify-between ${
-                  active ? 'font-semibold' : ''
-                }`}
-              >
-                <span>{opt.label}</span>
-                {active ? <span className="text-xs text-muted">✓</span> : null}
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
+            return (
+              <DropdownMenuItem key={opt.code} asChild>
+                <Link
+                  href={href}
+                  className={`flex items-center justify-between ${
+                    active ? 'font-semibold' : ''
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  {active ? (
+                    <span className="text-xs text-muted">✓</span>
+                  ) : null}
+                </Link>
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </ClientOnly>
   );
 }

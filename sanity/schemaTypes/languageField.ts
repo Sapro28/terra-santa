@@ -4,8 +4,6 @@ export const languageField = defineField({
   name: 'language',
   title: 'اللغة',
   type: 'string',
-  initialValue: 'ar',
-  validation: (Rule) => Rule.required(),
   options: {
     list: [
       { title: 'العربية', value: 'ar' },
@@ -15,4 +13,10 @@ export const languageField = defineField({
     layout: 'radio',
     direction: 'horizontal',
   },
+
+  initialValue: 'ar',
+  hidden: true,
+  readOnly: true,
+
+  validation: (Rule) => Rule.required(),
 });

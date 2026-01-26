@@ -34,13 +34,13 @@ export default async function NewsPage({
       <h1 className="text-3xl font-bold">News</h1>
 
       {posts.length === 0 ? (
-        <p className="text-(--muted)">No news posts yet.</p>
+        <p className="text-muted">No news posts yet.</p>
       ) : (
         <ul className="grid gap-4 p-0 list-none">
           {posts.map((post) => (
             <li
               key={post._id}
-              className="rounded-2xl border border-(--border) bg-white p-5"
+              className="rounded-2xl border border-border bg-white p-5"
             >
               <div className="flex items-center gap-2">
                 <Link
@@ -55,10 +55,10 @@ export default async function NewsPage({
               </div>
 
               {post.excerpt ? (
-                <p className="mt-2 text-sm text-(--muted)">{post.excerpt}</p>
+                <p className="mt-2 text-sm text-muted">{post.excerpt}</p>
               ) : null}
 
-              <p className="mt-3 text-xs text-(--muted)">
+              <p className="mt-3 text-xs text-muted">
                 {new Date(post.publishedAt).toLocaleDateString()}
               </p>
             </li>
