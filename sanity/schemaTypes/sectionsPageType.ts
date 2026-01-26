@@ -12,9 +12,8 @@ export const sectionsPageType = defineType({
   fields: [
     languageField,
 
-    // ✅ New flexible model (kept as `pageSections` because this schema already uses `sections`)
     defineField({
-      name: 'pageSections',
+      name: 'sections',
       title: 'الأقسام (Page Builder)',
       group: 'builder',
       type: 'array',
@@ -34,10 +33,15 @@ export const sectionsPageType = defineType({
       validation: (Rule) => Rule.required(),
       group: 'legacy',
     }),
-    defineField({ name: 'subtitle', title: 'النص التعريفي', type: 'string', group: 'legacy' }),
+    defineField({
+      name: 'subtitle',
+      title: 'النص التعريفي',
+      type: 'string',
+      group: 'legacy',
+    }),
 
     defineField({
-      name: 'sections',
+      name: 'stages',
       title: 'المراحل',
       type: 'array',
       group: 'legacy',

@@ -12,7 +12,6 @@ export const aboutPageType = defineType({
   fields: [
     languageField,
 
-    // ✅ New flexible model
     defineField({
       name: 'sections',
       title: 'الأقسام (Page Builder)',
@@ -34,7 +33,13 @@ export const aboutPageType = defineType({
       validation: (Rule) => Rule.required(),
       group: 'legacy',
     }),
-    defineField({ name: 'intro', title: 'المقدمة', type: 'text', rows: 4, group: 'legacy' }),
+    defineField({
+      name: 'intro',
+      title: 'المقدمة',
+      type: 'text',
+      rows: 4,
+      group: 'legacy',
+    }),
 
     defineField({
       name: 'cards',

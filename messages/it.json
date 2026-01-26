@@ -11,20 +11,10 @@
   },
 
   "Footer": {
-    "schoolName": "Nome della Scuola",
-    "addressLine1": "Indirizzo, Città, Paese",
-    "phone": "Telefono: +000 000 000",
-    "tagline": "Una comunità cristiana per apprendere e crescere.",
-    "hours": "Orari",
-    "hoursLine1": "Dom-Gio: 8:00-14:00",
-    "hoursLine2": "Ven-Sab: Chiuso",
-    "newsletter": {
-      "title": "Newsletter",
-      "subtitle": "Ricevi aggiornamenti e avvisi",
-      "placeholder": "Indirizzo email",
-      "button": "Iscriviti"
-    },
-    "rights": "Tutti i diritti riservati."
+    "hoursTitle": "Orari",
+    "rights": "Tutti i diritti riservati.",
+    "copyrightTemplate": "© {year} {name}. {rights}",
+    "schoolFallback": "Scuola"
   },
 
   "Home": {

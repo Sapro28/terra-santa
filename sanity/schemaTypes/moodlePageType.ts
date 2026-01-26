@@ -12,7 +12,6 @@ export const moodlePageType = defineType({
   fields: [
     languageField,
 
-    // ✅ New flexible model
     defineField({
       name: 'sections',
       title: 'الأقسام (Page Builder)',
@@ -32,7 +31,12 @@ export const moodlePageType = defineType({
       validation: (Rule) => Rule.required(),
       group: 'legacy',
     }),
-    defineField({ name: 'subtitle', title: 'العنوان الفرعي', type: 'string', group: 'legacy' }),
+    defineField({
+      name: 'subtitle',
+      title: 'العنوان الفرعي',
+      type: 'string',
+      group: 'legacy',
+    }),
     defineField({
       name: 'placeholder',
       title: 'النص المؤقت',

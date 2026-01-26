@@ -48,7 +48,6 @@ export const structure: StructureResolver = (S) =>
 
       S.divider(),
 
-      // ✅ PAGES GROUP
       S.listItem()
         .title('الصفحات')
         .icon(FileText)

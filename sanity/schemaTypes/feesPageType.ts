@@ -12,7 +12,6 @@ export const feesPageType = defineType({
   fields: [
     languageField,
 
-    // ✅ New flexible model
     defineField({
       name: 'sections',
       title: 'الأقسام (Page Builder)',
@@ -35,8 +34,19 @@ export const feesPageType = defineType({
       validation: (Rule) => Rule.required(),
       group: 'legacy',
     }),
-    defineField({ name: 'subtitle', title: 'العنوان الفرعي', type: 'string', group: 'legacy' }),
-    defineField({ name: 'intro', title: 'المقدمة', type: 'text', rows: 4, group: 'legacy' }),
+    defineField({
+      name: 'subtitle',
+      title: 'العنوان الفرعي',
+      type: 'string',
+      group: 'legacy',
+    }),
+    defineField({
+      name: 'intro',
+      title: 'المقدمة',
+      type: 'text',
+      rows: 4,
+      group: 'legacy',
+    }),
 
     defineField({
       name: 'items',
@@ -59,7 +69,12 @@ export const feesPageType = defineType({
       ],
     }),
 
-    defineField({ name: 'noteTitle', title: 'عنوان الملاحظة', type: 'string', group: 'legacy' }),
+    defineField({
+      name: 'noteTitle',
+      title: 'عنوان الملاحظة',
+      type: 'string',
+      group: 'legacy',
+    }),
     defineField({
       name: 'noteBody',
       title: 'نص الملاحظة',

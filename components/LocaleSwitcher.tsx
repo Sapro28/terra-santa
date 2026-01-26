@@ -1,6 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { Globe } from '@mynaui/icons-react';
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 const localeOptions = [
   { code: 'ar', label: 'AR' },
@@ -9,9 +18,8 @@ const localeOptions = [
 ] as const;
 
 function stripLeadingLocale(path: string) {
-  // Ensure it starts with /
   const pathname = path.startsWith('/') ? path : `/${path}`;
-  const parts = pathname.split('/'); // ["", "it", "something"...]
+  const parts = pathname.split('/');
   const maybeLocale = parts[1];
 
   const supported = localeOptions.map((l) => l.code);
@@ -19,7 +27,7 @@ function stripLeadingLocale(path: string) {
     maybeLocale &&
     supported.includes(maybeLocale as (typeof supported)[number])
   ) {
-    parts.splice(1, 1); // remove locale segment
+    parts.splice(1, 1);
   }
 
   const rest = parts.join('/');
@@ -35,26 +43,43 @@ export default function LocaleSwitcher({
 }) {
   const pathWithoutLocale = stripLeadingLocale(currentPath);
 
-  return (
-    <div className="flex items-center gap-1 rounded-xl border border-(--border) bg-white p-1">
-      {localeOptions.map((opt) => {
-        const target = `/${opt.code}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
-        const active = opt.code === locale;
+  const makeTarget = (code: string) =>
+    `/${code}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
 
-        return (
-          <Link
-            key={opt.code}
-            href={target}
-            className={`rounded-lg px-2 py-1 text-xs font-semibold ${
-              active
-                ? 'bg-(--accent) text-white'
-                : 'text-(--muted) hover:text-(--fg)'
-            }`}
-          >
-            {opt.label}
-          </Link>
-        );
-      })}
-    </div>
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-xl border border-border bg-white"
+          aria-label="Change language"
+        >
+          <Globe className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="min-w-28">
+        {localeOptions.map((opt) => {
+          const active = opt.code === locale;
+          const href = makeTarget(opt.code);
+
+          return (
+            <DropdownMenuItem key={opt.code} asChild>
+              <Link
+                href={href}
+                className={`flex items-center justify-between ${
+                  active ? 'font-semibold' : ''
+                }`}
+              >
+                <span>{opt.label}</span>
+                {active ? <span className="text-xs text-muted">✓</span> : null}
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

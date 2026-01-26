@@ -183,8 +183,6 @@ export const albumBySlugQuery = groq`
   }
 `;
 
-// --- NEW: page queries ---
-
 export const homePageQuery = groq`
   *[_type == "homePage" && language == $lang][0]{
     title,
@@ -200,78 +198,6 @@ export const homePageQuery = groq`
     announcementsHeading,
     announcementsEmpty,
     viewAllNewsLabel
-  }
-`;
-
-// --- Page Builder (sections[]) ---
-// These queries return an ordered `sections` (or `pageSections`) array.
-
-const sectionProjection = `
-  _type,
-  // Hero
-  _type == "sectionHero" => {
-    kicker, title, subtitle,
-    "imageUrl": image.asset->url,
-    "imageAlt": image.alt,
-    primaryCta{label, href},
-    secondaryCta{label, href}
-  },
-  // Stats
-  _type == "sectionStats" => { title, items[]{label, value} },
-  // Cards
-  _type == "sectionCards" => { title, cards[]{title, text} },
-  // Rich text
-  _type == "sectionRichText" => { title, content },
-  // Generic list
-  _type == "sectionList" => { title, subtitle, items[]{title, desc} },
-  // People
-  _type == "sectionPeople" => {
-    title, subtitle,
-    people[]{
-      name, role, bio,
-      "imageUrl": image.asset->url,
-      "imageAlt": image.alt
-    }
-  },
-  // Announcements
-  _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
-  // Spacer
-  _type == "sectionSpacer" => { size }
-`;
-
-export const homePageBuilderQuery = groq`
-  *[_type == "homePage" && language == $lang][0]{
-    title,
-    schoolName,
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const aboutPageBuilderQuery = groq`
-  *[_type == "aboutPage" && language == $lang][0]{
-    title,
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const feesPageBuilderQuery = groq`
-  *[_type == "feesPage" && language == $lang][0]{
-    title,
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const moodlePageBuilderQuery = groq`
-  *[_type == "moodlePage" && language == $lang][0]{
-    title,
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const sectionsPageBuilderQuery = groq`
-  *[_type == "sectionsPage" && language == $lang][0]{
-    title,
-    "sections": pageSections[]{ ${sectionProjection} }
   }
 `;
 
@@ -323,10 +249,114 @@ export const moodlePageQuery = groq`
   }
 `;
 
+const sectionProjection = `
+  _type,
+
+  // Hero
+  _type == "sectionHero" => {
+    kicker,
+    title,
+    subtitle,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt,
+
+    primaryCta{
+      label,
+      link{
+        linkType,
+        routeKey,
+        externalUrl,
+        openInNewTab
+      },
+      // keep legacy href during migration:
+      href
+    },
+
+    secondaryCta{
+      label,
+      link{
+        linkType,
+        routeKey,
+        externalUrl,
+        openInNewTab
+      },
+      href
+    }
+  },
+
+  // Stats
+  _type == "sectionStats" => { title, items[]{label, value} },
+
+  // Cards
+  _type == "sectionCards" => { title, cards[]{title, text} },
+
+  // Rich text
+  _type == "sectionRichText" => { title, content },
+
+  // Generic list
+  _type == "sectionList" => { title, subtitle, items[]{title, desc} },
+
+  // People
+  _type == "sectionPeople" => {
+    title,
+    subtitle,
+    people[]{
+      name,
+      role,
+      bio,
+      "imageUrl": image.asset->url,
+      "imageAlt": image.alt
+    }
+  },
+
+  // Announcements
+  _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
+
+  // Spacer
+  _type == "sectionSpacer" => { size }
+`;
+
+export const homePageBuilderQuery = groq`
+  *[_type == "homePage" && language == $lang][0]{
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
+export const aboutPageBuilderQuery = groq`
+  *[_type == "aboutPage" && language == $lang][0]{
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
+export const feesPageBuilderQuery = groq`
+  *[_type == "feesPage" && language == $lang][0]{
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
+export const moodlePageBuilderQuery = groq`
+  *[_type == "moodlePage" && language == $lang][0]{
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
+export const sectionsPageBuilderQuery = groq`
+  *[_type == "sectionsPage" && language == $lang][0]{
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings" && language == $lang][0]{
     schoolName,
-    navigation[]{ href, label },
+    navigation[]{
+      navType,
+      routeKey,
+      externalUrl,
+      openInNewTab,
+      label,
+      href
+    },
     footer{
       addressLine1,
       phone,

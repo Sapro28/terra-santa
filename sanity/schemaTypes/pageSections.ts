@@ -1,12 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-/**
- * Page Builder: reusable section blocks.
- *
- * This project currently uses "one document per language" via `languageField`.
- * So section fields do NOT need to be localized; the whole document is.
- */
-
 export const sectionHeroType = defineType({
   name: 'sectionHero',
   title: 'قسم: بطل (Hero)',
@@ -19,7 +12,12 @@ export const sectionHeroType = defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-    defineField({ name: 'subtitle', title: 'النص التعريفي', type: 'text', rows: 3 }),
+    defineField({
+      name: 'subtitle',
+      title: 'النص التعريفي',
+      type: 'text',
+      rows: 3,
+    }),
     defineField({
       name: 'image',
       title: 'صورة (اختياري)',
@@ -40,7 +38,18 @@ export const sectionHeroType = defineType({
       type: 'object',
       fields: [
         defineField({ name: 'label', title: 'Label', type: 'string' }),
-        defineField({ name: 'href', title: 'Link', type: 'string' }),
+
+        // ✅ New model: internal/external chooser (your custom link object)
+        defineField({ name: 'link', title: 'Link', type: 'link' }),
+
+        // ✅ Legacy field (kept hidden so older docs won’t break)
+        defineField({
+          name: 'href',
+          title: 'Legacy href (لا تستخدم)',
+          type: 'string',
+          readOnly: true,
+          hidden: true,
+        }),
       ],
     }),
     defineField({
@@ -49,7 +58,18 @@ export const sectionHeroType = defineType({
       type: 'object',
       fields: [
         defineField({ name: 'label', title: 'Label', type: 'string' }),
-        defineField({ name: 'href', title: 'Link', type: 'string' }),
+
+        // ✅ New model: internal/external chooser (your custom link object)
+        defineField({ name: 'link', title: 'Link', type: 'link' }),
+
+        // ✅ Legacy field (kept hidden so older docs won’t break)
+        defineField({
+          name: 'href',
+          title: 'Legacy href (لا تستخدم)',
+          type: 'string',
+          readOnly: true,
+          hidden: true,
+        }),
       ],
     }),
   ],
@@ -177,7 +197,12 @@ export const sectionListType = defineType({
           type: 'object',
           fields: [
             defineField({ name: 'title', title: 'العنوان', type: 'string' }),
-            defineField({ name: 'desc', title: 'الوصف', type: 'text', rows: 3 }),
+            defineField({
+              name: 'desc',
+              title: 'الوصف',
+              type: 'text',
+              rows: 3,
+            }),
           ],
         }),
       ],
@@ -219,7 +244,9 @@ export const sectionPeopleType = defineType({
               title: 'صورة',
               type: 'image',
               options: { hotspot: true },
-              fields: [defineField({ name: 'alt', title: 'Alt', type: 'string' })],
+              fields: [
+                defineField({ name: 'alt', title: 'Alt', type: 'string' }),
+              ],
             }),
           ],
         }),
@@ -245,7 +272,11 @@ export const sectionAnnouncementsType = defineType({
       title: 'نص عند عدم وجود إعلانات',
       type: 'string',
     }),
-    defineField({ name: 'viewAllLabel', title: 'زر: عرض الكل', type: 'string' }),
+    defineField({
+      name: 'viewAllLabel',
+      title: 'زر: عرض الكل',
+      type: 'string',
+    }),
     defineField({
       name: 'limit',
       title: 'العدد (اختياري)',

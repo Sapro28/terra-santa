@@ -2,14 +2,49 @@ import Link from 'next/link';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 
 type NavItem = {
-  href?: string | null;
+  navType?: 'internal' | 'external' | null;
+  routeKey?: string | null;
+  externalUrl?: string | null;
+  openInNewTab?: boolean | null;
   label?: string | null;
+
+  href?: string | null;
 };
 
 type SiteSettings = {
   schoolName?: string;
   navigation?: NavItem[];
 };
+
+function routeKeyToPathSegment(routeKey?: string | null) {
+  switch (routeKey) {
+    case 'home':
+      return '';
+    case 'about':
+      return 'about';
+    case 'sections':
+      return 'sections';
+    case 'album':
+      return 'album';
+    case 'news':
+      return 'news';
+    case 'fees':
+      return 'fees';
+    case 'moodle':
+      return 'moodle';
+    default:
+      return null;
+  }
+}
+
+function isAbsoluteUrl(url: string) {
+  return /^https?:\/\//i.test(url);
+}
+
+function normalizeLegacyHref(raw?: string | null) {
+  if (!raw) return '';
+  return raw.startsWith('/') ? raw.slice(1) : raw;
+}
 
 export default async function Header({
   locale,
@@ -19,15 +54,13 @@ export default async function Header({
   settings: SiteSettings | null;
 }) {
   const nav: NavItem[] = settings?.navigation ?? [
-    { href: '', label: 'Home' },
-    { href: 'about', label: 'About' },
-    { href: 'sections', label: 'Sections' },
-    { href: 'album', label: 'Album' },
-    { href: 'news', label: 'News' },
-    { href: 'fees', label: 'Fees' },
-    { href: 'moodle', label: 'Moodle' },
-
-    { href: '/studio', label: 'Studio' },
+    { navType: 'internal', routeKey: 'home', label: 'Home' },
+    { navType: 'internal', routeKey: 'about', label: 'About' },
+    { navType: 'internal', routeKey: 'sections', label: 'Sections' },
+    { navType: 'internal', routeKey: 'album', label: 'Album' },
+    { navType: 'internal', routeKey: 'news', label: 'News' },
+    { navType: 'internal', routeKey: 'fees', label: 'Fees' },
+    { navType: 'internal', routeKey: 'moodle', label: 'Moodle' },
   ];
 
   return (
@@ -40,13 +73,49 @@ export default async function Header({
         <div className="flex items-center gap-4">
           <nav className="hidden items-center gap-6 md:flex">
             {nav.map((item, index) => {
-              const rawHref = item?.href ?? '';
               const label = item?.label ?? 'Link';
-              const href = rawHref.startsWith('/')
-                ? rawHref
-                : rawHref
-                  ? `/${locale}/${rawHref}`
-                  : `/${locale}`;
+
+              const legacyHref = item?.href ?? null;
+              const legacyHrefNorm = normalizeLegacyHref(legacyHref);
+              const legacyHrefIsExternal = legacyHref
+                ? isAbsoluteUrl(legacyHref)
+                : false;
+
+              const isExternal =
+                item?.navType === 'external' || legacyHrefIsExternal;
+
+              if (isExternal) {
+                const url =
+                  item?.externalUrl ||
+                  (legacyHrefIsExternal ? legacyHref! : '');
+                const openNew = item?.openInNewTab ?? true;
+
+                if (!url) return null;
+
+                return (
+                  <a
+                    key={`${label}-${index}`}
+                    href={url}
+                    target={openNew ? '_blank' : undefined}
+                    rel={openNew ? 'noreferrer noopener' : undefined}
+                    className="text-sm font-semibold text-(--muted) hover:text-(--fg)"
+                  >
+                    {label}
+                  </a>
+                );
+              }
+
+              let seg: string | null = null;
+
+              if (item?.routeKey) {
+                seg = routeKeyToPathSegment(item.routeKey);
+              } else {
+                seg = legacyHrefNorm;
+              }
+
+              if (seg === null) return null;
+
+              const href = seg ? `/${locale}/${seg}` : `/${locale}`;
 
               return (
                 <Link

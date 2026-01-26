@@ -1,12 +1,9 @@
-import Link from 'next/link';
 import { getSanityClient } from '@/sanity/lib/getClient';
-import { moodlePageQuery } from '@/sanity/lib/queries';
+import { moodlePageBuilderQuery } from '@/sanity/lib/queries';
+import SectionRenderer from '@/components/sections/SectionRenderer';
 
-type MoodlePageContent = {
-  title?: string;
-  subtitle?: string;
-  placeholder?: string;
-  backHomeLabel?: string;
+type BuilderPage = {
+  sections?: Array<{ _type: string; [key: string]: any }>;
 };
 
 function localeToLang(locale: string) {
@@ -24,32 +21,9 @@ export default async function MoodlePage({
   const lang = localeToLang(locale);
 
   const client = await getSanityClient();
-  const page = await client.fetch<MoodlePageContent | null>(moodlePageQuery, {
+  const page = await client.fetch<BuilderPage | null>(moodlePageBuilderQuery, {
     lang,
   });
-  return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold">{page?.title ?? '—'}</h1>
-        {page?.subtitle ? (
-          <p className="text-(--muted)">{page.subtitle}</p>
-        ) : null}
-      </header>
 
-      <div className="rounded-3xl border border-(--border) bg-white p-6">
-        {page?.placeholder ? (
-          <p className="text-sm text-(--muted)">{page.placeholder}</p>
-        ) : null}
-
-        <div className="mt-4 flex gap-3">
-          <Link
-            href={`/${locale}`}
-            className="rounded-xl border border-(--border) bg-white px-4 py-2 text-sm font-semibold hover:bg-(--paper)"
-          >
-            {page?.backHomeLabel ?? 'Back home'}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return <SectionRenderer locale={locale} sections={page?.sections ?? []} />;
 }

@@ -27,20 +27,96 @@ export const siteSettingsType = defineType({
           type: 'object',
           fields: [
             defineField({
-              name: 'href',
-              title: 'الرابط',
-              type: 'string',
-              description:
-                'مثال: "" للصفحة الرئيسية، "about"، "news"، "fees"... بدون /locale',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
               name: 'label',
               title: 'النص',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
+
+            defineField({
+              name: 'navType',
+              title: 'نوع الرابط',
+              type: 'string',
+              initialValue: 'internal',
+              options: {
+                list: [
+                  { title: 'صفحة داخلية', value: 'internal' },
+                  { title: 'رابط خارجي', value: 'external' },
+                ],
+              },
+              validation: (Rule) => Rule.required(),
+            }),
+
+            defineField({
+              name: 'routeKey',
+              title: 'اختر الصفحة',
+              type: 'string',
+              description: 'اختر الوجهة من الصفحات الداخلية',
+              options: {
+                list: [
+                  { title: 'الرئيسية', value: 'home' },
+                  { title: 'من نحن', value: 'about' },
+                  { title: 'أقسام', value: 'sections' },
+                  { title: 'الألبوم', value: 'album' },
+                  { title: 'الأخبار', value: 'news' },
+                  { title: 'الرسوم', value: 'fees' },
+                  { title: 'مودل', value: 'moodle' },
+                ],
+              },
+              hidden: ({ parent }) => parent?.navType !== 'internal',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  const parent = context.parent as any;
+                  if (parent?.navType === 'internal' && !value) {
+                    return 'اختر صفحة داخلية';
+                  }
+                  return true;
+                }),
+            }),
+
+            defineField({
+              name: 'externalUrl',
+              title: 'الرابط الخارجي',
+              type: 'url',
+              hidden: ({ parent }) => parent?.navType !== 'external',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  const parent = context.parent as any;
+                  if (parent?.navType === 'external' && !value) {
+                    return 'أدخل رابط خارجي صحيح';
+                  }
+                  return true;
+                }),
+            }),
+
+            defineField({
+              name: 'href',
+              title: 'Legacy href (لا تستخدم)',
+              type: 'string',
+              readOnly: true,
+              hidden: true,
+            }),
           ],
+
+          preview: {
+            select: {
+              title: 'label',
+              navType: 'navType',
+              routeKey: 'routeKey',
+              externalUrl: 'externalUrl',
+            },
+            prepare(selection) {
+              const { title, navType, routeKey, externalUrl } =
+                selection as any;
+
+              let subtitle = '';
+              if (navType === 'external')
+                subtitle = externalUrl ? `↗ ${externalUrl}` : '↗ (بدون رابط)';
+              else subtitle = routeKey ? `→ ${routeKey}` : '→ (بدون اختيار)';
+
+              return { title, subtitle };
+            },
+          },
         }),
       ],
       validation: (Rule) => Rule.required().min(1),

@@ -11,20 +11,10 @@
   },
 
   "Footer": {
-    "schoolName": "اسم المدرسة",
-    "addressLine1": "العنوان، المدينة، الدولة",
-    "phone": "الهاتف: +000 000 000",
-    "tagline": "مجتمع تعليمي قائم على القيم والنمو.",
-    "hours": "ساعات الدوام",
-    "hoursLine1": "الأحد–الخميس: 8:00-14:00",
-    "hoursLine2": "الجمعة–السبت: مغلق",
-    "newsletter": {
-      "title": "النشرة البريدية",
-      "subtitle": "احصل على آخر الإعلانات والتحديثات",
-      "placeholder": "البريد الإلكتروني",
-      "button": "اشترك"
-    },
-    "rights": "جميع الحقوق محفوظة."
+    "hoursTitle": "ساعات الدوام",
+    "rights": "جميع الحقوق محفوظة.",
+    "copyrightTemplate": "© {year} {name}. {rights}",
+    "schoolFallback": "المدرسة"
   },
 
   "Home": {

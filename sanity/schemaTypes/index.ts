@@ -9,12 +9,14 @@ import { sectionsPageType } from './sectionsPageType';
 import { feesPageType } from './feesPageType';
 import { moodlePageType } from './moodlePageType';
 import { siteSettingsType } from './siteSettingsType';
+import { linkObject } from './objects/link';
 
 import { pageSections } from './pageSections';
 
 export const schema = {
   types: [
     blockContentType,
+    linkObject,
 
     ...pageSections,
     newsPostType,

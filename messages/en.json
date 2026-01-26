@@ -11,20 +11,10 @@
   },
 
   "Footer": {
-    "schoolName": "School Name",
-    "addressLine1": "Address line, City, Country",
-    "phone": "Phone: +000 000 000",
-    "tagline": "A Christ-centered community for learning and growth.",
-    "hours": "Hours",
-    "hoursLine1": "Sun-Thu: 8:00-14:00",
-    "hoursLine2": "Fri-Sat: Closed",
-    "newsletter": {
-      "title": "Newsletter",
-      "subtitle": "Get updates & announcements",
-      "placeholder": "Email address",
-      "button": "Join"
-    },
-    "rights": "All rights reserved."
+    "hoursTitle": "Hours",
+    "rights": "All rights reserved.",
+    "copyrightTemplate": "© {year} {name}. {rights}",
+    "schoolFallback": "School"
   },
 
   "Home": {
