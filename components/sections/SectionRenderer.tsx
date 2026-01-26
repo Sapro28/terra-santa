@@ -137,16 +137,16 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl bg-(--paper) p-3 text-center">
       <div className="text-xl font-bold">{value}</div>
-      <div className="mt-1 text-xs font-semibold text-(--muted)">{label}</div>
+      <div className="mt-1 text-xs font-semibold text-muted">{label}</div>
     </div>
   );
 }
 
 function InfoCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-(--border) bg-white p-5">
+    <div className="rounded-2xl border border-border bg-white p-5">
       <div className="font-semibold">{title}</div>
-      <p className="mt-2 text-sm text-(--muted)">{text}</p>
+      <p className="mt-2 text-sm text-muted">{text}</p>
     </div>
   );
 }
@@ -236,7 +236,7 @@ export default function SectionRenderer({
               >
                 <div>
                   {s.kicker ? (
-                    <div className="text-sm font-semibold text-(--muted)">
+                    <div className="text-sm font-semibold text-muted">
                       {s.kicker}
                     </div>
                   ) : null}
@@ -246,7 +246,7 @@ export default function SectionRenderer({
                   </h1>
 
                   {s.subtitle ? (
-                    <p className="mt-4 text-lg leading-relaxed text-(--muted)">
+                    <p className="mt-4 text-lg leading-relaxed text-muted">
                       {s.subtitle}
                     </p>
                   ) : null}
@@ -255,19 +255,19 @@ export default function SectionRenderer({
                     <CtaButton
                       resolved={primaryResolved}
                       label={s.primaryCta?.label ?? '—'}
-                      className="rounded-xl bg-(--accent) px-5 py-3 text-sm font-semibold text-white hover:bg-(--accent-hover)"
+                      className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-(--accent-hover)"
                     />
 
                     <CtaButton
                       resolved={secondaryResolved}
                       label={s.secondaryCta?.label ?? '—'}
-                      className="rounded-xl border border-(--border) bg-white px-5 py-3 text-sm font-semibold text-(--fg) hover:bg-(--paper)"
+                      className="rounded-xl border border-border bg-white px-5 py-3 text-sm font-semibold text-(--fg) hover:bg-(--paper)"
                     />
                   </div>
                 </div>
 
                 {s.imageUrl ? (
-                  <div className="overflow-hidden rounded-2xl border border-(--border) bg-white">
+                  <div className="overflow-hidden rounded-2xl border border-border bg-white">
                     <img
                       src={s.imageUrl}
                       alt={s.imageAlt || s.title || 'Hero image'}
@@ -291,7 +291,7 @@ export default function SectionRenderer({
                 {s.title ? (
                   <h2 className="mb-4 text-2xl font-semibold">{s.title}</h2>
                 ) : null}
-                <div className="grid grid-cols-3 gap-4 rounded-2xl border border-(--border) bg-white p-4">
+                <div className="grid grid-cols-3 gap-4 rounded-2xl border border-border bg-white p-4">
                   {items.map((it, i) => (
                     <Stat
                       key={i}
@@ -344,9 +344,9 @@ export default function SectionRenderer({
                   </h2>
                 </div>
 
-                <div className="rounded-2xl border border-(--border) bg-white">
+                <div className="rounded-2xl border border-border bg-white">
                   {list.length ? (
-                    <ul className="divide-y divide-(--border)">
+                    <ul className="divide-y divide-border">
                       {list.map((post) => (
                         <li key={post._id} className="p-4">
                           <Link
@@ -376,7 +376,7 @@ export default function SectionRenderer({
                               </div>
 
                               {post.excerpt ? (
-                                <p className="mt-1 line-clamp-2 text-sm text-(--muted)">
+                                <p className="mt-1 line-clamp-2 text-sm text-muted">
                                   {post.excerpt}
                                 </p>
                               ) : null}
@@ -397,7 +397,7 @@ export default function SectionRenderer({
                       ))}
                     </ul>
                   ) : (
-                    <div className="p-6 text-sm text-(--muted)">
+                    <div className="p-6 text-sm text-muted">
                       {s.emptyText ?? 'No announcements yet.'}
                     </div>
                   )}
