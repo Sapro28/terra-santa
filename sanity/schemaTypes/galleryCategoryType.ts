@@ -1,18 +1,37 @@
-import { ImageIcon } from '@sanity/icons';
+import { TagIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageFieldEditable } from './languageField';
+import { languageFieldLocked } from './languageField';
 
-export const albumType = defineType({
-  name: 'album',
-  title: 'الألبومات',
+export const galleryCategoryType = defineType({
+  name: 'galleryCategory',
+  title: 'المعرض (عنصر معرض)',
   type: 'document',
-  icon: ImageIcon,
+  icon: TagIcon,
+
   fields: [
-    languageFieldEditable,
+    languageFieldLocked,
+
+    defineField({
+      name: 'contextLock',
+      title: 'Context Lock (internal)',
+      type: 'boolean',
+      hidden: true,
+      readOnly: true,
+      initialValue: false,
+    }),
+
+    defineField({
+      name: 'section',
+      title: 'القسم (المرحلة)',
+      type: 'reference',
+      to: [{ type: 'schoolSection' }],
+      validation: (Rule) => Rule.required(),
+      readOnly: ({ document }) => Boolean((document as any)?.contextLock),
+    }),
 
     defineField({
       name: 'title',
-      title: 'عنوان الألبوم',
+      title: 'العنوان (مثال: Sports Day)',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -26,32 +45,39 @@ export const albumType = defineType({
     }),
 
     defineField({
-      name: 'description',
+      name: 'date',
+      title: 'التاريخ (اختياري)',
+      type: 'date',
+      description: 'اختياري — لو تريد ترتيب حسب الوقت.',
+    }),
+
+    defineField({
+      name: 'location',
+      title: 'الموقع (اختياري)',
+      type: 'string',
+    }),
+
+    defineField({
+      name: 'body',
       title: 'الوصف (اختياري)',
-      type: 'text',
-      rows: 3,
+      type: 'blockContent',
+      description: 'يظهر داخل صفحة /gallery/[slug].',
     }),
 
     defineField({
       name: 'coverImage',
-      title: 'صورة الغلاف (اختياري)',
+      title: 'صورة الغلاف (إلزامي)',
       type: 'image',
       options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          type: 'string',
-          title: 'نص بديل',
-        }),
-      ],
+      fields: [defineField({ name: 'alt', type: 'string', title: 'نص بديل' })],
+      validation: (Rule) => Rule.required(),
     }),
 
     defineField({
       name: 'media',
       title: 'الوسائط (صور / فيديوهات)',
       type: 'array',
-      validation: (Rule) =>
-        Rule.min(1).error('أضف على الأقل صورة أو فيديو واحد.'),
+      description: 'أضف صورًا أو فيديوهات لهذه الصفحة.',
       of: [
         defineArrayMember({
           name: 'photo',
@@ -107,9 +133,17 @@ export const albumType = defineType({
   ],
 
   preview: {
-    select: { title: 'title', media: 'coverImage' },
-    prepare({ title, media }) {
-      return { title, media };
+    select: {
+      title: 'title',
+      section: 'section.title',
+      media: 'coverImage',
+    },
+    prepare({ title, section, media }) {
+      return {
+        title,
+        subtitle: section ? `القسم: ${section}` : undefined,
+        media,
+      };
     },
   },
 });

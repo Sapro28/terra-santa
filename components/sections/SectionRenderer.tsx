@@ -28,8 +28,7 @@ type SectionHero = SectionBase & {
   imageUrl?: string;
   imageAlt?: string;
 
-  // ✅ New model
-  primaryCta?: { label?: string; link?: CMSLink; href?: string }; // href kept as legacy fallback
+  primaryCta?: { label?: string; link?: CMSLink; href?: string };
   secondaryCta?: { label?: string; link?: CMSLink; href?: string };
 };
 
@@ -74,8 +73,8 @@ function routeKeyToPathSegment(routeKey?: string | null) {
       return 'about';
     case 'sections':
       return 'sections';
-    case 'album':
-      return 'album';
+    case 'gallery':
+      return 'gallery';
     case 'news':
       return 'news';
     case 'fees':
@@ -227,7 +226,7 @@ export default function SectionRenderer({
               locale,
               link: s.secondaryCta?.link,
               legacyHref: s.secondaryCta?.href,
-            }) ?? { kind: 'internal' as const, href: `/${locale}/album` };
+            }) ?? { kind: 'internal' as const, href: `/${locale}/gallery` };
 
             return (
               <section

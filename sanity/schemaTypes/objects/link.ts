@@ -28,19 +28,13 @@ export const linkObject = defineType({
           { title: 'الرئيسية', value: 'home' },
           { title: 'من نحن', value: 'about' },
           { title: 'أقسام', value: 'sections' },
-          { title: 'الألبوم', value: 'album' },
+          { title: 'المعرض', value: 'gallery' },
           { title: 'الأخبار', value: 'news' },
           { title: 'الرسوم', value: 'fees' },
           { title: 'مودل', value: 'moodle' },
         ],
       },
       hidden: ({ parent }) => parent?.linkType !== 'internal',
-      validation: (Rule) =>
-        Rule.custom((value, ctx) => {
-          const p = ctx.parent as any;
-          if (p?.linkType === 'internal' && !value) return 'اختر صفحة داخلية';
-          return true;
-        }),
     }),
 
     defineField({
@@ -48,13 +42,6 @@ export const linkObject = defineType({
       title: 'الرابط الخارجي',
       type: 'url',
       hidden: ({ parent }) => parent?.linkType !== 'external',
-      validation: (Rule) =>
-        Rule.custom((value, ctx) => {
-          const p = ctx.parent as any;
-          if (p?.linkType === 'external' && !value)
-            return 'أدخل رابط خارجي صحيح';
-          return true;
-        }),
     }),
 
     defineField({

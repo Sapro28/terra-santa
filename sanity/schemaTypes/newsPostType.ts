@@ -1,12 +1,13 @@
 import { defineField, defineType } from 'sanity';
-import { languageFieldEditable } from './languageField';
+import { languageFieldLocked } from './languageField';
 
 export const newsPostType = defineType({
   name: 'newsPost',
   title: 'إعلان / خبر',
   type: 'document',
+
   fields: [
-    languageFieldEditable,
+    languageFieldLocked,
 
     defineField({
       name: 'title',
@@ -88,6 +89,14 @@ export const newsPostType = defineType({
       title: 'تاريخ النشر',
       description:
         'إذا كان محددًا، لن يظهر الخبر قبل هذا التاريخ. إذا لم يكن محددًا، سيظهر فورًا.',
+    }),
+
+    defineField({
+      name: 'expiresAt',
+      type: 'datetime',
+      title: 'انتهاء (اختياري)',
+      description:
+        'اختياري — إذا تم تحديده، لن يظهر الـ Popup بعد هذا التاريخ.',
     }),
   ],
 

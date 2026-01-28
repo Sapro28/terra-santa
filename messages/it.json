@@ -4,7 +4,7 @@
     "home": "Home",
     "about": "Chi siamo",
     "sections": "Sezioni",
-    "album": "Album",
+    "gallery": "Gallery",
     "news": "Notizie",
     "fees": "Commissioni",
     "moodle": "Moodle"
@@ -23,7 +23,7 @@
     "schoolName": "Nome della Scuola",
     "subtitle": "Un ambiente di apprendimento moderno per studenti, famiglie e insegnanti.",
     "ctaAbout": "Scopri di più",
-    "ctaalbum": "Vedi album",
+    "ctagallery": "Vedi galleria",
     "stats": {
       "students": "Studenti",
       "teachers": "Insegnanti",
@@ -63,10 +63,10 @@
     }
   },
 
-  "Album": {
-    "title": "Album",
+  "Gallery": {
+    "title": "Gallery",
     "subtitle": "Attività ed eventi della scuola.",
-    "empty": "Nessun album trovato.",
+    "empty": "Nessun galleria trovato.",
     "itemTitle": "Foto #{n}",
     "itemDesc": "Descrizione della foto.",
     "noCover": "لا يوجد",

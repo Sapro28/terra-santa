@@ -1,17 +1,5 @@
 import type { StructureResolver } from 'sanity/structure';
-import {
-  Settings,
-  LayoutGrid,
-  FileText,
-  Newspaper,
-  CalendarDays,
-  Image as ImageIcon,
-  Home,
-  School,
-  Layers,
-  BadgeDollarSign,
-  GraduationCap,
-} from 'lucide-react';
+import { CogIcon, DocumentIcon, DocumentsIcon, ImageIcon } from '@sanity/icons';
 
 type Lang = 'ar' | 'en' | 'it';
 
@@ -68,11 +56,11 @@ const PAGE_ITEMS: Array<{
   type: 'homePage' | 'aboutPage' | 'sectionsPage' | 'feesPage' | 'moodlePage';
   icon: any;
 }> = [
-  { key: 'home', type: 'homePage', icon: Home },
-  { key: 'about', type: 'aboutPage', icon: School },
-  { key: 'stages', type: 'sectionsPage', icon: Layers },
-  { key: 'fees', type: 'feesPage', icon: BadgeDollarSign },
-  { key: 'moodle', type: 'moodlePage', icon: GraduationCap },
+  { key: 'home', type: 'homePage', icon: DocumentIcon },
+  { key: 'about', type: 'aboutPage', icon: DocumentIcon },
+  { key: 'stages', type: 'sectionsPage', icon: DocumentsIcon },
+  { key: 'fees', type: 'feesPage', icon: DocumentIcon },
+  { key: 'moodle', type: 'moodlePage', icon: DocumentIcon },
 ];
 
 const SINGLETON_ID = {
@@ -110,7 +98,7 @@ export const structure: StructureResolver = (S) => {
           const t = LABELS[lang];
           return S.listItem()
             .title(`${t.settingsTitle} — ${t.langTitle}`)
-            .icon(Settings)
+            .icon(CogIcon)
             .child(
               S.document()
                 .schemaType('siteSettings')
@@ -121,32 +109,87 @@ export const structure: StructureResolver = (S) => {
         }),
       );
 
+  const galleryBySection = () =>
+    S.documentList()
+      .title('أقسام المدرسة')
+      .schemaType('schoolSection')
+      .filter('_type == "schoolSection"')
+      .defaultOrdering([{ field: 'order', direction: 'asc' }])
+      .child((sectionId) =>
+        (() => {
+          const galleryListFor = (lang: Lang) =>
+            S.documentList()
+              .title(`فعاليات — ${LABELS[lang].langTitle}`)
+              .schemaType('galleryCategory')
+              .filter(
+                '_type == "galleryCategory" && section._ref == $sectionId && language == $lang',
+              )
+              .params({ sectionId, lang })
+              .defaultOrdering([
+                { field: 'date', direction: 'desc' },
+                { field: '_createdAt', direction: 'desc' },
+              ])
+              .initialValueTemplates([
+                S.initialValueTemplateItem('galleryCategory-bySection', {
+                  lang,
+                  sectionId,
+                }),
+              ]);
+
+          const byLang = () =>
+            S.list()
+              .title('فعاليات (حسب اللغة)')
+              .items(
+                (Object.keys(LABELS) as Lang[]).map((lang) =>
+                  S.listItem()
+                    .title(LABELS[lang].langTitle)
+                    .icon(ImageIcon)
+                    .child(galleryListFor(lang)),
+                ),
+              );
+
+          return S.list()
+            .title('المعرض')
+            .items([
+              S.listItem().title('فعاليات').icon(ImageIcon).child(byLang()),
+            ]);
+        })(),
+      );
+
   return S.list()
     .title('CMS')
     .items([
       S.listItem()
         .title('إعدادات الموقع')
-        .icon(Settings)
+        .icon(CogIcon)
         .child(siteSettingsByLanguage()),
 
       S.divider(),
 
       S.listItem()
         .title('المحتوى')
-        .icon(LayoutGrid)
+        .icon(DocumentsIcon)
         .child(
           S.list()
             .title('المحتوى')
             .items([
-              S.documentTypeListItem('newsPost')
+              S.listItem()
                 .title('الأخبار / الإعلانات')
-                .icon(Newspaper),
-              S.documentTypeListItem('event')
-                .title('الفعاليات')
-                .icon(CalendarDays),
-              S.documentTypeListItem('album')
-                .title('الألبومات')
-                .icon(ImageIcon),
+                .icon(DocumentIcon)
+                .child(
+                  S.documentList()
+                    .title('الأخبار / الإعلانات')
+                    .schemaType('newsPost')
+                    .filter('_type == "newsPost" && language == "ar"')
+                    .defaultOrdering([
+                      { field: 'publishedAt', direction: 'desc' },
+                    ]),
+                ),
+
+              S.listItem()
+                .title('المعرض حسب القسم')
+                .icon(ImageIcon)
+                .child(galleryBySection()),
             ]),
         ),
 
@@ -154,22 +197,22 @@ export const structure: StructureResolver = (S) => {
 
       S.listItem()
         .title('الصفحات (حسب اللغة)')
-        .icon(FileText)
+        .icon(DocumentIcon)
         .child(
           S.list()
             .title('الصفحات (حسب اللغة)')
             .items([
               S.listItem()
                 .title(LABELS.ar.langTitle)
-                .icon(FileText)
+                .icon(DocumentIcon)
                 .child(singletonPagesByLanguage('ar')),
               S.listItem()
                 .title(LABELS.en.langTitle)
-                .icon(FileText)
+                .icon(DocumentIcon)
                 .child(singletonPagesByLanguage('en')),
               S.listItem()
                 .title(LABELS.it.langTitle)
-                .icon(FileText)
+                .icon(DocumentIcon)
                 .child(singletonPagesByLanguage('it')),
             ]),
         ),

@@ -76,7 +76,7 @@ export const newsPostBySlugQuery = groq`
     publishedAt,
     urgent,
     excerpt,
-    body,
+    content,
     placement
   }
 `;

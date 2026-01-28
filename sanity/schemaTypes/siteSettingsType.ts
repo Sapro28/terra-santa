@@ -88,7 +88,7 @@ export const siteSettingsType = defineType({
                   { title: 'الرئيسية', value: 'home' },
                   { title: 'من نحن', value: 'about' },
                   { title: 'أقسام', value: 'sections' },
-                  { title: 'الألبوم', value: 'album' },
+                  { title: 'المعرض', value: 'gallery' },
                   { title: 'الأخبار', value: 'news' },
                   { title: 'الرسوم', value: 'fees' },
                   { title: 'مودل', value: 'moodle' },

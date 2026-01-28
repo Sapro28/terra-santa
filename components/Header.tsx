@@ -24,8 +24,8 @@ function routeKeyToPathSegment(routeKey?: string | null) {
       return 'about';
     case 'sections':
       return 'sections';
-    case 'album':
-      return 'album';
+    case 'gallery':
+      return 'gallery';
     case 'news':
       return 'news';
     case 'fees':
@@ -57,14 +57,14 @@ export default async function Header({
     { navType: 'internal', routeKey: 'home', label: 'Home' },
     { navType: 'internal', routeKey: 'about', label: 'About' },
     { navType: 'internal', routeKey: 'sections', label: 'Sections' },
-    { navType: 'internal', routeKey: 'album', label: 'Album' },
+    { navType: 'internal', routeKey: 'gallery', label: 'Gallery' },
     { navType: 'internal', routeKey: 'news', label: 'News' },
     { navType: 'internal', routeKey: 'fees', label: 'Fees' },
     { navType: 'internal', routeKey: 'moodle', label: 'Moodle' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-(--border) bg-white">
+    <header className="sticky top-0 z-50 border-b border-border bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href={`/${locale}`} className="font-semibold text-(--fg)">
           {settings?.schoolName ?? 'School'}
@@ -98,7 +98,7 @@ export default async function Header({
                     href={url}
                     target={openNew ? '_blank' : undefined}
                     rel={openNew ? 'noreferrer noopener' : undefined}
-                    className="text-sm font-semibold text-(--muted) hover:text-(--fg)"
+                    className="text-sm font-semibold text-muted hover:text-(--fg)"
                   >
                     {label}
                   </a>
@@ -121,7 +121,7 @@ export default async function Header({
                 <Link
                   key={`${label}-${index}`}
                   href={href}
-                  className="text-sm font-semibold text-(--muted) hover:text-(--fg)"
+                  className="text-sm font-semibold text-muted hover:text-(--fg)"
                 >
                   {label}
                 </Link>

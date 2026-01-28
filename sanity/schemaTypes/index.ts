@@ -1,7 +1,7 @@
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
-import { eventType } from './eventType';
-import { albumType } from './albumType';
+import { schoolSectionType } from './schoolSectionType';
+import { galleryCategoryType } from './galleryCategoryType';
 import { homePageType } from './homePageType';
 import { aboutPageType } from './aboutPageType';
 import { sectionsPageType } from './sectionsPageType';
@@ -27,8 +27,8 @@ export const schema = {
     linkObject,
     ...pageSections,
     newsPostType,
-    eventType,
-    albumType,
+    schoolSectionType,
+    galleryCategoryType,
     homePageType,
     aboutPageType,
     sectionsPageType,
@@ -45,5 +45,22 @@ export const schema = {
     singletonLangTemplate('sectionsPage'),
     singletonLangTemplate('feesPage'),
     singletonLangTemplate('moodlePage'),
+
+    {
+      id: 'galleryCategory-bySection',
+      title: 'Gallery Category (by section)',
+      schemaType: 'galleryCategory',
+      parameters: [
+        { name: 'lang', title: 'Language', type: 'string' },
+        { name: 'sectionId', title: 'Section Document ID', type: 'string' },
+      ],
+      value: (params: any) => ({
+        language: params?.lang,
+        contextLock: true,
+        section: params?.sectionId
+          ? { _type: 'reference', _ref: params.sectionId }
+          : undefined,
+      }),
+    },
   ],
 };
