@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
+import { languageFieldLocked } from './languageField';
 
 export const aboutPageType = defineType({
   name: 'aboutPage',
@@ -7,7 +7,7 @@ export const aboutPageType = defineType({
   type: 'document',
 
   fields: [
-    languageField,
+    languageFieldLocked,
 
     defineField({
       name: 'sections',

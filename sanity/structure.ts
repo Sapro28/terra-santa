@@ -20,6 +20,7 @@ const LABELS: Record<
   {
     langTitle: string;
     pagesTitle: string;
+    settingsTitle: string;
     home: string;
     about: string;
     stages: string;
@@ -30,6 +31,7 @@ const LABELS: Record<
   ar: {
     langTitle: 'العربية',
     pagesTitle: 'الصفحات',
+    settingsTitle: 'إعدادات الموقع',
     home: 'الصفحة الرئيسية',
     about: 'صفحة عن المدرسة',
     stages: 'صفحة المراحل',
@@ -39,6 +41,7 @@ const LABELS: Record<
   en: {
     langTitle: 'English',
     pagesTitle: 'Pages',
+    settingsTitle: 'Site Settings',
     home: 'Home',
     about: 'About',
     stages: 'Stages / Sections',
@@ -48,6 +51,7 @@ const LABELS: Record<
   it: {
     langTitle: 'Italiano',
     pagesTitle: 'Pagine',
+    settingsTitle: 'Impostazioni sito',
     home: 'Home',
     about: 'Chi siamo',
     stages: 'Sezioni / Livelli',
@@ -71,8 +75,13 @@ const PAGE_ITEMS: Array<{
   { key: 'moodle', type: 'moodlePage', icon: GraduationCap },
 ];
 
+const SINGLETON_ID = {
+  siteSettings: (lang: Lang) => `siteSettings-${lang}`,
+  page: (type: string, lang: Lang) => `${type}-${lang}`,
+};
+
 export const structure: StructureResolver = (S) => {
-  const pagesByLanguage = (lang: Lang) => {
+  const singletonPagesByLanguage = (lang: Lang) => {
     const t = LABELS[lang];
 
     return S.list()
@@ -83,14 +92,34 @@ export const structure: StructureResolver = (S) => {
             .title(t[key])
             .icon(icon)
             .child(
-              S.documentList()
+              S.document()
+                .schemaType(type)
+                .documentId(SINGLETON_ID.page(type, lang))
                 .title(`${t[key]} — ${t.langTitle}`)
-                .filter('_type == $type && language == $lang')
-                .params({ type, lang }),
+                .initialValueTemplate(`${type}-byLang`, { lang }),
             ),
         ),
       );
   };
+
+  const siteSettingsByLanguage = () =>
+    S.list()
+      .title('إعدادات الموقع (حسب اللغة)')
+      .items(
+        (Object.keys(LABELS) as Lang[]).map((lang) => {
+          const t = LABELS[lang];
+          return S.listItem()
+            .title(`${t.settingsTitle} — ${t.langTitle}`)
+            .icon(Settings)
+            .child(
+              S.document()
+                .schemaType('siteSettings')
+                .documentId(SINGLETON_ID.siteSettings(lang))
+                .title(`${t.settingsTitle} — ${t.langTitle}`)
+                .initialValueTemplate('siteSettings-byLang', { lang }),
+            );
+        }),
+      );
 
   return S.list()
     .title('CMS')
@@ -98,7 +127,7 @@ export const structure: StructureResolver = (S) => {
       S.listItem()
         .title('إعدادات الموقع')
         .icon(Settings)
-        .child(S.documentTypeList('siteSettings').title('إعدادات الموقع')),
+        .child(siteSettingsByLanguage()),
 
       S.divider(),
 
@@ -133,15 +162,15 @@ export const structure: StructureResolver = (S) => {
               S.listItem()
                 .title(LABELS.ar.langTitle)
                 .icon(FileText)
-                .child(pagesByLanguage('ar')),
+                .child(singletonPagesByLanguage('ar')),
               S.listItem()
                 .title(LABELS.en.langTitle)
                 .icon(FileText)
-                .child(pagesByLanguage('en')),
+                .child(singletonPagesByLanguage('en')),
               S.listItem()
                 .title(LABELS.it.langTitle)
                 .icon(FileText)
-                .child(pagesByLanguage('it')),
+                .child(singletonPagesByLanguage('it')),
             ]),
         ),
     ]);

@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity';
 
 export const siteSettingsQuery = groq`
-  *[_type == "siteSettings" && language == $lang][0]{
+  *[_type == "siteSettings" && _id == $id][0]{
     schoolName,
     navigation[]{
       navType,

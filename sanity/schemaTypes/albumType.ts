@@ -1,6 +1,6 @@
 import { ImageIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
+import { languageFieldEditable } from './languageField';
 
 export const albumType = defineType({
   name: 'album',
@@ -8,7 +8,7 @@ export const albumType = defineType({
   type: 'document',
   icon: ImageIcon,
   fields: [
-    languageField,
+    languageFieldEditable,
 
     defineField({
       name: 'title',

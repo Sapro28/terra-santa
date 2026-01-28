@@ -1,6 +1,8 @@
 import { defineField } from 'sanity';
 
-export const languageField = defineField({
+export type Lang = 'ar' | 'en' | 'it';
+
+const base = {
   name: 'language',
   title: 'اللغة',
   type: 'string',
@@ -13,10 +15,18 @@ export const languageField = defineField({
     layout: 'radio',
     direction: 'horizontal',
   },
+  validation: (Rule: any) => Rule.required(),
+};
 
+export const languageFieldEditable = defineField({
+  ...base,
   initialValue: 'ar',
+  hidden: false,
+  readOnly: false,
+});
+
+export const languageFieldLocked = defineField({
+  ...base,
   hidden: true,
   readOnly: true,
-
-  validation: (Rule) => Rule.required(),
 });

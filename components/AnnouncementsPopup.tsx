@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-type PopupAnnouncement = {
+export type PopupAnnouncement = {
   _id: string;
   title: string;
   excerpt?: string;
@@ -81,11 +81,9 @@ export default function AnnouncementsPopup({
       <div className="relative z-10 w-[min(92vw,720px)] overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 p-5">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold leading-snug">
-                {announcement.title}
-              </h2>
-            </div>
+            <h2 className="text-lg font-bold leading-snug">
+              {announcement.title}
+            </h2>
 
             {announcement.excerpt ? (
               <p className="mt-2 text-sm text-gray-700">

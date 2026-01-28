@@ -38,11 +38,7 @@ export const sectionHeroType = defineType({
       type: 'object',
       fields: [
         defineField({ name: 'label', title: 'Label', type: 'string' }),
-
-        // ✅ New model: internal/external chooser (your custom link object)
         defineField({ name: 'link', title: 'Link', type: 'link' }),
-
-        // ✅ Legacy field (kept hidden so older docs won’t break)
         defineField({
           name: 'href',
           title: 'Legacy href (لا تستخدم)',
@@ -58,11 +54,7 @@ export const sectionHeroType = defineType({
       type: 'object',
       fields: [
         defineField({ name: 'label', title: 'Label', type: 'string' }),
-
-        // ✅ New model: internal/external chooser (your custom link object)
         defineField({ name: 'link', title: 'Link', type: 'link' }),
-
-        // ✅ Legacy field (kept hidden so older docs won’t break)
         defineField({
           name: 'href',
           title: 'Legacy href (لا تستخدم)',

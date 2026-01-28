@@ -7,6 +7,7 @@ import { schema } from './sanity/schemaTypes';
 import { myTheme } from './sanity/theme';
 import { presentationTool } from 'sanity/presentation';
 import { structure } from './sanity/structure';
+import I18nField from './sanity/components/I18nField';
 
 export default defineConfig({
   basePath: '/studio',
@@ -14,6 +15,12 @@ export default defineConfig({
   dataset,
   schema,
   theme: myTheme,
+
+  form: {
+    components: {
+      field: I18nField,
+    },
+  },
 
   document: {
     productionUrl: async (prev, context) => {

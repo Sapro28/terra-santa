@@ -1,6 +1,6 @@
+import SectionRenderer from '@/components/sections/SectionRenderer';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { moodlePageBuilderQuery } from '@/sanity/lib/queries';
-import SectionRenderer from '@/components/sections/SectionRenderer';
 
 type BuilderPage = {
   sections?: Array<{ _type: string; [key: string]: any }>;
@@ -22,8 +22,8 @@ export default async function MoodlePage({
 
   const client = await getSanityClient();
   const page = await client.fetch<BuilderPage | null>(moodlePageBuilderQuery, {
-    lang,
+    id: `moodlePage-${lang}`,
   });
 
-  return <SectionRenderer locale={locale} sections={page?.sections ?? []} />;
+  return <SectionRenderer locale={locale} sections={page?.sections || []} />;
 }

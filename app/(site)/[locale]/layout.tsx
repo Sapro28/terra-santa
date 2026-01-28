@@ -34,7 +34,7 @@ export default async function LocaleLayout({
 
   const { data: siteSettings } = await sanityFetch({
     query: siteSettingsQuery,
-    params: { lang: locale },
+    params: { id: `siteSettings-${locale}` },
   });
 
   return (

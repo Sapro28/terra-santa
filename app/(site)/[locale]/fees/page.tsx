@@ -1,6 +1,6 @@
+import SectionRenderer from '@/components/sections/SectionRenderer';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { feesPageBuilderQuery } from '@/sanity/lib/queries';
-import SectionRenderer from '@/components/sections/SectionRenderer';
 
 type BuilderPage = {
   sections?: Array<{ _type: string; [key: string]: any }>;
@@ -22,8 +22,8 @@ export default async function FeesPage({
 
   const client = await getSanityClient();
   const page = await client.fetch<BuilderPage | null>(feesPageBuilderQuery, {
-    lang,
+    id: `feesPage-${lang}`,
   });
 
-  return <SectionRenderer locale={locale} sections={page?.sections ?? []} />;
+  return <SectionRenderer locale={locale} sections={page?.sections || []} />;
 }

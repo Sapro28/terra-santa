@@ -1,6 +1,6 @@
 import { CalendarIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { languageField } from './languageField';
+import { languageFieldEditable } from './languageField';
 
 export const eventType = defineType({
   name: 'event',
@@ -8,7 +8,7 @@ export const eventType = defineType({
   type: 'document',
   icon: CalendarIcon,
   fields: [
-    languageField,
+    languageFieldEditable,
 
     defineField({
       name: 'title',
