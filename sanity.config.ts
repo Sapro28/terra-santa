@@ -39,9 +39,9 @@ export default defineConfig({
       let redirect = `/${locale}`;
 
       if (doc?._type === 'newsPost' && slug) {
-        redirect = `/${locale}/news/${slug}`;
+        redirect = `/${locale}/news/${encodeURIComponent(slug)}`;
       } else if (doc?._type === 'galleryCategory' && slug) {
-        redirect = `/${locale}/gallery/${slug}`;
+        redirect = `/${locale}/gallery/${encodeURIComponent(slug)}`;
       }
 
       return `${baseUrl}/api/draft-mode/enable?secret=${encodeURIComponent(

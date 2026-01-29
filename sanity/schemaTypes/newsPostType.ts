@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { languageFieldLocked } from './languageField';
+import SafeDatetimeInput from '../components/SafeDateTimeInput';
 
 export const newsPostType = defineType({
   name: 'newsPost',
@@ -20,8 +21,31 @@ export const newsPostType = defineType({
       name: 'slug',
       type: 'slug',
       title: 'الرابط المختصر',
-      options: { source: 'title', maxLength: 96 },
-      validation: (Rule) => Rule.required(),
+      options: {
+        source: 'title',
+        maxLength: 96,
+        slugify: (input: string) => {
+          const s = (input || '')
+            .toString()
+            .trim()
+            .toLowerCase()
+            .replace(/\/+?/g, '-')
+            .replace(/[\s_]+/g, '-')
+            .replace(/[^a-z0-9\u0600-\u06ff-]+/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+
+          return s.slice(0, 96);
+        },
+      },
+      validation: (Rule) =>
+        Rule.required().custom((value: any) => {
+          const current = value?.current as string | undefined;
+          if (!current) return true;
+          return current.includes('/')
+            ? 'الرابط المختصر لا يمكن أن يحتوي على "/"'
+            : true;
+        }),
     }),
 
     defineField({
@@ -68,27 +92,12 @@ export const newsPostType = defineType({
     }),
 
     defineField({
-      name: 'urgent',
-      type: 'boolean',
-      title: 'عاجل؟',
-      initialValue: false,
-      description:
-        'إذا كان عاجلاً، سيظهر في أعلى النتائج (ويمكن استخدامه كـ Popup)',
-    }),
-
-    defineField({
-      name: 'hidden',
-      type: 'boolean',
-      title: 'إخفاء من الموقع؟',
-      initialValue: false,
-    }),
-
-    defineField({
       name: 'publishedAt',
       type: 'datetime',
       title: 'تاريخ النشر',
       description:
         'إذا كان محددًا، لن يظهر الخبر قبل هذا التاريخ. إذا لم يكن محددًا، سيظهر فورًا.',
+      components: { input: SafeDatetimeInput },
     }),
 
     defineField({
@@ -97,6 +106,7 @@ export const newsPostType = defineType({
       title: 'انتهاء (اختياري)',
       description:
         'اختياري — إذا تم تحديده، لن يظهر الـ Popup بعد هذا التاريخ.',
+      components: { input: SafeDatetimeInput },
     }),
   ],
 
@@ -113,16 +123,14 @@ export const newsPostType = defineType({
       title: 'title',
       lang: 'language',
       publishedAt: 'publishedAt',
-      urgent: 'urgent',
     },
-    prepare({ title, lang, publishedAt, urgent }) {
-      const flags = [urgent ? 'عاجل' : null, lang ? `لغة: ${lang}` : null]
-        .filter(Boolean)
-        .join(' • ');
-
+    prepare({ title, lang, publishedAt }) {
       return {
         title: title || 'بدون عنوان',
-        subtitle: [flags, publishedAt ? `نشر: ${publishedAt}` : null]
+        subtitle: [
+          lang ? `لغة: ${lang}` : null,
+          publishedAt ? `نشر: ${publishedAt}` : null,
+        ]
           .filter(Boolean)
           .join(' — '),
       };

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { getSanityClient } from '@/sanity/lib/getClient';
-
 import { newsListQuery } from '@/sanity/lib/queries';
 
 type NewsListItem = {
@@ -36,31 +35,22 @@ export default async function NewsPage({
       {posts.length === 0 ? (
         <p className="text-muted">No news posts yet.</p>
       ) : (
-        <ul className="grid gap-4 p-0 list-none">
+        <ul className="grid gap-4 list-none p-0">
           {posts.map((post) => (
             <li
               key={post._id}
               className="rounded-2xl border border-border bg-white p-5"
             >
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/${locale}/news/${post.slug}`}
-                  className="font-semibold hover:underline"
-                >
-                  {post.title}
-                </Link>
-                {post.urgent ? (
-                  <span className="text-xs font-semibold">(urgent)</span>
-                ) : null}
-              </div>
+              <Link
+                href={`/${locale}/news/${encodeURIComponent(post.slug)}`}
+                className="font-semibold hover:underline"
+              >
+                {post.title}
+              </Link>
 
-              {post.excerpt ? (
+              {post.excerpt && (
                 <p className="mt-2 text-sm text-muted">{post.excerpt}</p>
-              ) : null}
-
-              <p className="mt-3 text-xs text-muted">
-                {new Date(post.publishedAt).toLocaleDateString()}
-              </p>
+              )}
             </li>
           ))}
         </ul>

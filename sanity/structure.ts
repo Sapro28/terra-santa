@@ -109,6 +109,25 @@ export const structure: StructureResolver = (S) => {
         }),
       );
 
+  const newsByLanguage = () =>
+    S.list()
+      .title('الأخبار / الإعلانات (حسب اللغة)')
+      .items(
+        (Object.keys(LABELS) as Lang[]).map((lang) =>
+          S.listItem()
+            .title(LABELS[lang].langTitle)
+            .icon(DocumentIcon)
+            .child(
+              S.documentList()
+                .title(`الأخبار / الإعلانات — ${LABELS[lang].langTitle}`)
+                .schemaType('newsPost')
+                .filter('_type == "newsPost" && language == $lang')
+                .params({ lang })
+                .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+            ),
+        ),
+      );
+
   const galleryBySection = () =>
     S.documentList()
       .title('أقسام المدرسة')
@@ -176,15 +195,7 @@ export const structure: StructureResolver = (S) => {
               S.listItem()
                 .title('الأخبار / الإعلانات')
                 .icon(DocumentIcon)
-                .child(
-                  S.documentList()
-                    .title('الأخبار / الإعلانات')
-                    .schemaType('newsPost')
-                    .filter('_type == "newsPost" && language == "ar"')
-                    .defaultOrdering([
-                      { field: 'publishedAt', direction: 'desc' },
-                    ]),
-                ),
+                .child(newsByLanguage()),
 
               S.listItem()
                 .title('المعرض حسب القسم')

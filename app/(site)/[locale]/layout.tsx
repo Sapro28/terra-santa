@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 
 import { siteSettingsQuery } from '@/sanity/lib/queries';
 import { sanityFetch, SanityLive } from '@/sanity/lib/live';
+import { sanityClient } from '@/sanity/lib/client';
 import VisualEditingComponent from '@/app/VisualEditing';
 
 const locales = ['ar', 'en', 'it'] as const;
@@ -31,11 +32,16 @@ export default async function LocaleLayout({
   if (dm.isEnabled) noStore();
 
   const messages = await getMessages();
-
-  const { data: siteSettings } = await sanityFetch({
-    query: siteSettingsQuery,
-    params: { id: `siteSettings-${locale}` },
-  });
+  const siteSettings = dm.isEnabled
+    ? (
+        await sanityFetch({
+          query: siteSettingsQuery,
+          params: { id: `siteSettings-${locale}` },
+        })
+      ).data
+    : await sanityClient.fetch(siteSettingsQuery, {
+        id: `siteSettings-${locale}`,
+      });
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

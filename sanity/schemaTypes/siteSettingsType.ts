@@ -1,4 +1,4 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField, defineArrayMember } from 'sanity';
 import { languageFieldLocked } from './languageField';
 
 export const siteSettingsType = defineType({
@@ -35,7 +35,7 @@ export const siteSettingsType = defineType({
         },
       },
       of: [
-        defineField({
+        defineArrayMember({
           name: 'navItem',
           title: 'Nav Item',
           type: 'object',

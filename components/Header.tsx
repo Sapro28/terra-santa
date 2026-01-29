@@ -7,7 +7,6 @@ type NavItem = {
   externalUrl?: string | null;
   openInNewTab?: boolean | null;
   label?: string | null;
-
   href?: string | null;
 };
 
@@ -33,7 +32,7 @@ function routeKeyToPathSegment(routeKey?: string | null) {
     case 'moodle':
       return 'moodle';
     default:
-      return null;
+      return normalizeLegacyHref(routeKey);
   }
 }
 
@@ -53,15 +52,7 @@ export default async function Header({
   locale: string;
   settings: SiteSettings | null;
 }) {
-  const nav: NavItem[] = settings?.navigation ?? [
-    { navType: 'internal', routeKey: 'home', label: 'Home' },
-    { navType: 'internal', routeKey: 'about', label: 'About' },
-    { navType: 'internal', routeKey: 'sections', label: 'Sections' },
-    { navType: 'internal', routeKey: 'gallery', label: 'Gallery' },
-    { navType: 'internal', routeKey: 'news', label: 'News' },
-    { navType: 'internal', routeKey: 'fees', label: 'Fees' },
-    { navType: 'internal', routeKey: 'moodle', label: 'Moodle' },
-  ];
+  const nav: NavItem[] = settings?.navigation ?? [];
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
@@ -71,63 +62,65 @@ export default async function Header({
         </Link>
 
         <div className="flex items-center gap-4">
-          <nav className="hidden items-center gap-6 md:flex">
-            {nav.map((item, index) => {
-              const label = item?.label ?? 'Link';
+          {nav.length > 0 ? (
+            <nav className="flex items-center gap-6">
+              {nav.map((item, index) => {
+                const label = item?.label ?? 'Link';
 
-              const legacyHref = item?.href ?? null;
-              const legacyHrefNorm = normalizeLegacyHref(legacyHref);
-              const legacyHrefIsExternal = legacyHref
-                ? isAbsoluteUrl(legacyHref)
-                : false;
+                const legacyHref = item?.href ?? null;
+                const legacyHrefNorm = normalizeLegacyHref(legacyHref);
+                const legacyHrefIsExternal = legacyHref
+                  ? isAbsoluteUrl(legacyHref)
+                  : false;
 
-              const isExternal =
-                item?.navType === 'external' || legacyHrefIsExternal;
+                const isExternal =
+                  item?.navType === 'external' || legacyHrefIsExternal;
 
-              if (isExternal) {
-                const url =
-                  item?.externalUrl ||
-                  (legacyHrefIsExternal ? legacyHref! : '');
-                const openNew = item?.openInNewTab ?? true;
+                if (isExternal) {
+                  const url =
+                    item?.externalUrl ||
+                    (legacyHrefIsExternal ? legacyHref! : '');
+                  const openNew = item?.openInNewTab ?? true;
 
-                if (!url) return null;
+                  if (!url) return null;
+
+                  return (
+                    <a
+                      key={`${label}-${index}`}
+                      href={url}
+                      target={openNew ? '_blank' : undefined}
+                      rel={openNew ? 'noreferrer noopener' : undefined}
+                      className="text-sm font-semibold text-muted hover:text-(--fg)"
+                    >
+                      {label}
+                    </a>
+                  );
+                }
+
+                let seg: string | null = null;
+
+                if (item?.routeKey) {
+                  seg = routeKeyToPathSegment(item.routeKey);
+                } else {
+                  seg = legacyHrefNorm;
+                }
+
+                if (seg === null) return null;
+
+                const href = seg ? `/${locale}/${seg}` : `/${locale}`;
 
                 return (
-                  <a
+                  <Link
                     key={`${label}-${index}`}
-                    href={url}
-                    target={openNew ? '_blank' : undefined}
-                    rel={openNew ? 'noreferrer noopener' : undefined}
+                    href={href}
                     className="text-sm font-semibold text-muted hover:text-(--fg)"
                   >
                     {label}
-                  </a>
+                  </Link>
                 );
-              }
-
-              let seg: string | null = null;
-
-              if (item?.routeKey) {
-                seg = routeKeyToPathSegment(item.routeKey);
-              } else {
-                seg = legacyHrefNorm;
-              }
-
-              if (seg === null) return null;
-
-              const href = seg ? `/${locale}/${seg}` : `/${locale}`;
-
-              return (
-                <Link
-                  key={`${label}-${index}`}
-                  href={href}
-                  className="text-sm font-semibold text-muted hover:text-(--fg)"
-                >
-                  {label}
-                </Link>
-              );
-            })}
-          </nav>
+              })}
+            </nav>
+          ) : null}
 
           <LocaleSwitcherClient locale={locale} />
         </div>

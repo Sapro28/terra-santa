@@ -2,6 +2,7 @@ import { getSanityClient } from '@/sanity/lib/getClient';
 import {
   homePageBuilderQuery,
   latestAnnouncementsQuery,
+  popupAnnouncementQuery,
 } from '@/sanity/lib/queries';
 
 import AnnouncementsPopup, {
@@ -25,12 +26,12 @@ type BuilderPage = {
   sections?: Array<{ _type: string; [key: string]: any }>;
 };
 
-function isPopupAnnouncement(a: Announcement): a is PopupAnnouncement {
+function isPopupAnnouncement(a: any): a is PopupAnnouncement {
   return (
-    typeof a._id === 'string' &&
-    typeof a.title === 'string' &&
+    typeof a?._id === 'string' &&
+    typeof a?.title === 'string' &&
     a.title.length > 0 &&
-    typeof a.slug === 'string' &&
+    typeof a?.slug === 'string' &&
     a.slug.length > 0
   );
 }
@@ -52,24 +53,28 @@ export default async function HomePage({
   const POPUP_LOCALES = ['ar'];
   const shouldShowPopup = POPUP_LOCALES.includes(locale);
 
-  const announcements: Announcement[] = shouldShowPopup
-    ? await client.fetch(latestAnnouncementsQuery, { lang })
-    : [];
+  const announcements: Announcement[] = await client.fetch(
+    latestAnnouncementsQuery,
+    { lang },
+  );
 
-  const popupAnnouncement: PopupAnnouncement | null =
-    announcements.find(
-      (a): a is PopupAnnouncement => !!a.urgent && isPopupAnnouncement(a),
-    ) ??
-    announcements.find(isPopupAnnouncement) ??
-    null;
+  const popupAnnouncement: PopupAnnouncement | null = shouldShowPopup
+    ? await client.fetch(popupAnnouncementQuery, { lang })
+    : null;
 
   return (
     <>
-      {shouldShowPopup && popupAnnouncement ? (
+      {shouldShowPopup &&
+      popupAnnouncement &&
+      isPopupAnnouncement(popupAnnouncement) ? (
         <AnnouncementsPopup locale={locale} announcement={popupAnnouncement} />
       ) : null}
 
-      <SectionRenderer locale={locale} sections={page?.sections || []} />
+      <SectionRenderer
+        locale={locale}
+        sections={page?.sections || []}
+        announcements={announcements}
+      />
     </>
   );
 }
