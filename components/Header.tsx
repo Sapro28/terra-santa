@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
+import SectionsDropdownClient, {
+  type SectionNavItem,
+} from './sections/SectionsDropdown.client';
 
 type NavItem = {
   navType?: 'internal' | 'external' | null;
@@ -14,6 +17,43 @@ type SiteSettings = {
   schoolName?: string;
   navigation?: NavItem[];
 };
+
+const FALLBACK_SECTION_PAGES_BY_LOCALE: Record<string, SectionNavItem[]> = {
+  ar: [
+    { title: 'القسم الأول', slug: 'division-1' },
+    { title: 'القسم الثاني', slug: 'division-2' },
+    { title: 'القسم الثالث', slug: 'division-3' },
+    { title: 'القسم الرابع', slug: 'division-4' },
+    { title: 'القسم الخامس', slug: 'division-5' },
+    { title: 'القسم السادس', slug: 'division-6' },
+    { title: 'القسم السابع', slug: 'division-7' },
+  ],
+  en: [
+    { title: '1st Division', slug: 'division-1' },
+    { title: '2nd Division', slug: 'division-2' },
+    { title: '3rd Division', slug: 'division-3' },
+    { title: '4th Division', slug: 'division-4' },
+    { title: '5th Division', slug: 'division-5' },
+    { title: '6th Division', slug: 'division-6' },
+    { title: '7th Division', slug: 'division-7' },
+  ],
+  it: [
+    { title: '1ª Divisione', slug: 'division-1' },
+    { title: '2ª Divisione', slug: 'division-2' },
+    { title: '3ª Divisione', slug: 'division-3' },
+    { title: '4ª Divisione', slug: 'division-4' },
+    { title: '5ª Divisione', slug: 'division-5' },
+    { title: '6ª Divisione', slug: 'division-6' },
+    { title: '7ª Divisione', slug: 'division-7' },
+  ],
+};
+
+function getFallbackSectionPages(locale: string): SectionNavItem[] {
+  return (
+    FALLBACK_SECTION_PAGES_BY_LOCALE[locale] ??
+    FALLBACK_SECTION_PAGES_BY_LOCALE.en
+  );
+}
 
 function routeKeyToPathSegment(routeKey?: string | null) {
   switch (routeKey) {
@@ -48,11 +88,35 @@ function normalizeLegacyHref(raw?: string | null) {
 export default async function Header({
   locale,
   settings,
+  sectionPages,
 }: {
   locale: string;
   settings: SiteSettings | null;
+  sectionPages?: Array<{
+    title?: string | null;
+    slug?: string | null;
+    order?: number | null;
+  }> | null;
 }) {
   const nav: NavItem[] = settings?.navigation ?? [];
+
+  const sectionDropdownItems: SectionNavItem[] = (sectionPages || [])
+    .map((s) => ({
+      title: s?.title || '',
+      slug: s?.slug || '',
+      order: typeof s?.order === 'number' ? s.order : 0,
+    }))
+    .filter((s) => s.title && s.slug)
+    .sort(
+      (a, b) =>
+        (a.order ?? 0) - (b.order ?? 0) || a.title.localeCompare(b.title),
+    )
+    .map(({ title, slug }) => ({ title, slug }));
+
+  const sectionItemsToUse =
+    sectionDropdownItems.length > 0
+      ? sectionDropdownItems
+      : getFallbackSectionPages(locale);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
@@ -94,6 +158,20 @@ export default async function Header({
                     >
                       {label}
                     </a>
+                  );
+                }
+
+                if (
+                  item?.navType !== 'external' &&
+                  item?.routeKey === 'sections'
+                ) {
+                  return (
+                    <SectionsDropdownClient
+                      key={`${label}-${index}`}
+                      locale={locale}
+                      label={label}
+                      items={sectionItemsToUse}
+                    />
                   );
                 }
 

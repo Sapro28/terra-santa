@@ -27,6 +27,6 @@ export const languageFieldEditable = defineField({
 
 export const languageFieldLocked = defineField({
   ...base,
-  hidden: true,
+  hidden: false,
   readOnly: true,
 });

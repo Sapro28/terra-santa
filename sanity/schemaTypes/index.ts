@@ -1,6 +1,7 @@
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
 import { schoolSectionType } from './schoolSectionType';
+import { schoolSectionPageType } from './schoolSectionPageType';
 import { galleryCategoryType } from './galleryCategoryType';
 import { homePageType } from './homePageType';
 import { aboutPageType } from './aboutPageType';
@@ -28,6 +29,7 @@ export const schema = {
     ...pageSections,
     newsPostType,
     schoolSectionType,
+    schoolSectionPageType,
     galleryCategoryType,
     homePageType,
     aboutPageType,
@@ -39,12 +41,15 @@ export const schema = {
 
   templates: (prev: any[]) => [
     ...prev,
+
     singletonLangTemplate('siteSettings'),
     singletonLangTemplate('homePage'),
     singletonLangTemplate('aboutPage'),
     singletonLangTemplate('sectionsPage'),
     singletonLangTemplate('feesPage'),
     singletonLangTemplate('moodlePage'),
+    singletonLangTemplate('newsPost'),
+    singletonLangTemplate('schoolSectionPage'),
 
     {
       id: 'galleryCategory-bySection',

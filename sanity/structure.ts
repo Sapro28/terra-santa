@@ -14,6 +14,8 @@ const LABELS: Record<
     stages: string;
     fees: string;
     moodle: string;
+
+    dropdownItems: string;
   }
 > = {
   ar: {
@@ -25,6 +27,7 @@ const LABELS: Record<
     stages: 'صفحة المراحل',
     fees: 'صفحة الرسوم',
     moodle: 'صفحة مودل',
+    dropdownItems: 'صفحات الأقسام (عناصر القائمة المنسدلة)',
   },
   en: {
     langTitle: 'English',
@@ -35,6 +38,7 @@ const LABELS: Record<
     stages: 'Stages / Sections',
     fees: 'Fees',
     moodle: 'Moodle',
+    dropdownItems: 'Section pages (dropdown items)',
   },
   it: {
     langTitle: 'Italiano',
@@ -45,23 +49,9 @@ const LABELS: Record<
     stages: 'Sezioni / Livelli',
     fees: 'Tasse / Tariffe',
     moodle: 'Moodle',
+    dropdownItems: 'Pagine sezioni (voci menu)',
   },
 };
-
-const PAGE_ITEMS: Array<{
-  key: keyof Pick<
-    typeof LABELS.en,
-    'home' | 'about' | 'stages' | 'fees' | 'moodle'
-  >;
-  type: 'homePage' | 'aboutPage' | 'sectionsPage' | 'feesPage' | 'moodlePage';
-  icon: any;
-}> = [
-  { key: 'home', type: 'homePage', icon: DocumentIcon },
-  { key: 'about', type: 'aboutPage', icon: DocumentIcon },
-  { key: 'stages', type: 'sectionsPage', icon: DocumentsIcon },
-  { key: 'fees', type: 'feesPage', icon: DocumentIcon },
-  { key: 'moodle', type: 'moodlePage', icon: DocumentIcon },
-];
 
 const SINGLETON_ID = {
   siteSettings: (lang: Lang) => `siteSettings-${lang}`,
@@ -69,25 +59,78 @@ const SINGLETON_ID = {
 };
 
 export const structure: StructureResolver = (S) => {
+  const sectionPagesList = (lang: Lang) => {
+    const t = LABELS[lang];
+
+    return S.documentList()
+      .title(`${t.dropdownItems} — ${t.langTitle}`)
+      .schemaType('schoolSectionPage')
+      .filter('_type == "schoolSectionPage" && language == $lang')
+      .params({ lang })
+      .defaultOrdering([
+        { field: 'order', direction: 'asc' },
+        { field: 'title', direction: 'asc' },
+      ])
+      .initialValueTemplates([
+        S.initialValueTemplateItem('schoolSectionPage-byLang', { lang }),
+      ]);
+  };
+
   const singletonPagesByLanguage = (lang: Lang) => {
     const t = LABELS[lang];
 
     return S.list()
       .title(`${t.pagesTitle} — ${t.langTitle}`)
-      .items(
-        PAGE_ITEMS.map(({ key, type, icon }) =>
-          S.listItem()
-            .title(t[key])
-            .icon(icon)
-            .child(
-              S.document()
-                .schemaType(type)
-                .documentId(SINGLETON_ID.page(type, lang))
-                .title(`${t[key]} — ${t.langTitle}`)
-                .initialValueTemplate(`${type}-byLang`, { lang }),
-            ),
-        ),
-      );
+      .items([
+        S.listItem()
+          .title(t.home)
+          .icon(DocumentIcon)
+          .child(
+            S.document()
+              .schemaType('homePage')
+              .documentId(SINGLETON_ID.page('homePage', lang))
+              .title(`${t.home} — ${t.langTitle}`)
+              .initialValueTemplate('homePage-byLang', { lang }),
+          ),
+
+        S.listItem()
+          .title(t.about)
+          .icon(DocumentIcon)
+          .child(
+            S.document()
+              .schemaType('aboutPage')
+              .documentId(SINGLETON_ID.page('aboutPage', lang))
+              .title(`${t.about} — ${t.langTitle}`)
+              .initialValueTemplate('aboutPage-byLang', { lang }),
+          ),
+
+        S.listItem()
+          .title(t.stages)
+          .icon(DocumentsIcon)
+          .child(sectionPagesList(lang)),
+
+        S.listItem()
+          .title(t.fees)
+          .icon(DocumentIcon)
+          .child(
+            S.document()
+              .schemaType('feesPage')
+              .documentId(SINGLETON_ID.page('feesPage', lang))
+              .title(`${t.fees} — ${t.langTitle}`)
+              .initialValueTemplate('feesPage-byLang', { lang }),
+          ),
+
+        S.listItem()
+          .title(t.moodle)
+          .icon(DocumentIcon)
+          .child(
+            S.document()
+              .schemaType('moodlePage')
+              .documentId(SINGLETON_ID.page('moodlePage', lang))
+              .title(`${t.moodle} — ${t.langTitle}`)
+              .initialValueTemplate('moodlePage-byLang', { lang }),
+          ),
+      ]);
   };
 
   const siteSettingsByLanguage = () =>
@@ -123,7 +166,10 @@ export const structure: StructureResolver = (S) => {
                 .schemaType('newsPost')
                 .filter('_type == "newsPost" && language == $lang')
                 .params({ lang })
-                .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+                .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                .initialValueTemplates([
+                  S.initialValueTemplateItem('newsPost-byLang', { lang }),
+                ]),
             ),
         ),
       );
@@ -184,7 +230,6 @@ export const structure: StructureResolver = (S) => {
         .child(siteSettingsByLanguage()),
 
       S.divider(),
-
       S.listItem()
         .title('المحتوى')
         .icon(DocumentsIcon)
@@ -205,7 +250,6 @@ export const structure: StructureResolver = (S) => {
         ),
 
       S.divider(),
-
       S.listItem()
         .title('الصفحات (حسب اللغة)')
         .icon(DocumentIcon)
