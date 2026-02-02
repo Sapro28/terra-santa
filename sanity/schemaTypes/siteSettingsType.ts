@@ -55,91 +55,46 @@ export const siteSettingsType = defineType({
             }),
 
             defineField({
-              name: 'navType',
-              title: 'نوع الرابط',
-              type: 'string',
-              initialValue: 'internal',
+              name: 'link',
+              title: 'الرابط',
+              type: 'link',
               options: {
                 i18nTitle: {
-                  ar: 'نوع الرابط',
-                  en: 'Link type',
-                  it: 'Tipo di link',
+                  ar: 'الرابط',
+                  en: 'Link',
+                  it: 'Link',
                 },
-                list: [
-                  { title: 'صفحة داخلية', value: 'internal' },
-                  { title: 'رابط خارجي', value: 'external' },
-                ],
               },
               validation: (Rule) => Rule.required(),
             }),
 
             defineField({
-              name: 'routeKey',
-              title: 'اختر الصفحة',
+              name: 'navType',
+              title: 'Legacy navType (لا تستخدم)',
               type: 'string',
-              description: 'اختر الوجهة من الصفحات الداخلية',
-              options: {
-                i18nTitle: {
-                  ar: 'اختر الصفحة',
-                  en: 'Choose internal page',
-                  it: 'Scegli pagina interna',
-                },
-                list: [
-                  { title: 'الرئيسية', value: 'home' },
-                  { title: 'من نحن', value: 'about' },
-                  { title: 'أقسام', value: 'sections' },
-                  { title: 'المعرض', value: 'gallery' },
-                  { title: 'الأخبار', value: 'news' },
-                  { title: 'الرسوم', value: 'fees' },
-                  { title: 'مودل', value: 'moodle' },
-                ],
-              },
-              hidden: ({ parent }) => parent?.navType !== 'internal',
-              validation: (Rule) =>
-                Rule.custom((value, context) => {
-                  const parent = context.parent as any;
-                  if (parent?.navType === 'internal' && !value) {
-                    return 'اختر صفحة داخلية';
-                  }
-                  return true;
-                }),
+              readOnly: true,
+              hidden: true,
             }),
-
+            defineField({
+              name: 'routeKey',
+              title: 'Legacy routeKey (لا تستخدم)',
+              type: 'string',
+              readOnly: true,
+              hidden: true,
+            }),
             defineField({
               name: 'externalUrl',
-              title: 'الرابط الخارجي',
+              title: 'Legacy externalUrl (لا تستخدم)',
               type: 'url',
-              options: {
-                i18nTitle: {
-                  ar: 'الرابط الخارجي',
-                  en: 'External URL',
-                  it: 'URL esterno',
-                },
-              },
-              hidden: ({ parent }) => parent?.navType !== 'external',
-              validation: (Rule) =>
-                Rule.custom((value, context) => {
-                  const parent = context.parent as any;
-                  if (parent?.navType === 'external' && !value) {
-                    return 'أدخل رابط خارجي';
-                  }
-                  return true;
-                }),
+              readOnly: true,
+              hidden: true,
             }),
-
             defineField({
               name: 'openInNewTab',
-              title: 'فتح في تبويب جديد؟',
+              title: 'Legacy openInNewTab (لا تستخدم)',
               type: 'boolean',
-              initialValue: true,
-              options: {
-                i18nTitle: {
-                  ar: 'فتح في تبويب جديد؟',
-                  en: 'Open in a new tab?',
-                  it: 'Aprire in una nuova scheda?',
-                },
-              },
-              hidden: ({ parent }) => parent?.navType !== 'external',
+              readOnly: true,
+              hidden: true,
             }),
 
             defineField({
@@ -220,11 +175,11 @@ export const siteSettingsType = defineType({
         }),
         defineField({
           name: 'hoursTitle',
-          title: 'عنوان أوقات الدوام',
+          title: 'عنوان ساعات الدوام',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'عنوان أوقات الدوام',
+              ar: 'عنوان ساعات الدوام',
               en: 'Hours title',
               it: 'Titolo orari',
             },
@@ -232,11 +187,11 @@ export const siteSettingsType = defineType({
         }),
         defineField({
           name: 'hoursLine1',
-          title: 'أوقات الدوام (سطر 1)',
+          title: 'ساعات الدوام (سطر 1)',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'أوقات الدوام (سطر 1)',
+              ar: 'ساعات الدوام (سطر 1)',
               en: 'Hours (line 1)',
               it: 'Orari (riga 1)',
             },
@@ -244,11 +199,11 @@ export const siteSettingsType = defineType({
         }),
         defineField({
           name: 'hoursLine2',
-          title: 'أوقات الدوام (سطر 2)',
+          title: 'ساعات الدوام (سطر 2)',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'أوقات الدوام (سطر 2)',
+              ar: 'ساعات الدوام (سطر 2)',
               en: 'Hours (line 2)',
               it: 'Orari (riga 2)',
             },
@@ -261,25 +216,12 @@ export const siteSettingsType = defineType({
           options: {
             i18nTitle: {
               ar: 'حقوق النشر',
-              en: 'Copyright',
-              it: 'Copyright',
+              en: 'Rights',
+              it: 'Diritti',
             },
           },
         }),
       ],
     }),
   ],
-
-  preview: {
-    select: {
-      lang: 'language',
-      schoolName: 'schoolName',
-    },
-    prepare({ lang, schoolName }) {
-      return {
-        title: schoolName ? `إعدادات الموقع — ${schoolName}` : 'إعدادات الموقع',
-        subtitle: lang ? `اللغة: ${lang}` : undefined,
-      };
-    },
-  },
 });

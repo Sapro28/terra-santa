@@ -64,11 +64,10 @@ type SectionDivisions = SectionBase & {
   _type: 'sectionDivisions';
   title?: string;
   subtitle?: string;
-  anchorId?: string;
   divisions?: Array<{
     title?: string;
     text?: string;
-    jumpToId?: string;
+    sectionSlug?: string;
     imageUrl?: string;
     imageAlt?: string;
     hoverText?: string;
@@ -80,14 +79,12 @@ type SectionColors = SectionBase & {
   _type: 'sectionColors';
   title?: string;
   subtitle?: string;
-  anchorId?: string;
   colors?: Array<{ name?: string; hex?: string }>;
 };
 
 type SectionRichText = SectionBase & {
   _type: 'sectionRichText';
   title?: string;
-  anchorId?: string;
   content?: any;
 };
 
@@ -219,22 +216,6 @@ function InfoCard({ title, text }: { title: string; text: string }) {
     <div className="rounded-2xl border border-border bg-white p-5">
       <div className="font-semibold">{title}</div>
       <p className="mt-2 text-sm text-muted">{text}</p>
-    </div>
-  );
-}
-
-function AnchorWrapper({
-  anchorId,
-  children,
-}: {
-  anchorId?: string;
-  children: React.ReactNode;
-}) {
-  if (!anchorId) return <>{children}</>;
-
-  return (
-    <div id={anchorId} className="scroll-mt-24">
-      {children}
     </div>
   );
 }
@@ -478,22 +459,20 @@ export default function SectionRenderer({
 
             return (
               <section key={idx}>
-                <AnchorWrapper anchorId={s.anchorId}>
-                  {s.title ? (
-                    <h2 className="text-2xl font-semibold">{s.title}</h2>
-                  ) : null}
-                  {s.subtitle ? (
-                    <p className="mt-2 max-w-3xl text-sm text-muted">
-                      {s.subtitle}
-                    </p>
-                  ) : null}
+                {s.title ? (
+                  <h2 className="text-2xl font-semibold">{s.title}</h2>
+                ) : null}
+                {s.subtitle ? (
+                  <p className="mt-2 max-w-3xl text-sm text-muted">
+                    {s.subtitle}
+                  </p>
+                ) : null}
 
-                  <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    {divisions.map((d, i) => (
-                      <DivisionCard key={i} locale={locale} d={d} />
-                    ))}
-                  </div>
-                </AnchorWrapper>
+                <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  {divisions.map((d, i) => (
+                    <DivisionCard key={i} locale={locale} d={d} />
+                  ))}
+                </div>
               </section>
             );
           }
@@ -505,46 +484,42 @@ export default function SectionRenderer({
 
             return (
               <section key={idx}>
-                <AnchorWrapper anchorId={s.anchorId}>
-                  {s.title ? (
-                    <h2 className="text-2xl font-semibold">{s.title}</h2>
-                  ) : null}
-                  {s.subtitle ? (
-                    <p className="mt-2 max-w-3xl text-sm text-muted">
-                      {s.subtitle}
-                    </p>
-                  ) : null}
+                {s.title ? (
+                  <h2 className="text-2xl font-semibold">{s.title}</h2>
+                ) : null}
+                {s.subtitle ? (
+                  <p className="mt-2 max-w-3xl text-sm text-muted">
+                    {s.subtitle}
+                  </p>
+                ) : null}
 
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                    {colors.map((c, i) => (
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {colors.map((c, i) => (
+                    <div
+                      key={i}
+                      className="rounded-2xl border border-border bg-white p-4"
+                    >
                       <div
-                        key={i}
-                        className="rounded-2xl border border-border bg-white p-4"
-                      >
-                        <div
-                          className="h-14 w-full rounded-xl border border-border"
-                          style={{ backgroundColor: c.hex }}
-                        />
-                        <div className="mt-3 flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="line-clamp-1 text-sm font-semibold">
-                              {c.name ?? '—'}
-                            </div>
-                            <div className="mt-1 text-xs text-muted">
-                              {c.hex}
-                            </div>
+                        className="h-14 w-full rounded-xl border border-border"
+                        style={{ backgroundColor: c.hex }}
+                      />
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="line-clamp-1 text-sm font-semibold">
+                            {c.name ?? '—'}
                           </div>
-
-                          <div
-                            className="h-10 w-10 shrink-0 rounded-xl border border-border"
-                            style={{ backgroundColor: c.hex }}
-                            aria-hidden
-                          />
+                          <div className="mt-1 text-xs text-muted">{c.hex}</div>
                         </div>
+
+                        <div
+                          className="h-10 w-10 shrink-0 rounded-xl border border-border"
+                          style={{ backgroundColor: c.hex }}
+                          aria-hidden
+                        />
                       </div>
-                    ))}
-                  </div>
-                </AnchorWrapper>
+                    </div>
+                  ))}
+                </div>
               </section>
             );
           }
@@ -602,14 +577,12 @@ export default function SectionRenderer({
 
             return (
               <section key={idx}>
-                <AnchorWrapper anchorId={s.anchorId}>
-                  {s.title ? (
-                    <h2 className="mb-4 text-2xl font-semibold">{s.title}</h2>
-                  ) : null}
-                  <div className="prose max-w-none rounded-2xl border border-border bg-white p-6 prose-headings:tracking-tight prose-a:text-accent">
-                    <PortableText value={s.content} />
-                  </div>
-                </AnchorWrapper>
+                {s.title ? (
+                  <h2 className="mb-4 text-2xl font-semibold">{s.title}</h2>
+                ) : null}
+                <div className="prose max-w-none rounded-2xl border border-border bg-white p-6 prose-headings:tracking-tight prose-a:text-accent">
+                  <PortableText value={s.content} />
+                </div>
               </section>
             );
           }

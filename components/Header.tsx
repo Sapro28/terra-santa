@@ -4,12 +4,22 @@ import SectionsDropdownClient, {
   type SectionNavItem,
 } from './sections/SectionsDropdown.client';
 
+type CmsLink = {
+  linkType?: 'internal' | 'external' | null;
+  routeKey?: string | null;
+  externalUrl?: string | null;
+  openInNewTab?: boolean | null;
+};
+
 type NavItem = {
+  label?: string | null;
+  link?: CmsLink | null;
+
+  // Legacy fields (kept temporarily so old content still renders)
   navType?: 'internal' | 'external' | null;
   routeKey?: string | null;
   externalUrl?: string | null;
   openInNewTab?: boolean | null;
-  label?: string | null;
   href?: string | null;
 };
 
@@ -17,43 +27,6 @@ type SiteSettings = {
   schoolName?: string;
   navigation?: NavItem[];
 };
-
-const FALLBACK_SECTION_PAGES_BY_LOCALE: Record<string, SectionNavItem[]> = {
-  ar: [
-    { title: 'القسم الأول', slug: 'division-1' },
-    { title: 'القسم الثاني', slug: 'division-2' },
-    { title: 'القسم الثالث', slug: 'division-3' },
-    { title: 'القسم الرابع', slug: 'division-4' },
-    { title: 'القسم الخامس', slug: 'division-5' },
-    { title: 'القسم السادس', slug: 'division-6' },
-    { title: 'القسم السابع', slug: 'division-7' },
-  ],
-  en: [
-    { title: '1st Division', slug: 'division-1' },
-    { title: '2nd Division', slug: 'division-2' },
-    { title: '3rd Division', slug: 'division-3' },
-    { title: '4th Division', slug: 'division-4' },
-    { title: '5th Division', slug: 'division-5' },
-    { title: '6th Division', slug: 'division-6' },
-    { title: '7th Division', slug: 'division-7' },
-  ],
-  it: [
-    { title: '1ª Divisione', slug: 'division-1' },
-    { title: '2ª Divisione', slug: 'division-2' },
-    { title: '3ª Divisione', slug: 'division-3' },
-    { title: '4ª Divisione', slug: 'division-4' },
-    { title: '5ª Divisione', slug: 'division-5' },
-    { title: '6ª Divisione', slug: 'division-6' },
-    { title: '7ª Divisione', slug: 'division-7' },
-  ],
-};
-
-function getFallbackSectionPages(locale: string): SectionNavItem[] {
-  return (
-    FALLBACK_SECTION_PAGES_BY_LOCALE[locale] ??
-    FALLBACK_SECTION_PAGES_BY_LOCALE.en
-  );
-}
 
 function routeKeyToPathSegment(routeKey?: string | null) {
   switch (routeKey) {
@@ -82,7 +55,68 @@ function isAbsoluteUrl(url: string) {
 
 function normalizeLegacyHref(raw?: string | null) {
   if (!raw) return '';
-  return raw.startsWith('/') ? raw.slice(1) : raw;
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  return trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+}
+
+function resolveNavLink(args: {
+  locale: string;
+  link?: CmsLink | null;
+  legacy?: Pick<
+    NavItem,
+    'navType' | 'routeKey' | 'externalUrl' | 'openInNewTab' | 'href'
+  >;
+}):
+  | { kind: 'internal'; href: string; isSectionsRoot: boolean }
+  | { kind: 'external'; href: string; newTab: boolean }
+  | null {
+  const { locale, link, legacy } = args;
+
+  // Preferred: link object
+  if (link?.linkType === 'external') {
+    const href = (link.externalUrl ?? '').trim();
+    if (!href) return null;
+    return { kind: 'external', href, newTab: link.openInNewTab ?? true };
+  }
+
+  if (link?.linkType === 'internal') {
+    const seg = routeKeyToPathSegment(link.routeKey);
+    if (seg === null) return null;
+    const href = seg ? `/${locale}/${seg}` : `/${locale}`;
+    return {
+      kind: 'internal',
+      href,
+      isSectionsRoot: link.routeKey === 'sections',
+    };
+  }
+
+  // Legacy fallback (so old documents keep working)
+  const legacyHref = legacy?.href ?? null;
+  const legacyHrefIsExternal = legacyHref ? isAbsoluteUrl(legacyHref) : false;
+  const isExternal = legacy?.navType === 'external' || legacyHrefIsExternal;
+
+  if (isExternal) {
+    const href = (
+      legacy?.externalUrl ||
+      (legacyHrefIsExternal ? legacyHref : '') ||
+      ''
+    ).trim();
+    if (!href) return null;
+    return { kind: 'external', href, newTab: legacy?.openInNewTab ?? true };
+  }
+
+  const seg = legacy?.routeKey
+    ? routeKeyToPathSegment(legacy.routeKey)
+    : normalizeLegacyHref(legacyHref);
+
+  if (seg === null) return null;
+  const href = seg ? `/${locale}/${seg}` : `/${locale}`;
+  return {
+    kind: 'internal',
+    href,
+    isSectionsRoot: legacy?.routeKey === 'sections',
+  };
 }
 
 export default async function Header({
@@ -102,8 +136,8 @@ export default async function Header({
 
   const sectionDropdownItems: SectionNavItem[] = (sectionPages || [])
     .map((s) => ({
-      title: s?.title || '',
-      slug: s?.slug || '',
+      title: (s?.title ?? '').trim(),
+      slug: (s?.slug ?? '').trim(),
       order: typeof s?.order === 'number' ? s.order : 0,
     }))
     .filter((s) => s.title && s.slug)
@@ -112,11 +146,6 @@ export default async function Header({
         (a.order ?? 0) - (b.order ?? 0) || a.title.localeCompare(b.title),
     )
     .map(({ title, slug }) => ({ title, slug }));
-
-  const sectionItemsToUse =
-    sectionDropdownItems.length > 0
-      ? sectionDropdownItems
-      : getFallbackSectionPages(locale);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
@@ -131,29 +160,44 @@ export default async function Header({
               {nav.map((item, index) => {
                 const label = item?.label ?? 'Link';
 
-                const legacyHref = item?.href ?? null;
-                const legacyHrefNorm = normalizeLegacyHref(legacyHref);
-                const legacyHrefIsExternal = legacyHref
-                  ? isAbsoluteUrl(legacyHref)
-                  : false;
+                const resolved = resolveNavLink({
+                  locale,
+                  link: item?.link ?? null,
+                  legacy: {
+                    navType: item?.navType,
+                    routeKey: item?.routeKey,
+                    externalUrl: item?.externalUrl,
+                    openInNewTab: item?.openInNewTab,
+                    href: item?.href,
+                  },
+                });
 
-                const isExternal =
-                  item?.navType === 'external' || legacyHrefIsExternal;
+                if (!resolved) return null;
 
-                if (isExternal) {
-                  const url =
-                    item?.externalUrl ||
-                    (legacyHrefIsExternal ? legacyHref! : '');
-                  const openNew = item?.openInNewTab ?? true;
+                // If this item points to the Sections landing page, render it as a dropdown.
+                // If section pages aren't configured yet, gracefully fall back to a normal link.
+                if (
+                  resolved.kind === 'internal' &&
+                  resolved.isSectionsRoot &&
+                  sectionDropdownItems.length > 0
+                ) {
+                  return (
+                    <SectionsDropdownClient
+                      key={`${label}-${index}`}
+                      locale={locale}
+                      label={label}
+                      items={sectionDropdownItems}
+                    />
+                  );
+                }
 
-                  if (!url) return null;
-
+                if (resolved.kind === 'external') {
                   return (
                     <a
                       key={`${label}-${index}`}
-                      href={url}
-                      target={openNew ? '_blank' : undefined}
-                      rel={openNew ? 'noreferrer noopener' : undefined}
+                      href={resolved.href}
+                      target={resolved.newTab ? '_blank' : undefined}
+                      rel={resolved.newTab ? 'noreferrer noopener' : undefined}
                       className="text-sm font-semibold text-muted hover:text-(--fg)"
                     >
                       {label}
@@ -161,36 +205,10 @@ export default async function Header({
                   );
                 }
 
-                if (
-                  item?.navType !== 'external' &&
-                  item?.routeKey === 'sections'
-                ) {
-                  return (
-                    <SectionsDropdownClient
-                      key={`${label}-${index}`}
-                      locale={locale}
-                      label={label}
-                      items={sectionItemsToUse}
-                    />
-                  );
-                }
-
-                let seg: string | null = null;
-
-                if (item?.routeKey) {
-                  seg = routeKeyToPathSegment(item.routeKey);
-                } else {
-                  seg = legacyHrefNorm;
-                }
-
-                if (seg === null) return null;
-
-                const href = seg ? `/${locale}/${seg}` : `/${locale}`;
-
                 return (
                   <Link
                     key={`${label}-${index}`}
-                    href={href}
+                    href={resolved.href}
                     className="text-sm font-semibold text-muted hover:text-(--fg)"
                   >
                     {label}

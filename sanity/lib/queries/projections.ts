@@ -73,7 +73,7 @@ export const sectionProjection = `
   _type == "sectionCards" => { title, cards[]{title, text} },
 
   // Rich text
-  _type == "sectionRichText" => { title, anchorId, content },
+  _type == "sectionRichText" => { title, content },
 
   // Generic list
   _type == "sectionList" => { title, subtitle, items[]{title, desc} },
@@ -95,13 +95,12 @@ export const sectionProjection = `
   _type == "sectionDivisions" => {
     title,
     subtitle,
-    anchorId,
     divisions[]{
       title,
       text,
       hoverText,
       ctaLabel,
-      jumpToId,
+      sectionSlug,
       "imageUrl": image.asset->url,
       "imageAlt": image.alt
     }
@@ -111,7 +110,6 @@ export const sectionProjection = `
   _type == "sectionColors" => {
     title,
     subtitle,
-    anchorId,
     colors[]{name, hex}
   },
 

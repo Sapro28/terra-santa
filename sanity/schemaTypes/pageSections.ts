@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { SCHOOL_SECTION_SLUG_OPTIONS } from '../lib/sectionSlugs';
 
 export const sectionHeroType = defineType({
   name: 'sectionHero',
@@ -262,13 +263,6 @@ export const sectionRichTextType = defineType({
   fields: [
     defineField({ name: 'title', title: 'العنوان (اختياري)', type: 'string' }),
     defineField({
-      name: 'anchorId',
-      title: 'Anchor ID (اختياري)',
-      type: 'string',
-      description:
-        'اختياري — استخدمه كـ id للقسم لتفعيل روابط jump داخل الصفحة.',
-    }),
-    defineField({
       name: 'content',
       title: 'المحتوى',
       type: 'blockContent',
@@ -421,13 +415,6 @@ export const sectionDivisionsType = defineType({
       rows: 2,
     }),
     defineField({
-      name: 'anchorId',
-      title: 'Anchor ID (اختياري)',
-      type: 'string',
-      description:
-        'اختياري — استخدمه كـ id للقسم لتفعيل روابط jump داخل الصفحة.',
-    }),
-    defineField({
       name: 'divisions',
       title: 'التقسيمات',
       type: 'array',
@@ -445,32 +432,42 @@ export const sectionDivisionsType = defineType({
             }),
             defineField({
               name: 'text',
-              title: 'نص (اختياري)',
+              title: 'نص',
               type: 'text',
               rows: 3,
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'hoverText',
-              title: 'نص عند المرور (Hover) (اختياري)',
+              title: 'نص عند المرور (Hover)',
               type: 'text',
               rows: 2,
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'ctaLabel',
-              title: 'نص زر (اختياري)',
+              title: 'نص زر',
               type: 'string',
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
-              name: 'jumpToId',
-              title: 'Jump To ID (اختياري)',
+              name: 'sectionSlug',
+              title: 'Section slug (destination page)',
               type: 'string',
               description:
-                'اختياري — يفتح القسم الذي يحمل هذا الـ id في نفس الصفحة.',
+                'اختر القسم الذي تذهب إليه هذه البطاقة (صفحة /sections/<slug>).',
+              options: {
+                list: SCHOOL_SECTION_SLUG_OPTIONS,
+                layout: 'dropdown',
+              },
+              validation: (Rule) => Rule.required(),
             }),
+
             defineField({
               name: 'image',
-              title: 'صورة (اختياري)',
+              title: 'صورة',
               type: 'image',
+              validation: (Rule) => Rule.required(),
               options: { hotspot: true },
               fields: [
                 defineField({ name: 'alt', title: 'Alt', type: 'string' }),
@@ -506,13 +503,6 @@ export const sectionColorsType = defineType({
       title: 'نص تعريفي (اختياري)',
       type: 'text',
       rows: 2,
-    }),
-    defineField({
-      name: 'anchorId',
-      title: 'Anchor ID (اختياري)',
-      type: 'string',
-      description:
-        'اختياري — استخدمه كـ id للقسم لتفعيل روابط jump داخل الصفحة.',
     }),
     defineField({
       name: 'colors',

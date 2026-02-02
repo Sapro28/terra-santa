@@ -1,11 +1,12 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 type Division = {
   title?: string;
   text?: string;
-  jumpToId?: string;
+  sectionSlug?: string;
   imageUrl?: string;
   imageAlt?: string;
 
@@ -13,15 +14,11 @@ type Division = {
   ctaLabel?: string;
 };
 
-const SECTION_SLUGS = new Set([
-  'st-francis-of-assisi',
-  'anthony-of-padua',
-  'virgin-mary',
-  'infant-jesus',
-  'st-joseph-worker',
-  'st-clare-of-assisi',
-  'holy-family',
-]);
+const buildSectionHref = (locale: string, sectionSlug?: string) => {
+  const slug = (sectionSlug ?? '').trim();
+  if (!slug) return null;
+  return `/${locale}/sections/${slug}`;
+};
 
 export default function DivisionCard({
   locale,
@@ -30,17 +27,7 @@ export default function DivisionCard({
   locale: string;
   d: Division;
 }) {
-  const raw = (d.jumpToId ?? '').trim();
-
-  const href = (() => {
-    if (!raw) return '#';
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    if (raw.startsWith('/')) return raw;
-    if (raw.startsWith('sections/')) return `/${locale}/${raw}`;
-    if (SECTION_SLUGS.has(raw)) return `/${locale}/sections/${raw}`;
-
-    return `#${raw}`;
-  })();
+  const href = buildSectionHref(locale, d.sectionSlug) ?? '#';
 
   const title = d.title ?? '';
   const subtitle = d.text ?? '';
@@ -50,9 +37,8 @@ export default function DivisionCard({
   const patternDataUri =
     'data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20width%3D%27360%27%20height%3D%27360%27%20viewBox%3D%270%200%20360%20360%27%3E%0A%3Cg%20fill%3D%27none%27%20stroke%3D%27%23ffffff%27%20stroke-opacity%3D%270.18%27%20stroke-width%3D%2710%27%3E%0A%20%20%3Cpath%20d%3D%27M180%2030c62%200%20112%2050%20112%20112s-50%20112-112%20112S68%20204%2068%20142%20118%2030%20180%2030Z%27/%3E%0A%20%20%3Cpath%20d%3D%27M180%2070c40%200%2072%2032%2072%2072s-32%2072-72%2072-72-32-72-72%2032-72%2072-72Z%27/%3E%0A%20%20%3Cpath%20d%3D%27M180%20110c18%200%2032%2014%2032%2032s-14%2032-32%2032-32-14-32-32%2014-32%2032-32Z%27/%3E%0A%20%20%3Cpath%20d%3D%27M180%2018v324M18%20180h324M55%2055l250%20250M305%2055%2055%20305%27/%3E%0A%3C/g%3E%3C/svg%3E';
 
-  return (
-    <a
-      href={href}
+  const CardInner = (
+    <div
       className={[
         'group relative block overflow-hidden rounded-[28px]',
         'ring-1 ring-black/10',
@@ -161,6 +147,16 @@ export default function DivisionCard({
           <div className="absolute -top-24 left-[-30%] h-48 w-[160%] rotate-[-10deg] bg-white/10 blur-2xl" />
         </div>
       </div>
-    </a>
+    </div>
+  );
+
+  if (href === '#') {
+    return CardInner;
+  }
+
+  return (
+    <Link href={href} className="block" aria-label={title || 'Division'}>
+      {CardInner}
+    </Link>
   );
 }
