@@ -1,38 +1,6 @@
 export const sectionProjection = `
   _type,
 
-  // Hero
-  _type == "sectionHero" => {
-    kicker,
-    title,
-    subtitle,
-    "imageUrl": image.asset->url,
-    "imageAlt": image.alt,
-
-    primaryCta{
-      label,
-      link{
-        linkType,
-        routeKey,
-        externalUrl,
-        openInNewTab
-      },
-      // keep legacy href during migration:
-      href
-    },
-
-    secondaryCta{
-      label,
-      link{
-        linkType,
-        routeKey,
-        externalUrl,
-        openInNewTab
-      },
-      href
-    }
-  },
-
   // Video Hero
   _type == "sectionVideoHero" => {
     kicker,

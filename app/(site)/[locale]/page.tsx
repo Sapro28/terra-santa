@@ -48,6 +48,7 @@ export default async function HomePage({
 
   const page: BuilderPage | null = await client.fetch(homePageBuilderQuery, {
     id: `homePage-${lang}`,
+    lang,
   });
 
   const POPUP_LOCALES = ['ar'];

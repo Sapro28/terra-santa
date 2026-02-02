@@ -22,18 +22,6 @@ type CMSLink = {
   openInNewTab?: boolean | null;
 };
 
-type SectionHero = SectionBase & {
-  _type: 'sectionHero';
-  kicker?: string;
-  title?: string;
-  subtitle?: string;
-  imageUrl?: string;
-  imageAlt?: string;
-
-  primaryCta?: { label?: string; link?: CMSLink; href?: string };
-  secondaryCta?: { label?: string; link?: CMSLink; href?: string };
-};
-
 type SectionVideoHero = SectionBase & {
   _type: 'sectionVideoHero';
   kicker?: string;
@@ -122,7 +110,6 @@ type SectionSpacer = SectionBase & {
 };
 
 type Section =
-  | SectionHero
   | SectionVideoHero
   | SectionStats
   | SectionCards
@@ -382,72 +369,6 @@ export default function SectionRenderer({
                     </div>
                   </div>
                 </div>
-              </section>
-            );
-          }
-
-          case 'sectionHero': {
-            const s = section as SectionHero;
-
-            const primaryResolved = resolveCmsLink({
-              locale,
-              link: s.primaryCta?.link,
-              legacyHref: s.primaryCta?.href,
-            }) ?? { kind: 'internal' as const, href: `/${locale}/about` };
-
-            const secondaryResolved = resolveCmsLink({
-              locale,
-              link: s.secondaryCta?.link,
-              legacyHref: s.secondaryCta?.href,
-            }) ?? { kind: 'internal' as const, href: `/${locale}/gallery` };
-
-            return (
-              <section
-                key={idx}
-                className="grid items-center gap-10 md:grid-cols-2"
-              >
-                <div>
-                  {s.kicker ? (
-                    <div className="text-sm font-semibold text-muted">
-                      {s.kicker}
-                    </div>
-                  ) : null}
-
-                  <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-                    {s.title ?? '—'}
-                  </h1>
-
-                  {s.subtitle ? (
-                    <p className="mt-4 text-lg leading-relaxed text-muted">
-                      {s.subtitle}
-                    </p>
-                  ) : null}
-
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <CtaButton
-                      resolved={primaryResolved}
-                      label={s.primaryCta?.label ?? '—'}
-                      className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-(--accent-hover)"
-                    />
-
-                    <CtaButton
-                      resolved={secondaryResolved}
-                      label={s.secondaryCta?.label ?? '—'}
-                      className="rounded-xl border border-border bg-white px-5 py-3 text-sm font-semibold text-(--fg) hover:bg-(--paper)"
-                    />
-                  </div>
-                </div>
-
-                {s.imageUrl ? (
-                  <div className="overflow-hidden rounded-2xl border border-border bg-white">
-                    <img
-                      src={s.imageUrl}
-                      alt={s.imageAlt || s.title || 'Hero image'}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ) : null}
               </section>
             );
           }
