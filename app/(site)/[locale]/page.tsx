@@ -1,15 +1,21 @@
+import { notFound } from 'next/navigation';
+
+import AnnouncementsPopup, {
+  type PopupAnnouncement,
+} from '@/components/AnnouncementsPopup';
+import SectionRenderer from '@/components/sections/SectionRenderer';
+
 import { getSanityClient } from '@/sanity/lib/getClient';
 import {
   homePageBuilderQuery,
   latestAnnouncementsQuery,
   popupAnnouncementQuery,
+  upcomingEventsQuery,
 } from '@/sanity/lib/queries';
 
-import AnnouncementsPopup, {
-  type PopupAnnouncement,
-} from '@/components/AnnouncementsPopup';
-
-import SectionRenderer from '@/components/sections/SectionRenderer';
+type BuilderPage = {
+  sections?: Array<{ _type: string; [key: string]: any }>;
+};
 
 type Announcement = {
   _id: string;
@@ -22,10 +28,6 @@ type Announcement = {
   mainImageAlt?: string;
 };
 
-type BuilderPage = {
-  sections?: Array<{ _type: string; [key: string]: any }>;
-};
-
 function isPopupAnnouncement(a: any): a is PopupAnnouncement {
   return (
     typeof a?._id === 'string' &&
@@ -36,15 +38,33 @@ function isPopupAnnouncement(a: any): a is PopupAnnouncement {
   );
 }
 
-export default async function HomePage({
+function localeToLang(locale: string) {
+  if (locale === 'ar') return 'ar';
+  if (locale === 'it') return 'it';
+  return 'en';
+}
+
+export default async function LocaleHomePage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const lang = localeToLang(locale);
 
-  const lang = locale;
+  if (!['ar', 'en', 'it'].includes(locale)) notFound();
+
   const client = await getSanityClient();
+
+  const announcements: Announcement[] = await client.fetch(
+    latestAnnouncementsQuery,
+    { lang },
+  );
+
+  const upcomingEvents: Announcement[] = await client.fetch(
+    upcomingEventsQuery,
+    { lang },
+  );
 
   const page: BuilderPage | null = await client.fetch(homePageBuilderQuery, {
     id: `homePage-${lang}`,
@@ -53,12 +73,6 @@ export default async function HomePage({
 
   const POPUP_LOCALES = ['ar'];
   const shouldShowPopup = POPUP_LOCALES.includes(locale);
-
-  const announcements: Announcement[] = await client.fetch(
-    latestAnnouncementsQuery,
-    { lang },
-  );
-
   const popupAnnouncement: PopupAnnouncement | null = shouldShowPopup
     ? await client.fetch(popupAnnouncementQuery, { lang })
     : null;
@@ -75,6 +89,7 @@ export default async function HomePage({
         locale={locale}
         sections={page?.sections || []}
         announcements={announcements}
+        upcomingEvents={upcomingEvents}
       />
     </>
   );

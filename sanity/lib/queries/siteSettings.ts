@@ -8,6 +8,7 @@ export const siteSettingsQuery = groq`
       link{
         linkType,
         routeKey,
+        internalPath,
         externalUrl,
         openInNewTab
       },

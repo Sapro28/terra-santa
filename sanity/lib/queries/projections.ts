@@ -8,14 +8,13 @@ export const sectionProjection = `
     subtitle,
     overlayOpacity,
     "videoUrl": video.asset->url,
-    "posterUrl": posterImage.asset->url,
-    "posterAlt": posterImage.alt,
 
     primaryCta{
       label,
       link{
         linkType,
         routeKey,
+        internalPath,
         externalUrl,
         openInNewTab
       },
@@ -27,35 +26,11 @@ export const sectionProjection = `
       link{
         linkType,
         routeKey,
+        internalPath,
         externalUrl,
         openInNewTab
       },
       href
-    }
-  },
-
-  // Stats
-  _type == "sectionStats" => { title, items[]{label, value} },
-
-  // Cards
-  _type == "sectionCards" => { title, cards[]{title, text} },
-
-  // Rich text
-  _type == "sectionRichText" => { title, content },
-
-  // Generic list
-  _type == "sectionList" => { title, subtitle, items[]{title, desc} },
-
-  // People
-  _type == "sectionPeople" => {
-    title,
-    subtitle,
-    people[]{
-      name,
-      role,
-      bio,
-      "imageUrl": image.asset->url,
-      "imageAlt": image.alt
     }
   },
 
@@ -84,16 +59,9 @@ export const sectionProjection = `
   // Announcements
   _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
 
-  // Gallery
-  _type == "sectionGallery" => {
-    title,
-    subtitle,
-    limit,
-    viewAllLabel,
-    viewAllHref,
-    section->{ _id, title, "key": key.current }
-  },
+  // Upcoming Events
+  _type == "sectionUpcomingEvents" => { title, emptyText, viewAllLabel, limit },
 
-  // Spacer
-  _type == "sectionSpacer" => { size }
+  // Parents Testimonials
+  _type == "sectionParentsTestimonials" => { title, testimonials[]{text} }
 `;

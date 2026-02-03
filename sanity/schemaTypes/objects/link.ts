@@ -38,6 +38,26 @@ export const linkObject = defineType({
     }),
 
     defineField({
+      name: 'internalPath',
+      title: 'مسار داخلي (اختياري)',
+      type: 'string',
+      description:
+        'اكتب المسار بدون لغة وبدون / في البداية. مثال: "admissions" أو "admissions/fees". إذا تم تعيينه سيتم استخدامه بدل اختيار الصفحة.',
+      hidden: ({ parent }) => parent?.linkType !== 'internal',
+      validation: (Rule) =>
+        Rule.custom((value, ctx) => {
+          const linkType = (ctx as any)?.parent?.linkType;
+          if (linkType !== 'internal') return true;
+          if (!value) return true;
+          const v = String(value).trim();
+          if (!v) return true;
+          if (v.startsWith('/')) return 'Do not start with "/".';
+          if (v.includes('://')) return 'Use External link type for full URLs.';
+          return true;
+        }),
+    }),
+
+    defineField({
       name: 'externalUrl',
       title: 'الرابط الخارجي',
       type: 'url',

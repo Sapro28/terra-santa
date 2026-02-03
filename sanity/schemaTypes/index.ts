@@ -8,6 +8,7 @@ import { aboutPageType } from './aboutPageType';
 import { sectionsPageType } from './sectionsPageType';
 import { feesPageType } from './feesPageType';
 import { moodlePageType } from './moodlePageType';
+import { sitePageType } from './sitePageType';
 import { siteSettingsType } from './siteSettingsType';
 import { linkObject } from './objects/link';
 import { pageSections } from './pageSections';
@@ -36,6 +37,7 @@ export const schema = {
     sectionsPageType,
     feesPageType,
     moodlePageType,
+    sitePageType,
     siteSettingsType,
   ],
 

@@ -7,6 +7,7 @@ import SectionsDropdownClient, {
 type CmsLink = {
   linkType?: 'internal' | 'external' | null;
   routeKey?: string | null;
+  internalPath?: string | null;
   externalUrl?: string | null;
   openInNewTab?: boolean | null;
 };
@@ -81,13 +82,14 @@ function resolveNavLink(args: {
   }
 
   if (link?.linkType === 'internal') {
-    const seg = routeKeyToPathSegment(link.routeKey);
+    const raw = (link.internalPath ?? '').trim();
+    const seg = raw ? normalizeLegacyHref(raw) : routeKeyToPathSegment(link.routeKey);
     if (seg === null) return null;
     const href = seg ? `/${locale}/${seg}` : `/${locale}`;
     return {
       kind: 'internal',
       href,
-      isSectionsRoot: link.routeKey === 'sections',
+      isSectionsRoot: (raw ? seg : link.routeKey) === 'sections',
     };
   }
 

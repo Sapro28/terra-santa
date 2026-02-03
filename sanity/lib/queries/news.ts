@@ -21,6 +21,28 @@ export const latestAnnouncementsQuery = groq`
   }
 `;
 
+export const upcomingEventsQuery = groq`
+  *[
+    _type == "newsPost" &&
+    hidden != true &&
+    ( !defined(placement) || placement in ["list", "both"] ) &&
+    language == $lang &&
+    defined(publishedAt) &&
+    publishedAt > now()
+  ]
+  | order(publishedAt asc)[0...3]{
+    _id,
+    title,
+    excerpt,
+    publishedAt,
+    urgent,
+    placement,
+    "slug": slug.current,
+    "mainImageUrl": mainImage.asset->url,
+    "mainImageAlt": mainImage.alt
+  }
+`;
+
 export const popupAnnouncementQuery = groq`
   *[
     _type == "newsPost" &&

@@ -30,3 +30,11 @@ export const sectionsPageBuilderQuery = groq`
     "sections": sections[]{ ${sectionProjection} }
   }
 `;
+
+export const sitePageBySlugQuery = groq`
+  *[_type == "sitePage" && language == $lang && slug.current == $slug][0]{
+    title,
+    "slug": slug.current,
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;

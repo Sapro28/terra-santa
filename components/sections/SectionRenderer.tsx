@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { PortableText } from '@portabletext/react';
+
 import DivisionCard from './DivisionCard.client';
 
 type Announcement = {
@@ -18,6 +18,7 @@ type SectionBase = { _type: string };
 type CMSLink = {
   linkType?: 'internal' | 'external' | null;
   routeKey?: string | null;
+  internalPath?: string | null;
   externalUrl?: string | null;
   openInNewTab?: boolean | null;
 };
@@ -36,18 +37,6 @@ type SectionVideoHero = SectionBase & {
   secondaryCta?: { label?: string; link?: CMSLink; href?: string };
 };
 
-type SectionStats = SectionBase & {
-  _type: 'sectionStats';
-  title?: string;
-  items?: Array<{ label?: string; value?: string }>;
-};
-
-type SectionCards = SectionBase & {
-  _type: 'sectionCards';
-  title?: string;
-  cards?: Array<{ title?: string; text?: string }>;
-};
-
 type SectionDivisions = SectionBase & {
   _type: 'sectionDivisions';
   title?: string;
@@ -63,37 +52,10 @@ type SectionDivisions = SectionBase & {
   }>;
 };
 
-type SectionColors = SectionBase & {
-  _type: 'sectionColors';
+type SectionParentsTestimonials = SectionBase & {
+  _type: 'sectionParentsTestimonials';
   title?: string;
-  subtitle?: string;
-  colors?: Array<{ name?: string; hex?: string }>;
-};
-
-type SectionRichText = SectionBase & {
-  _type: 'sectionRichText';
-  title?: string;
-  content?: any;
-};
-
-type SectionList = SectionBase & {
-  _type: 'sectionList';
-  title?: string;
-  subtitle?: string;
-  items?: Array<{ title?: string; desc?: string }>;
-};
-
-type SectionPeople = SectionBase & {
-  _type: 'sectionPeople';
-  title?: string;
-  subtitle?: string;
-  people?: Array<{
-    name?: string;
-    role?: string;
-    bio?: string;
-    imageUrl?: string;
-    imageAlt?: string;
-  }>;
+  testimonials?: Array<{ text?: string }>;
 };
 
 type SectionAnnouncements = SectionBase & {
@@ -104,22 +66,28 @@ type SectionAnnouncements = SectionBase & {
   limit?: number;
 };
 
-type SectionSpacer = SectionBase & {
-  _type: 'sectionSpacer';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type SectionUpcomingEvents = SectionBase & {
+  _type: 'sectionUpcomingEvents';
+  title?: string;
+  emptyText?: string;
+  viewAllLabel?: string;
+  limit?: number; // kept for forward-compat even if hidden in Sanity
+};
+
+type SectionColors = SectionBase & {
+  _type: 'sectionColors';
+  title?: string;
+  subtitle?: string;
+  colors?: Array<{ name?: string; hex?: string }>;
 };
 
 type Section =
   | SectionVideoHero
-  | SectionStats
-  | SectionCards
   | SectionDivisions
-  | SectionColors
-  | SectionRichText
-  | SectionList
-  | SectionPeople
+  | SectionParentsTestimonials
   | SectionAnnouncements
-  | SectionSpacer
+  | SectionUpcomingEvents
+  | SectionColors
   | (SectionBase & Record<string, any>);
 
 function routeKeyToPathSegment(routeKey?: string | null) {
@@ -171,7 +139,10 @@ function resolveCmsLink(args: {
   }
 
   if (link?.linkType === 'internal') {
-    const seg = routeKeyToPathSegment(link.routeKey);
+    const raw = (link.internalPath ?? '').trim();
+    const seg = raw
+      ? normalizeLegacyHref(raw)
+      : routeKeyToPathSegment(link.routeKey);
     if (seg === null) return null;
     return { kind: 'internal', href: seg ? `/${locale}/${seg}` : `/${locale}` };
   }
@@ -187,41 +158,6 @@ function resolveCmsLink(args: {
   }
 
   return null;
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-(--paper) p-3 text-center">
-      <div className="text-xl font-bold">{value}</div>
-      <div className="mt-1 text-xs font-semibold text-muted">{label}</div>
-    </div>
-  );
-}
-
-function InfoCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-2xl border border-border bg-white p-5">
-      <div className="font-semibold">{title}</div>
-      <p className="mt-2 text-sm text-muted">{text}</p>
-    </div>
-  );
-}
-
-function spacerClass(size?: SectionSpacer['size']) {
-  switch (size) {
-    case 'xs':
-      return 'h-2';
-    case 'sm':
-      return 'h-4';
-    case 'md':
-      return 'h-8';
-    case 'lg':
-      return 'h-12';
-    case 'xl':
-      return 'h-16';
-    default:
-      return 'h-8';
-  }
 }
 
 function CtaButton({
@@ -255,15 +191,100 @@ function CtaButton({
   );
 }
 
+function NewsList({
+  locale,
+  title,
+  emptyText,
+  viewAllLabel,
+  posts,
+  viewAllHref,
+}: {
+  locale: string;
+  title: string;
+  emptyText: string;
+  viewAllLabel: string;
+  posts: Announcement[];
+  viewAllHref: string;
+}) {
+  return (
+    <section>
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold">{title}</h2>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-white">
+        {posts.length ? (
+          <ul className="divide-y divide-border">
+            {posts.map((post) => (
+              <li key={post._id} className="p-4">
+                <Link
+                  href={`/${locale}/news/${post.slug ?? ''}`}
+                  className="flex gap-4 hover:opacity-90"
+                >
+                  <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-(--paper)">
+                    {post.mainImageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={post.mainImageUrl}
+                        alt={post.mainImageAlt || post.title || 'Post'}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="line-clamp-1 text-base font-semibold">
+                      {post.title}
+                    </h3>
+
+                    {post.excerpt ? (
+                      <p className="mt-1 line-clamp-2 text-sm text-muted">
+                        {post.excerpt}
+                      </p>
+                    ) : null}
+
+                    {post.publishedAt ? (
+                      <p className="mt-2 text-sm text-red-800">
+                        📅{' '}
+                        {new Date(post.publishedAt).toLocaleDateString(
+                          locale === 'ar' ? 'ar' : locale,
+                        )}
+                      </p>
+                    ) : null}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="p-6 text-sm text-muted">{emptyText}</div>
+        )}
+
+        <div className="flex items-center justify-end p-4">
+          <Link
+            href={viewAllHref}
+            className="text-sm font-semibold text-(--fg) hover:underline"
+          >
+            {viewAllLabel}
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function SectionRenderer({
   locale,
   sections,
   announcements,
+  upcomingEvents,
   pageTitle,
 }: {
   locale: string;
   sections?: Section[] | null;
   announcements?: Announcement[];
+  upcomingEvents?: Announcement[];
   pageTitle?: string;
 }) {
   if (!sections?.length) return null;
@@ -275,6 +296,7 @@ export default function SectionRenderer({
           <h1 className="text-3xl font-bold">{pageTitle}</h1>
         </div>
       ) : null}
+
       {sections.map((section, idx) => {
         switch (section._type) {
           case 'sectionVideoHero': {
@@ -337,35 +359,35 @@ export default function SectionRenderer({
                         </div>
                       ) : null}
 
-                      <h1 className="mt-3 text-4xl font-bold tracking-tight text-white md:text-6xl">
-                        {s.title ?? '—'}
-                      </h1>
+                      {s.title ? (
+                        <h1 className="mt-2 text-3xl font-bold leading-tight text-white md:text-5xl">
+                          {s.title}
+                        </h1>
+                      ) : null}
 
                       {s.subtitle ? (
-                        <p className="mt-4 text-lg leading-relaxed text-white/80">
+                        <p className="mt-4 max-w-xl text-base text-white/85 md:text-lg">
                           {s.subtitle}
                         </p>
                       ) : null}
 
-                      {primaryResolved || secondaryResolved ? (
-                        <div className="mt-6 flex flex-wrap gap-3">
-                          {primaryResolved ? (
-                            <CtaButton
-                              resolved={primaryResolved}
-                              label={s.primaryCta?.label ?? '—'}
-                              className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
-                            />
-                          ) : null}
+                      <div className="mt-6 flex flex-wrap gap-3">
+                        {primaryResolved && s.primaryCta?.label ? (
+                          <CtaButton
+                            resolved={primaryResolved}
+                            label={s.primaryCta.label}
+                            className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
+                          />
+                        ) : null}
 
-                          {secondaryResolved ? (
-                            <CtaButton
-                              resolved={secondaryResolved}
-                              label={s.secondaryCta?.label ?? '—'}
-                              className="rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/15"
-                            />
-                          ) : null}
-                        </div>
-                      ) : null}
+                        {secondaryResolved && s.secondaryCta?.label ? (
+                          <CtaButton
+                            resolved={secondaryResolved}
+                            label={s.secondaryCta.label}
+                            className="rounded-xl border border-white/60 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                          />
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -375,22 +397,22 @@ export default function SectionRenderer({
 
           case 'sectionDivisions': {
             const s = section as SectionDivisions;
-            const divisions = (s.divisions ?? []).slice(0, 12);
-            if (!divisions.length) return null;
 
             return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                {s.subtitle ? (
-                  <p className="mt-2 max-w-3xl text-sm text-muted">
-                    {s.subtitle}
-                  </p>
-                ) : null}
+              <section key={idx} className="mx-auto max-w-6xl px-4">
+                <div className="mb-6">
+                  {s.title ? (
+                    <h2 className="text-2xl font-semibold">{s.title}</h2>
+                  ) : null}
+                  {s.subtitle ? (
+                    <p className="mt-2 max-w-3xl text-sm text-muted">
+                      {s.subtitle}
+                    </p>
+                  ) : null}
+                </div>
 
-                <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  {divisions.map((d, i) => (
+                <div className="grid gap-6 md:grid-cols-2">
+                  {(s.divisions ?? []).map((d, i) => (
                     <DivisionCard key={i} locale={locale} d={d} />
                   ))}
                 </div>
@@ -398,200 +420,29 @@ export default function SectionRenderer({
             );
           }
 
-          case 'sectionColors': {
-            const s = section as SectionColors;
-            const colors = (s.colors ?? []).filter((c) => c?.hex);
-            if (!colors.length) return null;
-
-            return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                {s.subtitle ? (
-                  <p className="mt-2 max-w-3xl text-sm text-muted">
-                    {s.subtitle}
-                  </p>
-                ) : null}
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  {colors.map((c, i) => (
-                    <div
-                      key={i}
-                      className="rounded-2xl border border-border bg-white p-4"
-                    >
-                      <div
-                        className="h-14 w-full rounded-xl border border-border"
-                        style={{ backgroundColor: c.hex }}
-                      />
-                      <div className="mt-3 flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="line-clamp-1 text-sm font-semibold">
-                            {c.name ?? '—'}
-                          </div>
-                          <div className="mt-1 text-xs text-muted">{c.hex}</div>
-                        </div>
-
-                        <div
-                          className="h-10 w-10 shrink-0 rounded-xl border border-border"
-                          style={{ backgroundColor: c.hex }}
-                          aria-hidden
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+          case 'sectionParentsTestimonials': {
+            const s = section as SectionParentsTestimonials;
+            const items = (s.testimonials ?? []).filter((t) =>
+              (t.text ?? '').trim(),
             );
-          }
-
-          case 'sectionStats': {
-            const s = section as SectionStats;
-            const items = (s.items ?? []).slice(0, 3);
 
             if (!items.length) return null;
 
             return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="mb-4 text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                <div className="grid grid-cols-3 gap-4 rounded-2xl border border-border bg-white p-4">
-                  {items.map((it, i) => (
-                    <Stat
-                      key={i}
-                      label={it.label ?? '—'}
-                      value={it.value ?? '—'}
-                    />
-                  ))}
+              <section key={idx} className="mx-auto max-w-6xl px-4">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold">
+                    {s.title ?? 'Parents Testimonials'}
+                  </h2>
                 </div>
-              </section>
-            );
-          }
 
-          case 'sectionCards': {
-            const s = section as SectionCards;
-            const cards = (s.cards ?? []).slice(0, 3);
-            if (!cards.length) return null;
-
-            return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="mb-6 text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                <div className="grid gap-4 md:grid-cols-3">
-                  {cards.map((c, i) => (
-                    <InfoCard
-                      key={i}
-                      title={c.title ?? '—'}
-                      text={c.text ?? ''}
-                    />
-                  ))}
-                </div>
-              </section>
-            );
-          }
-
-          case 'sectionRichText': {
-            const s = section as SectionRichText;
-            if (!s.content) return null;
-
-            return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="mb-4 text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                <div className="prose max-w-none rounded-2xl border border-border bg-white p-6 prose-headings:tracking-tight prose-a:text-accent">
-                  <PortableText value={s.content} />
-                </div>
-              </section>
-            );
-          }
-
-          case 'sectionList': {
-            const s = section as SectionList;
-            const items = (s.items ?? []).filter((it) => it?.title || it?.desc);
-            if (!items.length) return null;
-
-            return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                {s.subtitle ? (
-                  <p className="mt-2 max-w-3xl text-sm text-muted">
-                    {s.subtitle}
-                  </p>
-                ) : null}
-
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {items.map((it, i) => (
+                <div className="grid gap-6 md:grid-cols-3">
+                  {items.map((t, i) => (
                     <div
                       key={i}
-                      className="rounded-2xl border border-border bg-white p-5"
+                      className="rounded-2xl border border-border bg-white p-6 text-sm text-(--fg)"
                     >
-                      {it.title ? (
-                        <div className="font-semibold">{it.title}</div>
-                      ) : null}
-                      {it.desc ? (
-                        <p className="mt-2 text-sm text-muted">{it.desc}</p>
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            );
-          }
-
-          case 'sectionPeople': {
-            const s = section as SectionPeople;
-            const people = (s.people ?? []).filter((p) => p?.name);
-            if (!people.length) return null;
-
-            return (
-              <section key={idx}>
-                {s.title ? (
-                  <h2 className="text-2xl font-semibold">{s.title}</h2>
-                ) : null}
-                {s.subtitle ? (
-                  <p className="mt-2 max-w-3xl text-sm text-muted">
-                    {s.subtitle}
-                  </p>
-                ) : null}
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {people.map((p, i) => (
-                    <div
-                      key={i}
-                      className="rounded-2xl border border-border bg-white p-5"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-(--paper)">
-                          {p.imageUrl ? (
-                            <img
-                              src={p.imageUrl}
-                              alt={p.imageAlt || p.name || 'Person'}
-                              className="h-full w-full object-cover"
-                              loading="lazy"
-                            />
-                          ) : null}
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="line-clamp-1 font-semibold">
-                            {p.name}
-                          </div>
-                          {p.role ? (
-                            <div className="mt-0.5 text-sm text-muted">
-                              {p.role}
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      {p.bio ? (
-                        <p className="mt-4 text-sm text-muted">{p.bio}</p>
-                      ) : null}
+                      <p className="leading-relaxed text-muted">“{t.text}”</p>
                     </div>
                   ))}
                 </div>
@@ -603,93 +454,82 @@ export default function SectionRenderer({
             const s = section as SectionAnnouncements;
             const limit =
               typeof s.limit === 'number' && s.limit > 0 ? s.limit : undefined;
-            const list = (announcements ?? []).slice(
-              0,
-              limit ?? announcements?.length ?? 0,
-            );
+
+            const posts = (announcements ?? []).slice(0, limit ?? 999);
 
             return (
-              <section key={idx}>
-                <div className="mb-6">
-                  <h2 className="text-2xl font-semibold">
-                    {s.title ?? 'Announcements'}
-                  </h2>
-                </div>
-
-                <div className="rounded-2xl border border-border bg-white">
-                  {list.length ? (
-                    <ul className="divide-y divide-border">
-                      {list.map((post) => (
-                        <li key={post._id} className="p-4">
-                          <Link
-                            href={`/${locale}/news/${post.slug ?? ''}`}
-                            className="flex gap-4 hover:opacity-90"
-                          >
-                            <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-(--paper)">
-                              {post.mainImageUrl ? (
-                                <img
-                                  src={post.mainImageUrl}
-                                  alt={
-                                    post.mainImageAlt ||
-                                    post.title ||
-                                    'Announcement'
-                                  }
-                                  className="h-full w-full object-cover"
-                                  loading="lazy"
-                                />
-                              ) : null}
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-start justify-between gap-3">
-                                <h3 className="line-clamp-1 text-base font-semibold">
-                                  {post.title}
-                                </h3>
-                              </div>
-
-                              {post.excerpt ? (
-                                <p className="mt-1 line-clamp-2 text-sm text-muted">
-                                  {post.excerpt}
-                                </p>
-                              ) : null}
-
-                              {post.publishedAt ? (
-                                <p className="mt-2 text-sm text-red-800">
-                                  📅{' '}
-                                  {new Date(
-                                    post.publishedAt,
-                                  ).toLocaleDateString(
-                                    locale === 'ar' ? 'ar' : locale,
-                                  )}
-                                </p>
-                              ) : null}
-                            </div>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="p-6 text-sm text-muted">
-                      {s.emptyText ?? 'No announcements yet.'}
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-end p-4">
-                    <Link
-                      href={`/${locale}/news`}
-                      className="text-sm font-semibold text-(--fg) hover:underline"
-                    >
-                      {s.viewAllLabel ?? 'View all news →'}
-                    </Link>
-                  </div>
-                </div>
-              </section>
+              <NewsList
+                key={idx}
+                locale={locale}
+                title={s.title ?? 'Latest news'}
+                emptyText={s.emptyText ?? 'No announcements yet.'}
+                viewAllLabel={s.viewAllLabel ?? 'View all news →'}
+                posts={posts}
+                viewAllHref={`/${locale}/news`}
+              />
             );
           }
 
-          case 'sectionSpacer': {
-            const s = section as SectionSpacer;
-            return <div key={idx} className={spacerClass(s.size)} />;
+          case 'sectionUpcomingEvents': {
+            const s = section as SectionUpcomingEvents;
+            const limit =
+              typeof s.limit === 'number' && s.limit > 0 ? s.limit : 3;
+
+            const posts = (upcomingEvents ?? []).slice(0, limit);
+
+            return (
+              <NewsList
+                key={idx}
+                locale={locale}
+                title={s.title ?? 'Upcoming events'}
+                emptyText={s.emptyText ?? 'No upcoming events.'}
+                viewAllLabel={s.viewAllLabel ?? 'View all news →'}
+                posts={posts}
+                viewAllHref={`/${locale}/news`}
+              />
+            );
+          }
+
+          case 'sectionColors': {
+            const s = section as SectionColors;
+
+            const colors = (s.colors ?? []).filter((c) => (c.hex ?? '').trim());
+
+            if (!colors.length) return null;
+
+            return (
+              <section key={idx} className="mx-auto max-w-6xl px-4">
+                <div className="mb-6">
+                  {s.title ? (
+                    <h2 className="text-2xl font-semibold">{s.title}</h2>
+                  ) : null}
+                  {s.subtitle ? (
+                    <p className="mt-2 max-w-3xl text-sm text-muted">
+                      {s.subtitle}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {colors.map((c, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
+                    >
+                      <div>
+                        <div className="font-semibold">{c.name}</div>
+                        <div className="mt-1 text-sm text-muted">{c.hex}</div>
+                      </div>
+                      <div
+                        className="h-10 w-10 rounded-xl border border-border"
+                        style={{ backgroundColor: c.hex }}
+                        aria-label={c.hex}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
           }
 
           default:

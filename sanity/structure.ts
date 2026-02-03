@@ -130,6 +130,20 @@ export const structure: StructureResolver = (S) => {
               .title(`${t.moodle} — ${t.langTitle}`)
               .initialValueTemplate('moodlePage-byLang', { lang }),
           ),
+
+        S.divider(),
+
+        S.listItem()
+          .title('صفحات مخصّصة (Custom Pages)')
+          .icon(DocumentsIcon)
+          .child(
+            S.documentList()
+              .title(`صفحات مخصّصة — ${t.langTitle}`)
+              .schemaType('sitePage')
+              .filter('_type == "sitePage" && language == $lang')
+              .params({ lang })
+              .defaultOrdering([{ field: 'title', direction: 'asc' }]),
+          ),
       ]);
   };
 
