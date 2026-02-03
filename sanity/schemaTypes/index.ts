@@ -8,6 +8,7 @@ import { aboutPageType } from './aboutPageType';
 import { sectionsPageType } from './sectionsPageType';
 import { feesPageType } from './feesPageType';
 import { moodlePageType } from './moodlePageType';
+import { navHeaderType } from './navHeaderType';
 import { sitePageType } from './sitePageType';
 import { siteSettingsType } from './siteSettingsType';
 import { linkObject } from './objects/link';
@@ -37,6 +38,7 @@ export const schema = {
     sectionsPageType,
     feesPageType,
     moodlePageType,
+    navHeaderType,
     sitePageType,
     siteSettingsType,
   ],
@@ -53,6 +55,24 @@ export const schema = {
     singletonLangTemplate('newsPost'),
     singletonLangTemplate('schoolSectionPage'),
 
+    // Header groups
+    singletonLangTemplate('navHeader'),
+
+    // Site page under a header group
+    {
+      id: 'sitePage-byHeader',
+      title: 'sitePage (by header + language)',
+      schemaType: 'sitePage',
+      parameters: [
+        { name: 'lang', title: 'Language', type: 'string' },
+        { name: 'headerId', title: 'Header Document ID', type: 'string' },
+      ],
+      value: (params: any) => ({
+        language: params?.lang,
+        header: params?.headerId ? { _type: 'reference', _ref: params.headerId } : undefined,
+      }),
+    },
+
     {
       id: 'galleryCategory-bySection',
       title: 'Gallery Category (by section)',
@@ -63,7 +83,6 @@ export const schema = {
       ],
       value: (params: any) => ({
         language: params?.lang,
-        contextLock: true,
         section: params?.sectionId
           ? { _type: 'reference', _ref: params.sectionId }
           : undefined,

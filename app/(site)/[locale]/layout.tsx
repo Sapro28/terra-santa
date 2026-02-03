@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 import {
+  headerNavQuery,
   siteSettingsQuery,
   schoolSectionPagesNavQuery,
 } from '@/sanity/lib/queries';
@@ -46,6 +47,15 @@ export default async function LocaleLayout({
         id: `siteSettings-${locale}`,
       });
 
+  const headerNav = dm.isEnabled
+    ? (
+        await sanityFetch({
+          query: headerNavQuery,
+          params: { lang: locale },
+        })
+      ).data
+    : await sanityClient.fetch(headerNavQuery, { lang: locale });
+
   const sectionPages = dm.isEnabled
     ? (
         await sanityFetch({
@@ -61,6 +71,7 @@ export default async function LocaleLayout({
         <Header
           locale={locale}
           settings={siteSettings}
+          headerNav={headerNav}
           sectionPages={sectionPages}
         />
         <main>{children}</main>

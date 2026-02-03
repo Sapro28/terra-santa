@@ -1,4 +1,4 @@
-import { defineType, defineField, defineArrayMember } from 'sanity';
+import { defineType, defineField } from 'sanity';
 import { languageFieldLocked } from './languageField';
 
 export const siteSettingsType = defineType({
@@ -21,108 +21,6 @@ export const siteSettingsType = defineType({
         },
       },
       validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
-      name: 'navigation',
-      title: 'روابط القائمة (Header)',
-      type: 'array',
-      options: {
-        i18nTitle: {
-          ar: 'روابط القائمة (Header)',
-          en: 'Header navigation links',
-          it: 'Link di navigazione (Header)',
-        },
-      },
-      of: [
-        defineArrayMember({
-          name: 'navItem',
-          title: 'Nav Item',
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'النص',
-              type: 'string',
-              options: {
-                i18nTitle: {
-                  ar: 'النص',
-                  en: 'Label',
-                  it: 'Etichetta',
-                },
-              },
-              validation: (Rule) => Rule.required(),
-            }),
-
-            defineField({
-              name: 'link',
-              title: 'الرابط',
-              type: 'link',
-              options: {
-                i18nTitle: {
-                  ar: 'الرابط',
-                  en: 'Link',
-                  it: 'Link',
-                },
-              },
-              validation: (Rule) => Rule.required(),
-            }),
-
-            defineField({
-              name: 'navType',
-              title: 'Legacy navType (لا تستخدم)',
-              type: 'string',
-              readOnly: true,
-              hidden: true,
-            }),
-            defineField({
-              name: 'routeKey',
-              title: 'Legacy routeKey (لا تستخدم)',
-              type: 'string',
-              readOnly: true,
-              hidden: true,
-            }),
-            defineField({
-              name: 'externalUrl',
-              title: 'Legacy externalUrl (لا تستخدم)',
-              type: 'url',
-              readOnly: true,
-              hidden: true,
-            }),
-            defineField({
-              name: 'openInNewTab',
-              title: 'Legacy openInNewTab (لا تستخدم)',
-              type: 'boolean',
-              readOnly: true,
-              hidden: true,
-            }),
-
-            defineField({
-              name: 'href',
-              title: 'Legacy href (لا تستخدم)',
-              type: 'string',
-              readOnly: true,
-              hidden: true,
-            }),
-          ],
-          preview: {
-            select: {
-              title: 'label',
-              navType: 'navType',
-              routeKey: 'routeKey',
-              externalUrl: 'externalUrl',
-            },
-            prepare({ title, navType, routeKey, externalUrl }) {
-              let subtitle = '';
-              if (navType === 'internal')
-                subtitle = `داخلي: ${routeKey || '-'}`;
-              if (navType === 'external')
-                subtitle = `خارجي: ${externalUrl || '-'}`;
-              return { title, subtitle };
-            },
-          },
-        }),
-      ],
     }),
 
     defineField({
@@ -168,30 +66,30 @@ export const siteSettingsType = defineType({
           options: {
             i18nTitle: {
               ar: 'وصف مختصر',
-              en: 'Tagline',
-              it: 'Slogan',
+              en: 'Short description',
+              it: 'Descrizione breve',
             },
           },
         }),
         defineField({
           name: 'hoursTitle',
-          title: 'عنوان ساعات الدوام',
+          title: 'ساعات العمل (عنوان)',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'عنوان ساعات الدوام',
-              en: 'Hours title',
-              it: 'Titolo orari',
+              ar: 'ساعات العمل (عنوان)',
+              en: 'Hours (title)',
+              it: 'Orari (titolo)',
             },
           },
         }),
         defineField({
           name: 'hoursLine1',
-          title: 'ساعات الدوام (سطر 1)',
+          title: 'ساعات العمل (سطر 1)',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'ساعات الدوام (سطر 1)',
+              ar: 'ساعات العمل (سطر 1)',
               en: 'Hours (line 1)',
               it: 'Orari (riga 1)',
             },
@@ -199,11 +97,11 @@ export const siteSettingsType = defineType({
         }),
         defineField({
           name: 'hoursLine2',
-          title: 'ساعات الدوام (سطر 2)',
+          title: 'ساعات العمل (سطر 2)',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'ساعات الدوام (سطر 2)',
+              ar: 'ساعات العمل (سطر 2)',
               en: 'Hours (line 2)',
               it: 'Orari (riga 2)',
             },

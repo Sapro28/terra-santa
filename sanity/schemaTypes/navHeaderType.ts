@@ -2,9 +2,9 @@ import { defineArrayMember, defineField, defineType } from 'sanity';
 import { DocumentIcon } from '@sanity/icons';
 import { languageFieldLocked } from './languageField';
 
-export const sitePageType = defineType({
-  name: 'sitePage',
-  title: 'صفحة (داخل قسم الهيدر)',
+export const navHeaderType = defineType({
+  name: 'navHeader',
+  title: 'عنصر هيدر (Header)',
   type: 'document',
   icon: DocumentIcon,
 
@@ -12,16 +12,8 @@ export const sitePageType = defineType({
     languageFieldLocked,
 
     defineField({
-      name: 'header',
-      title: 'القسم (Header)',
-      type: 'reference',
-      to: [{ type: 'navHeader' }],
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
       name: 'title',
-      title: 'عنوان الصفحة',
+      title: 'اسم القسم في الهيدر',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -30,7 +22,7 @@ export const sitePageType = defineType({
       name: 'slug',
       title: 'الرابط (Slug)',
       type: 'string',
-      description: 'اكتب المسار بدون / في البداية. مثال: fees',
+      description: 'اكتب المسار بدون / في البداية. مثال: admissions',
       validation: (Rule) =>
         Rule.required()
           .min(1)
@@ -47,8 +39,16 @@ export const sitePageType = defineType({
     }),
 
     defineField({
+      name: 'order',
+      title: 'الترتيب (اختياري)',
+      type: 'number',
+      description: 'رقم أصغر = يظهر أولاً في الهيدر',
+      validation: (Rule) => Rule.min(0),
+    }),
+
+    defineField({
       name: 'sections',
-      title: 'محتوى الصفحة (Page Builder)',
+      title: 'محتوى صفحة القسم (اختياري)',
       type: 'array',
       of: [
         defineArrayMember({ type: 'sectionVideoHero' }),
@@ -62,21 +62,9 @@ export const sitePageType = defineType({
   ],
 
   preview: {
-    select: {
-      title: 'title',
-      lang: 'language',
-      headerTitle: 'header.title',
-      headerSlug: 'header.slug',
-      slug: 'slug',
-    },
-    prepare({ title, lang, headerTitle, headerSlug, slug }) {
-      const full =
-        headerSlug && slug ? `/${headerSlug}/${slug}` : headerSlug ? `/${headerSlug}` : null;
-      const parts = [
-        lang ? `اللغة: ${lang}` : null,
-        headerTitle ? `قسم: ${headerTitle}` : null,
-        full ? full : null,
-      ]
+    select: { title: 'title', lang: 'language', slug: 'slug' },
+    prepare({ title, lang, slug }) {
+      const parts = [lang ? `اللغة: ${lang}` : null, slug ? `/${slug}` : null]
         .filter(Boolean)
         .join(' • ');
 

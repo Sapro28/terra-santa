@@ -16,6 +16,8 @@ const LABELS: Record<
     moodle: string;
 
     dropdownItems: string;
+
+    headerGroups: string;
   }
 > = {
   ar: {
@@ -28,6 +30,7 @@ const LABELS: Record<
     fees: 'صفحة الرسوم',
     moodle: 'صفحة مودل',
     dropdownItems: 'صفحات الأقسام (عناصر القائمة المنسدلة)',
+    headerGroups: 'أقسام الهيدر (Admissions…)',
   },
   en: {
     langTitle: 'English',
@@ -39,6 +42,7 @@ const LABELS: Record<
     fees: 'Fees',
     moodle: 'Moodle',
     dropdownItems: 'Section pages (dropdown items)',
+    headerGroups: 'Header groups',
   },
   it: {
     langTitle: 'Italiano',
@@ -50,6 +54,7 @@ const LABELS: Record<
     fees: 'Tasse / Tariffe',
     moodle: 'Moodle',
     dropdownItems: 'Pagine sezioni (voci menu)',
+    headerGroups: 'Gruppi header',
   },
 };
 
@@ -74,6 +79,58 @@ export const structure: StructureResolver = (S) => {
       .initialValueTemplates([
         S.initialValueTemplateItem('schoolSectionPage-byLang', { lang }),
       ]);
+  };
+
+  const headerGroupsList = (lang: Lang) => {
+    const t = LABELS[lang];
+
+    return S.documentList()
+      .title(`${t.headerGroups} — ${t.langTitle}`)
+      .schemaType('navHeader')
+      .filter('_type == "navHeader" && language == $lang')
+      .params({ lang })
+      .defaultOrdering([
+        { field: 'order', direction: 'asc' },
+        { field: 'title', direction: 'asc' },
+      ])
+      .initialValueTemplates([
+        S.initialValueTemplateItem('navHeader-byLang', { lang }),
+      ])
+      .child((headerId) =>
+        S.list()
+          .title(t.headerGroups)
+          .items([
+            S.listItem()
+              .title('صفحة القسم')
+              .icon(DocumentIcon)
+              .child(
+                S.document()
+                  .schemaType('navHeader')
+                  .documentId(headerId)
+                  .title('صفحة القسم'),
+              ),
+
+            S.divider(),
+
+            S.listItem()
+              .title('الصفحات داخل القسم')
+              .icon(DocumentsIcon)
+              .child(
+                S.documentList()
+                  .title('الصفحات داخل القسم')
+                  .schemaType('sitePage')
+                  .filter('_type == "sitePage" && language == $lang && header._ref == $headerId')
+                  .params({ lang, headerId })
+                  .defaultOrdering([{ field: 'title', direction: 'asc' }])
+                  .initialValueTemplates([
+                    S.initialValueTemplateItem('sitePage-byHeader', {
+                      lang,
+                      headerId,
+                    }),
+                  ]),
+              ),
+          ]),
+      );
   };
 
   const singletonPagesByLanguage = (lang: Lang) => {
@@ -108,6 +165,11 @@ export const structure: StructureResolver = (S) => {
           .title(t.stages)
           .icon(DocumentsIcon)
           .child(sectionPagesList(lang)),
+
+        S.listItem()
+          .title(t.headerGroups)
+          .icon(DocumentsIcon)
+          .child(headerGroupsList(lang)),
 
         S.listItem()
           .title(t.fees)
@@ -147,21 +209,38 @@ export const structure: StructureResolver = (S) => {
       ]);
   };
 
-  const siteSettingsByLanguage = () =>
+  const websiteByLanguage = () =>
     S.list()
-      .title('إعدادات الموقع (حسب اللغة)')
+      .title('الموقع (حسب اللغة)')
       .items(
         (Object.keys(LABELS) as Lang[]).map((lang) => {
           const t = LABELS[lang];
+
           return S.listItem()
-            .title(`${t.settingsTitle} — ${t.langTitle}`)
+            .title(t.langTitle)
             .icon(CogIcon)
             .child(
-              S.document()
-                .schemaType('siteSettings')
-                .documentId(SINGLETON_ID.siteSettings(lang))
-                .title(`${t.settingsTitle} — ${t.langTitle}`)
-                .initialValueTemplate('siteSettings-byLang', { lang }),
+              S.list()
+                .title(`الموقع — ${t.langTitle}`)
+                .items([
+                  S.listItem()
+                    .title(t.settingsTitle)
+                    .icon(CogIcon)
+                    .child(
+                      S.document()
+                        .schemaType('siteSettings')
+                        .documentId(SINGLETON_ID.siteSettings(lang))
+                        .title(`${t.settingsTitle} — ${t.langTitle}`)
+                        .initialValueTemplate('siteSettings-byLang', { lang }),
+                    ),
+
+                  S.divider(),
+
+                  S.listItem()
+                    .title(t.pagesTitle)
+                    .icon(DocumentIcon)
+                    .child(singletonPagesByLanguage(lang)),
+                ]),
             );
         }),
       );
@@ -239,11 +318,12 @@ export const structure: StructureResolver = (S) => {
     .title('CMS')
     .items([
       S.listItem()
-        .title('إعدادات الموقع')
+        .title('الموقع')
         .icon(CogIcon)
-        .child(siteSettingsByLanguage()),
+        .child(websiteByLanguage()),
 
       S.divider(),
+
       S.listItem()
         .title('المحتوى')
         .icon(DocumentsIcon)
@@ -260,29 +340,6 @@ export const structure: StructureResolver = (S) => {
                 .title('المعرض حسب القسم')
                 .icon(ImageIcon)
                 .child(galleryBySection()),
-            ]),
-        ),
-
-      S.divider(),
-      S.listItem()
-        .title('الصفحات (حسب اللغة)')
-        .icon(DocumentIcon)
-        .child(
-          S.list()
-            .title('الصفحات (حسب اللغة)')
-            .items([
-              S.listItem()
-                .title(LABELS.ar.langTitle)
-                .icon(DocumentIcon)
-                .child(singletonPagesByLanguage('ar')),
-              S.listItem()
-                .title(LABELS.en.langTitle)
-                .icon(DocumentIcon)
-                .child(singletonPagesByLanguage('en')),
-              S.listItem()
-                .title(LABELS.it.langTitle)
-                .icon(DocumentIcon)
-                .child(singletonPagesByLanguage('it')),
             ]),
         ),
     ]);

@@ -4,6 +4,7 @@ export const linkObject = defineType({
   name: 'link',
   title: 'Link',
   type: 'object',
+
   fields: [
     defineField({
       name: 'linkType',
@@ -20,14 +21,30 @@ export const linkObject = defineType({
     }),
 
     defineField({
+      name: 'internalRef',
+      title: 'اختر صفحة (مُستحسن)',
+      type: 'reference',
+      // NOTE:
+      // - navHeader is the "landing" page for a header group (ex: /admissions)
+      // - sitePage is a child page under a header group (ex: /admissions/fees)
+      // - schoolSectionPage is a section detail page (ex: /sections/primary)
+      to: [
+        { type: 'navHeader' },
+        { type: 'sitePage' },
+        { type: 'schoolSectionPage' },
+      ],
+      description: 'اختر صفحة من صفحات الموقع. سيتم إنشاء الرابط تلقائياً.',
+      hidden: ({ parent }) => parent?.linkType !== 'internal',
+    }),
+
+    defineField({
       name: 'routeKey',
-      title: 'اختر الصفحة',
+      title: 'أو اختر صفحة ثابتة',
       type: 'string',
       options: {
         list: [
           { title: 'الرئيسية', value: 'home' },
           { title: 'من نحن', value: 'about' },
-          { title: 'أقسام', value: 'sections' },
           { title: 'المعرض', value: 'gallery' },
           { title: 'الأخبار', value: 'news' },
           { title: 'الرسوم', value: 'fees' },
@@ -72,4 +89,86 @@ export const linkObject = defineType({
       hidden: ({ parent }) => parent?.linkType !== 'external',
     }),
   ],
+
+  preview: {
+    select: {
+      linkType: 'linkType',
+      routeKey: 'routeKey',
+      internalPath: 'internalPath',
+      externalUrl: 'externalUrl',
+      refType: 'internalRef._type',
+      refTitle: 'internalRef.title',
+      // navHeader + sitePage use a string slug field, while schoolSectionPage uses slug.current
+      refSlug: 'internalRef.slug',
+      refSlugCurrent: 'internalRef.slug.current',
+      // sitePage has a header reference; navHeader itself does not.
+      refHeaderSlug: 'internalRef.header->slug',
+      refOrder: 'internalRef.order',
+    },
+    prepare({
+      linkType,
+      routeKey,
+      internalPath,
+      externalUrl,
+      refType,
+      refTitle,
+      refSlug,
+      refSlugCurrent,
+      refHeaderSlug,
+      refOrder,
+    }) {
+      if (linkType === 'external') {
+        return { title: externalUrl || 'External link', subtitle: 'خارجي' };
+      }
+
+      const byRef = refTitle ? `مرجع: ${refTitle}` : null;
+      const byRoute = routeKey ? `مسار: ${routeKey}` : null;
+      const byPath = internalPath ? `مخصص: ${internalPath}` : null;
+
+      const slugValue = ((): string | null => {
+        if (typeof refSlugCurrent === 'string' && refSlugCurrent.trim()) {
+          return refSlugCurrent.trim();
+        }
+        if (typeof refSlug === 'string' && refSlug.trim())
+          return refSlug.trim();
+        return null;
+      })();
+
+      const slugInfo = (() => {
+        if (!slugValue) return null;
+        // /sections/<slug>
+        if (refType === 'schoolSectionPage') return `/sections/${slugValue}`;
+        // /<header>/<child>
+        if (refType === 'sitePage' && refHeaderSlug)
+          return `/${refHeaderSlug}/${slugValue}`;
+        // /<header>
+        return `/${slugValue}`;
+      })();
+
+      const orderInfo =
+        typeof refOrder === 'number' ? `Order: ${refOrder}` : null;
+
+      return {
+        title: byRef || byRoute || byPath || 'Internal link',
+        subtitle: [slugInfo, orderInfo].filter(Boolean).join(' • ') || 'داخلي',
+      };
+    },
+  },
+
+  validation: (Rule) =>
+    Rule.custom((value: any) => {
+      const linkType = value?.linkType;
+      if (linkType === 'external') {
+        const href = String(value?.externalUrl || '').trim();
+        return href ? true : 'External URL is required.';
+      }
+
+      const hasRef = Boolean(value?.internalRef?._ref);
+      const hasRouteKey = Boolean(String(value?.routeKey || '').trim());
+      const hasPath = Boolean(String(value?.internalPath || '').trim());
+
+      return hasRef || hasRouteKey || hasPath
+        ? true
+        : 'Choose an internal page, or route, or type a path.';
+    }),
 });

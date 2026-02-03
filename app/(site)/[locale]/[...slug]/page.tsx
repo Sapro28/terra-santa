@@ -10,7 +10,9 @@ import {
   moodlePageBuilderQuery,
   schoolSectionPageBuilderBySlugQuery,
   sectionsPageBuilderQuery,
-  sitePageBySlugQuery,
+  navHeaderBySlugQuery,
+  sitePageByHeaderAndSlugQuery,
+  legacySitePageBySlugQuery,
   upcomingEventsQuery,
 } from '@/sanity/lib/queries';
 
@@ -151,22 +153,71 @@ export default async function CatchAllCmsPage({
     }
   }
 
-  // Generic CMS pages (slug can be nested, ex: "foo/bar")
-  const slugPath = segments.join('/');
-  const page = await client.fetch<BuilderPage | null>(sitePageBySlugQuery, {
-    slug: slugPath,
-    lang,
-  });
+  // Header pages (landing + child pages)
+  if (segments.length === 1) {
+    const headerPage = await client.fetch<BuilderPage | null>(
+      navHeaderBySlugQuery,
+      {
+        slug: first,
+        lang,
+      },
+    );
 
-  if (!page) notFound();
+    if (headerPage) {
+      return (
+        <SectionRenderer
+          locale={locale}
+          sections={headerPage.sections || []}
+          announcements={announcements}
+          upcomingEvents={upcomingEvents}
+          pageTitle={headerPage.title}
+        />
+      );
+    }
+  }
+
+  if (segments.length === 2) {
+    const page = await client.fetch<BuilderPage | null>(
+      sitePageByHeaderAndSlugQuery,
+      {
+        headerSlug: segments[0],
+        slug: segments[1],
+        lang,
+      },
+    );
+
+    if (page) {
+      return (
+        <SectionRenderer
+          locale={locale}
+          sections={page.sections || []}
+          announcements={announcements}
+          upcomingEvents={upcomingEvents}
+          pageTitle={page.title}
+        />
+      );
+    }
+  }
+
+  // Legacy fallback (older docs that stored nested paths like "foo/bar" in slug.current)
+  const slugPath = segments.join('/');
+  const legacyPage = await client.fetch<BuilderPage | null>(
+    legacySitePageBySlugQuery,
+    {
+      slug: slugPath,
+      lang,
+    },
+  );
+
+  if (!legacyPage) notFound();
 
   return (
     <SectionRenderer
       locale={locale}
-      sections={page.sections || []}
+      sections={legacyPage.sections || []}
       announcements={announcements}
       upcomingEvents={upcomingEvents}
-      pageTitle={page.title}
+      pageTitle={legacyPage.title}
     />
   );
 }

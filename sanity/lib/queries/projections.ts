@@ -13,6 +13,14 @@ export const sectionProjection = `
       label,
       link{
         linkType,
+        internalRef->{
+          _type,
+          title,
+          // navHeader/sitePage slugs are stored as strings; schoolSectionPage uses slug.current.
+          "slug": coalesce(slug.current, slug),
+          // Only sitePage has a header reference.
+          "headerSlug": header->slug
+        },
         routeKey,
         internalPath,
         externalUrl,
@@ -25,6 +33,12 @@ export const sectionProjection = `
       label,
       link{
         linkType,
+        internalRef->{
+          _type,
+          title,
+          "slug": coalesce(slug.current, slug),
+          "headerSlug": header->slug
+        },
         routeKey,
         internalPath,
         externalUrl,
