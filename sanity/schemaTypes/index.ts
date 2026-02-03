@@ -3,12 +3,8 @@ import { newsPostType } from './newsPostType';
 import { schoolSectionType } from './schoolSectionType';
 import { schoolSectionPageType } from './schoolSectionPageType';
 import { galleryCategoryType } from './galleryCategoryType';
-import { homePageType } from './homePageType';
-import { aboutPageType } from './aboutPageType';
-import { sectionsPageType } from './sectionsPageType';
-import { feesPageType } from './feesPageType';
-import { moodlePageType } from './moodlePageType';
 import { navHeaderType } from './navHeaderType';
+import { homePageType } from './homePageType';
 import { sitePageType } from './sitePageType';
 import { siteSettingsType } from './siteSettingsType';
 import { linkObject } from './objects/link';
@@ -33,12 +29,8 @@ export const schema = {
     schoolSectionType,
     schoolSectionPageType,
     galleryCategoryType,
-    homePageType,
-    aboutPageType,
-    sectionsPageType,
-    feesPageType,
-    moodlePageType,
     navHeaderType,
+    homePageType,
     sitePageType,
     siteSettingsType,
   ],
@@ -47,18 +39,11 @@ export const schema = {
     ...prev,
 
     singletonLangTemplate('siteSettings'),
-    singletonLangTemplate('homePage'),
-    singletonLangTemplate('aboutPage'),
-    singletonLangTemplate('sectionsPage'),
-    singletonLangTemplate('feesPage'),
-    singletonLangTemplate('moodlePage'),
     singletonLangTemplate('newsPost'),
     singletonLangTemplate('schoolSectionPage'),
-
-    // Header groups
     singletonLangTemplate('navHeader'),
+    singletonLangTemplate('homePage'),
 
-    // Site page under a header group
     {
       id: 'sitePage-byHeader',
       title: 'sitePage (by header + language)',
@@ -69,7 +54,9 @@ export const schema = {
       ],
       value: (params: any) => ({
         language: params?.lang,
-        header: params?.headerId ? { _type: 'reference', _ref: params.headerId } : undefined,
+        header: params?.headerId
+          ? { _type: 'reference', _ref: params.headerId }
+          : undefined,
       }),
     },
 

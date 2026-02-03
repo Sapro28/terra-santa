@@ -1,4 +1,4 @@
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
 import { DocumentIcon } from '@sanity/icons';
 import { languageFieldLocked } from './languageField';
 
@@ -12,6 +12,13 @@ export const navHeaderType = defineType({
     languageFieldLocked,
 
     defineField({
+      name: 'order',
+      title: 'ترتيب الظهور في القائمة',
+      type: 'number',
+      description: 'رقم أصغر = يظهر أولاً. (اختياري)',
+    }),
+
+    defineField({
       name: 'title',
       title: 'اسم القسم في الهيدر',
       type: 'string',
@@ -20,51 +27,32 @@ export const navHeaderType = defineType({
 
     defineField({
       name: 'slug',
-      title: 'الرابط (Slug)',
+      title: 'مفتاح الرابط (Slug) — ثابت لكل اللغات',
       type: 'string',
-      description: 'اكتب المسار بدون / في البداية. مثال: admissions',
+      description:
+        'مهم: هذا الـSlug يُستخدم في الرابط داخل الموقع، وLocale Switcher يبدّل /ar ↔ /en ↔ /it ويُبقي نفس المسار. لذلك يجب أن يكون الـSlug نفسه في كل اللغات لنفس القسم. ننصح بكتابته بحروف لاتينية صغيرة (a-z) وأرقام وشرطة (-) فقط. مثال: admissions.',
       validation: (Rule) =>
-        Rule.required()
-          .min(1)
-          .custom((value) => {
-            const v = String(value || '').trim();
-            if (!v) return 'Slug is required.';
-            if (v.startsWith('/')) return 'Slug must not start with "/".';
-            if (v.includes(' ')) return 'Slug must not contain spaces.';
-            if (v.includes('//')) return 'Slug must not contain "//".';
-            if (v.includes('://')) return 'Slug must be a relative path.';
-            if (v.includes('/')) return 'Use a single segment only (no "/").';
-            return true;
-          }),
-    }),
+        Rule.required().custom((value) => {
+          const v = String(value || '').trim();
 
-    defineField({
-      name: 'order',
-      title: 'الترتيب (اختياري)',
-      type: 'number',
-      description: 'رقم أصغر = يظهر أولاً في الهيدر',
-      validation: (Rule) => Rule.min(0),
-    }),
-
-    defineField({
-      name: 'sections',
-      title: 'محتوى صفحة القسم (اختياري)',
-      type: 'array',
-      of: [
-        defineArrayMember({ type: 'sectionVideoHero' }),
-        defineArrayMember({ type: 'sectionDivisions' }),
-        defineArrayMember({ type: 'sectionParentsTestimonials' }),
-        defineArrayMember({ type: 'sectionAnnouncements' }),
-        defineArrayMember({ type: 'sectionUpcomingEvents' }),
-        defineArrayMember({ type: 'sectionColors' }),
-      ],
+          if (!v) return 'Slug is required.';
+          if (v.startsWith('/')) return 'Slug must not start with "/".';
+          if (v.includes(' ')) return 'Slug must not contain spaces.';
+          if (v.includes('//')) return 'Slug must not contain "//".';
+          if (v.includes('://')) return 'Slug must be a relative path.';
+          if (v.includes('/')) return 'Use a single segment only (no "/").';
+          if (!/^[a-z0-9-]+$/.test(v))
+            return 'Use only lowercase latin letters (a-z), numbers (0-9), and hyphens (-).';
+          return true;
+        }),
     }),
   ],
 
   preview: {
     select: { title: 'title', lang: 'language', slug: 'slug' },
     prepare({ title, lang, slug }) {
-      const parts = [lang ? `اللغة: ${lang}` : null, slug ? `/${slug}` : null]
+      const path = slug ? `/${slug}` : '';
+      const parts = [lang ? `اللغة: ${lang}` : null, path]
         .filter(Boolean)
         .join(' • ');
 

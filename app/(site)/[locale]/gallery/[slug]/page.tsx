@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+
+import { locales, type Locale } from '@/i18n/config';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { galleryEntryBySlugQuery } from '@/sanity/lib/queries/gallery';
 import { PortableText } from '@portabletext/react';
@@ -28,12 +30,6 @@ type GalleryEntry = {
   >;
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 function formatDate(date?: string) {
   if (!date) return '';
   const d = new Date(date);
@@ -47,7 +43,7 @@ export default async function GalleryEntryPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const lang = localeToLang(locale);
+  const lang = locale as Locale;
 
   const client = await getSanityClient();
   const entry = await client.fetch<GalleryEntry | null>(

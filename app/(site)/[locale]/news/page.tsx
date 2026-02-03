@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { newsListQuery } from '@/sanity/lib/queries';
-
+import type { Locale } from '@/i18n/config';
+import { locales } from '@/i18n/config';
 type NewsListItem = {
   _id: string;
   title: string;
@@ -11,19 +12,13 @@ type NewsListItem = {
   urgent?: boolean;
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 export default async function NewsPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const lang = localeToLang(locale);
+  const lang = locale as Locale;
 
   const client = await getSanityClient();
   const posts = await client.fetch<NewsListItem[]>(newsListQuery, { lang });

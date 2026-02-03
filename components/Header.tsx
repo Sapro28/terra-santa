@@ -1,8 +1,14 @@
 import Link from 'next/link';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
-import SectionsDropdownClient, { type SectionNavItem } from './sections/SectionsDropdown.client';
+import SectionsDropdownClient, {
+  type SectionNavItem,
+} from './sections/SectionsDropdown.client';
 
-type HeaderNavPage = { _id?: string; title?: string | null; slug?: string | null };
+type HeaderNavPage = {
+  _id?: string;
+  title?: string | null;
+  slug?: string | null;
+};
 
 type HeaderNavGroup = {
   _id?: string;
@@ -54,7 +60,6 @@ export default async function Header({
 
         <div className="flex items-center gap-4">
           <nav className="flex items-center gap-6">
-            {/* Auto-generated header groups (Admissions -> Fees, etc.) */}
             {groups.map((g) => {
               const title = (g?.title ?? '').trim();
               const slug = (g?.slug ?? '').trim();
@@ -64,7 +69,6 @@ export default async function Header({
                 (p) => (p?.title ?? '').trim() && (p?.slug ?? '').trim(),
               );
 
-              // No sub-pages: render as a simple link to the header landing page
               if (!pages.length) {
                 return (
                   <Link
@@ -77,7 +81,6 @@ export default async function Header({
                 );
               }
 
-              // Has sub-pages: simple dropdown
               return (
                 <div key={slug} className="relative group">
                   <Link
@@ -107,22 +110,6 @@ export default async function Header({
                 </div>
               );
             })}
-
-            {/* Existing Sections dropdown (auto-generated from section pages) */}
-            {sectionDropdownItems.length > 0 ? (
-              <SectionsDropdownClient
-                locale={locale}
-                label={locale === 'ar' ? 'الأقسام' : 'Sections'}
-                items={sectionDropdownItems}
-              />
-            ) : (
-              <Link
-                href={`/${locale}/sections`}
-                className="text-sm font-semibold text-muted hover:text-(--fg)"
-              >
-                {locale === 'ar' ? 'الأقسام' : 'Sections'}
-              </Link>
-            )}
           </nav>
 
           <LocaleSwitcherClient locale={locale} />

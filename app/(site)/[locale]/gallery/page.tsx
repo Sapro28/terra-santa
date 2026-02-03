@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSanityClient } from '@/sanity/lib/getClient';
-
+import type { Locale } from '@/i18n/config';
+import { locales } from '@/i18n/config';
 import { gallerySectionsWithEntriesQuery } from '@/sanity/lib/queries/gallery';
 
 type GalleryListItem = {
@@ -22,12 +23,6 @@ type GallerySection = {
   items: GalleryListItem[];
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 function formatDate(date?: string, locale?: string) {
   if (!date) return '';
   const d = new Date(date);
@@ -41,7 +36,7 @@ export default async function GalleryPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const lang = localeToLang(locale);
+  const lang = locale as Locale;
 
   const client = await getSanityClient();
   const sections = await client.fetch<GallerySection[]>(

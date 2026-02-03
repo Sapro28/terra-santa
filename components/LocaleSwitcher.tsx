@@ -13,9 +13,9 @@ import {
 import { Button } from '@/components/ui/button';
 
 const localeOptions = [
-  { code: 'ar', label: 'AR' },
-  { code: 'en', label: 'EN' },
-  { code: 'it', label: 'IT' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'en', label: 'English' },
+  { code: 'it', label: 'Italiano' },
 ] as const;
 
 function ClientOnly({ children }: { children: React.ReactNode }) {

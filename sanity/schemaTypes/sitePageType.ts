@@ -12,14 +12,6 @@ export const sitePageType = defineType({
     languageFieldLocked,
 
     defineField({
-      name: 'header',
-      title: 'القسم (Header)',
-      type: 'reference',
-      to: [{ type: 'navHeader' }],
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
       name: 'title',
       title: 'عنوان الصفحة',
       type: 'string',
@@ -28,9 +20,10 @@ export const sitePageType = defineType({
 
     defineField({
       name: 'slug',
-      title: 'الرابط (Slug)',
+      title: 'مفتاح الرابط (Slug) — ثابت لكل اللغات',
       type: 'string',
-      description: 'اكتب المسار بدون / في البداية. مثال: fees',
+      description:
+        'مهم: هذا الـSlug يُستخدم في الرابط داخل الموقع، وLocale Switcher يبدّل /ar ↔ /en ↔ /it ويُبقي نفس المسار. لذلك يجب أن يكون الـSlug نفسه في كل اللغات لنفس الصفحة. ننصح بحروف لاتينية صغيرة (a-z) وأرقام وشرطة (-) فقط. مثال: fees.',
       validation: (Rule) =>
         Rule.required()
           .min(1)
@@ -42,6 +35,8 @@ export const sitePageType = defineType({
             if (v.includes('//')) return 'Slug must not contain "//".';
             if (v.includes('://')) return 'Slug must be a relative path.';
             if (v.includes('/')) return 'Use a single segment only (no "/").';
+            if (!/^[a-z0-9-]+$/.test(v))
+              return 'Use only lowercase latin letters (a-z), numbers (0-9), and hyphens (-).';
             return true;
           }),
     }),
@@ -71,7 +66,11 @@ export const sitePageType = defineType({
     },
     prepare({ title, lang, headerTitle, headerSlug, slug }) {
       const full =
-        headerSlug && slug ? `/${headerSlug}/${slug}` : headerSlug ? `/${headerSlug}` : null;
+        headerSlug && slug
+          ? `/${headerSlug}/${slug}`
+          : headerSlug
+            ? `/${headerSlug}`
+            : null;
       const parts = [
         lang ? `اللغة: ${lang}` : null,
         headerTitle ? `قسم: ${headerTitle}` : null,

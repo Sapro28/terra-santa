@@ -1,4 +1,6 @@
 import { notFound } from 'next/navigation';
+
+import { locales, type Locale } from '@/i18n/config';
 import { PortableText } from '@portabletext/react';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { newsPostBySlugQuery } from '@/sanity/lib/queries';
@@ -11,19 +13,13 @@ type NewsPost = {
   content?: any;
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 export default async function NewsPostPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { locale, slug } = await params; // ✅ FIX
-  const lang = localeToLang(locale);
+  const { locale, slug } = await params;
+  const lang = locale as Locale;
 
   const client = await getSanityClient();
   const post = await client.fetch<NewsPost | null>(newsPostBySlugQuery, {

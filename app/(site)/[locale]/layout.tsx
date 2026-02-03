@@ -17,8 +17,7 @@ import { sanityFetch, SanityLive } from '@/sanity/lib/live';
 import { sanityClient } from '@/sanity/lib/client';
 import VisualEditingComponent from '@/app/VisualEditing';
 
-const locales = ['ar', 'en', 'it'] as const;
-type Locale = (typeof locales)[number];
+import { locales, type Locale } from '@/i18n/config';
 
 export default async function LocaleLayout({
   children,

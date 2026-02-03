@@ -10,6 +10,7 @@ import { structure } from './sanity/structure';
 import I18nField from './sanity/components/I18nField';
 
 const I18N_SCHEMA_TYPES = new Set(['newsPost', 'galleryCategory']);
+const STRUCTURE_ONLY_TYPES = new Set(['navHeader', 'sitePage']);
 
 export default defineConfig({
   basePath: '/studio',
@@ -34,7 +35,8 @@ export default defineConfig({
 
       const doc = context.document as any;
       const locale = doc?.language || 'ar';
-      const slug = doc?.slug?.current;
+      const slug =
+        typeof doc?.slug === 'string' ? doc.slug : doc?.slug?.current;
 
       let redirect = `/${locale}`;
 
@@ -42,6 +44,17 @@ export default defineConfig({
         redirect = `/${locale}/news/${encodeURIComponent(slug)}`;
       } else if (doc?._type === 'galleryCategory' && slug) {
         redirect = `/${locale}/gallery/${encodeURIComponent(slug)}`;
+      } else if (doc?._type === 'homePage') {
+        redirect = `/${locale}`;
+      } else if (doc?._type === 'navHeader') {
+        if (slug) redirect = `/${locale}/${encodeURIComponent(slug)}`;
+      } else if (doc?._type === 'sitePage') {
+        const headerSlug =
+          typeof doc?.header?.slug === 'string'
+            ? doc.header.slug
+            : doc?.header?.slug?.current;
+        if (headerSlug && slug)
+          redirect = `/${locale}/${encodeURIComponent(headerSlug)}/${encodeURIComponent(slug)}`;
       }
 
       return `${baseUrl}/api/draft-mode/enable?secret=${encodeURIComponent(
@@ -53,7 +66,11 @@ export default defineConfig({
       const { type, schemaType } = creationContext;
 
       if (type === 'global') {
-        return prev.filter((tpl) => !I18N_SCHEMA_TYPES.has(tpl.templateId));
+        return prev.filter(
+          (tpl) =>
+            !I18N_SCHEMA_TYPES.has(tpl.templateId) &&
+            !STRUCTURE_ONLY_TYPES.has(tpl.templateId),
+        );
       }
 
       if (

@@ -1,16 +1,14 @@
 import { notFound } from 'next/navigation';
 
+import { locales, type Locale } from '@/i18n/config';
+
 import SectionRenderer from '@/components/sections/SectionRenderer';
 
 import { getSanityClient } from '@/sanity/lib/getClient';
 import {
-  aboutPageBuilderQuery,
-  feesPageBuilderQuery,
   latestAnnouncementsQuery,
-  moodlePageBuilderQuery,
-  schoolSectionPageBuilderBySlugQuery,
-  sectionsPageBuilderQuery,
   navHeaderBySlugQuery,
+  firstSitePageByHeaderQuery,
   sitePageByHeaderAndSlugQuery,
   legacySitePageBySlugQuery,
   upcomingEventsQuery,
@@ -20,6 +18,11 @@ type BuilderPage = {
   title?: string;
   slug?: string;
   sections?: Array<{ _type: string; [key: string]: any }>;
+};
+
+type NavHeader = {
+  title?: string;
+  slug?: string;
 };
 
 type Announcement = {
@@ -33,12 +36,6 @@ type Announcement = {
   mainImageAlt?: string;
 };
 
-function localeToLang(locale: string) {
-  if (locale === 'ar') return 'ar';
-  if (locale === 'it') return 'it';
-  return 'en';
-}
-
 export default async function CatchAllCmsPage({
   params,
 }: {
@@ -46,131 +43,40 @@ export default async function CatchAllCmsPage({
 }) {
   const { locale, slug } = await params;
 
-  if (!['ar', 'en', 'it'].includes(locale)) notFound();
+  if (!locales.includes(locale as Locale)) notFound();
 
-  const lang = localeToLang(locale);
+  const lang = locale as Locale;
   const client = await getSanityClient();
 
-  const announcements: Announcement[] = await client.fetch(
-    latestAnnouncementsQuery,
-    { lang },
-  );
-
-  const upcomingEvents: Announcement[] = await client.fetch(
-    upcomingEventsQuery,
-    {
-      lang,
-    },
-  );
+  const [announcements, upcomingEvents] = await Promise.all([
+    client.fetch<Announcement[]>(latestAnnouncementsQuery, { lang }),
+    client.fetch<Announcement[]>(upcomingEventsQuery, { lang }),
+  ]);
 
   const segments = Array.isArray(slug) ? slug : [];
   const first = segments[0] ?? '';
 
-  // Explicit top-level routes that are driven by dedicated singleton docs
-  if (segments.length === 1 && first === 'about') {
-    const page = await client.fetch<BuilderPage | null>(aboutPageBuilderQuery, {
-      id: `aboutPage-${lang}`,
-    });
-
-    return (
-      <SectionRenderer
-        locale={locale}
-        sections={page?.sections || []}
-        announcements={announcements}
-        upcomingEvents={upcomingEvents}
-      />
-    );
-  }
-
-  if (segments.length === 1 && first === 'fees') {
-    const page = await client.fetch<BuilderPage | null>(feesPageBuilderQuery, {
-      id: `feesPage-${lang}`,
-    });
-
-    return (
-      <SectionRenderer
-        locale={locale}
-        sections={page?.sections || []}
-        announcements={announcements}
-        upcomingEvents={upcomingEvents}
-      />
-    );
-  }
-
-  if (segments.length === 1 && first === 'moodle') {
-    const page = await client.fetch<BuilderPage | null>(
-      moodlePageBuilderQuery,
-      {
-        id: `moodlePage-${lang}`,
-      },
-    );
-
-    return (
-      <SectionRenderer
-        locale={locale}
-        sections={page?.sections || []}
-        announcements={announcements}
-        upcomingEvents={upcomingEvents}
-      />
-    );
-  }
-
-  // Sections index + section detail pages
-  if (first === 'sections') {
-    if (segments.length === 1) {
-      const page = await client.fetch<BuilderPage | null>(
-        sectionsPageBuilderQuery,
-        { id: `sectionsPage-${lang}` },
-      );
-
-      return (
-        <SectionRenderer
-          locale={locale}
-          sections={page?.sections || []}
-          announcements={announcements}
-          upcomingEvents={upcomingEvents}
-        />
-      );
-    }
-
-    if (segments.length === 2) {
-      const page = await client.fetch<BuilderPage | null>(
-        schoolSectionPageBuilderBySlugQuery,
-        { slug: segments[1], lang },
-      );
-
-      if (!page) notFound();
-
-      return (
-        <SectionRenderer
-          locale={locale}
-          sections={page.sections || []}
-          announcements={announcements}
-          upcomingEvents={upcomingEvents}
-          pageTitle={page.title}
-        />
-      );
-    }
-  }
-
-  // Header pages (landing + child pages)
   if (segments.length === 1) {
-    const headerPage = await client.fetch<BuilderPage | null>(
-      navHeaderBySlugQuery,
-      {
-        slug: first,
-        lang,
-      },
-    );
+    const header = await client.fetch<NavHeader | null>(navHeaderBySlugQuery, {
+      slug: first,
+      lang,
+    });
 
-    if (headerPage) {
+    if (header) {
+      const firstChildPage = await client.fetch<BuilderPage | null>(
+        firstSitePageByHeaderQuery,
+        { headerSlug: first, lang },
+      );
+
+      if (!firstChildPage) notFound();
+
       return (
         <SectionRenderer
           locale={locale}
-          sections={headerPage.sections || []}
+          sections={firstChildPage.sections || []}
           announcements={announcements}
           upcomingEvents={upcomingEvents}
-          pageTitle={headerPage.title}
+          pageTitle={firstChildPage.title || header.title}
         />
       );
     }
@@ -199,7 +105,6 @@ export default async function CatchAllCmsPage({
     }
   }
 
-  // Legacy fallback (older docs that stored nested paths like "foo/bar" in slug.current)
   const slugPath = segments.join('/');
   const legacyPage = await client.fetch<BuilderPage | null>(
     legacySitePageBySlugQuery,

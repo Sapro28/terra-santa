@@ -1,50 +1,31 @@
 import { groq } from 'next-sanity';
 import { sectionProjection } from './projections';
 
-export const homePageBuilderQuery = groq`
-  *[_type == "homePage" && _id == $id][0]{
+export const homePageQuery = groq`
+  *[_type == "homePage" && language == $lang][0]{
     "sections": sections[]{ ${sectionProjection} }
   }
 `;
 
-export const aboutPageBuilderQuery = groq`
-  *[_type == "aboutPage" && _id == $id][0]{
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const feesPageBuilderQuery = groq`
-  *[_type == "feesPage" && _id == $id][0]{
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const moodlePageBuilderQuery = groq`
-  *[_type == "moodlePage" && _id == $id][0]{
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-export const sectionsPageBuilderQuery = groq`
-  *[_type == "sectionsPage" && _id == $id][0]{
-    "sections": sections[]{ ${sectionProjection} }
-  }
-`;
-
-/**
- * Header landing pages (ex: /admissions)
- */
 export const navHeaderBySlugQuery = groq`
   *[_type == "navHeader" && language == $lang && slug == $slug][0]{
     title,
-    "slug": slug,
-    "sections": sections[]{ ${sectionProjection} }
+    "slug": slug
   }
 `;
 
-/**
- * Header child pages (ex: /admissions/fees)
- */
+// For routes like /{headerSlug} we render the FIRST page under that header.
+// (Headers themselves only hold: title, slug, order.)
+export const firstSitePageByHeaderQuery = groq`
+  *[_type == "sitePage" && language == $lang && header->slug == $headerSlug]
+    | order(title asc)[0]{
+      title,
+      "slug": slug,
+      "headerSlug": header->slug,
+      "sections": sections[]{ ${sectionProjection} }
+    }
+`;
+
 export const sitePageByHeaderAndSlugQuery = groq`
   *[_type == "sitePage" && language == $lang && header->slug == $headerSlug && slug == $slug][0]{
     title,
@@ -54,9 +35,6 @@ export const sitePageByHeaderAndSlugQuery = groq`
   }
 `;
 
-/**
- * Header navigation for the website header (auto-generated)
- */
 export const headerNavQuery = groq`
   *[_type == "navHeader" && language == $lang] | order(coalesce(order, 9999) asc, title asc) {
     _id,
@@ -69,14 +47,10 @@ export const headerNavQuery = groq`
     }
   }
 `;
-
-/**
- * Legacy fallback (older docs that stored full nested paths in slug.current)
- */
 export const legacySitePageBySlugQuery = groq`
-  *[_type == "sitePage" && language == $lang && slug.current == $slug][0]{
+  *[_type == "sitePage" && language == $lang && (slug == $slug || slug.current == $slug)][0]{
     title,
-    "slug": slug.current,
+    "slug": coalesce(slug, slug.current),
     "sections": sections[]{ ${sectionProjection} }
   }
 `;
