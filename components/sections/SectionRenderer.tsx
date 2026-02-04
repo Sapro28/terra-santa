@@ -71,7 +71,7 @@ type SectionUpcomingEvents = SectionBase & {
   title?: string;
   emptyText?: string;
   viewAllLabel?: string;
-  limit?: number; // kept for forward-compat even if hidden in Sanity
+  limit?: number;
 };
 
 type SectionColors = SectionBase & {
@@ -223,7 +223,6 @@ function NewsList({
                 >
                   <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-(--paper)">
                     {post.mainImageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={post.mainImageUrl}
                         alt={post.mainImageAlt || post.title || 'Post'}

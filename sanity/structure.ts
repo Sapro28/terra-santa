@@ -66,9 +66,6 @@ const SINGLETON_ID = {
 };
 
 export const structure: StructureResolver = (S, context) => {
-  /**
-   * Manage top-level headers (Admissions, About, Academics…)
-   */
   const headersManager = (lang: Lang) => {
     const t = LABELS[lang];
 
@@ -89,9 +86,6 @@ export const structure: StructureResolver = (S, context) => {
       );
   };
 
-  /**
-   * Website (per language): header groups, footer singleton, main page, and pages under each header.
-   */
   const websiteByLanguage = () =>
     S.list()
       .title('الموقع (حسب اللغة)')
@@ -117,13 +111,11 @@ export const structure: StructureResolver = (S, context) => {
               return S.list()
                 .title(`الموقع — ${t.langTitle}`)
                 .items([
-                  // Create / manage headers
                   S.listItem()
                     .title('Header')
                     .icon(DocumentIcon)
                     .child(headersManager(lang)),
 
-                  // Footer singleton
                   S.listItem()
                     .title('Footer')
                     .icon(DocumentIcon)
@@ -137,7 +129,6 @@ export const structure: StructureResolver = (S, context) => {
 
                   S.divider(),
 
-                  // Main page (usually 1 doc per language)
                   S.listItem()
                     .title('Main Page')
                     .icon(DocumentIcon)
@@ -165,7 +156,6 @@ export const structure: StructureResolver = (S, context) => {
 
                   S.divider(),
 
-                  // Each header shows its own pages directly at this level
                   ...headers.map((h) =>
                     S.listItem()
                       .title(h.title || 'Untitled header')

@@ -12,6 +12,26 @@ export const sitePageType = defineType({
     languageFieldLocked,
 
     defineField({
+      name: 'header',
+      title: 'القسم الرئيسي (Header)',
+      type: 'reference',
+      to: [{ type: 'navHeader' }],
+      description: 'اختر القسم (Header) الذي تنتمي إليه هذه الصفحة.',
+      validation: (Rule) => Rule.required(),
+      options: {
+        disableNew: true,
+        filter: ({ document }) => {
+          const lang = (document as any)?.language;
+          if (!lang) return { filter: '_type == "navHeader"' };
+          return {
+            filter: '_type == "navHeader" && language == $lang',
+            params: { lang },
+          };
+        },
+      },
+    }),
+
+    defineField({
       name: 'title',
       title: 'عنوان الصفحة',
       type: 'string',

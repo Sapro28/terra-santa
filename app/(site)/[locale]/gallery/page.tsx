@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import type { Locale } from '@/i18n/config';
-import { locales } from '@/i18n/config';
 import { gallerySectionsWithEntriesQuery } from '@/sanity/lib/queries/gallery';
 
 type GalleryListItem = {
