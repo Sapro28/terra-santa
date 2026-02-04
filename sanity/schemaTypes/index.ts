@@ -1,7 +1,6 @@
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
 import { schoolSectionType } from './schoolSectionType';
-import { schoolSectionPageType } from './schoolSectionPageType';
 import { galleryCategoryType } from './galleryCategoryType';
 import { navHeaderType } from './navHeaderType';
 import { homePageType } from './homePageType';
@@ -27,7 +26,6 @@ export const schema = {
     ...pageSections,
     newsPostType,
     schoolSectionType,
-    schoolSectionPageType,
     galleryCategoryType,
     navHeaderType,
     homePageType,
@@ -40,7 +38,6 @@ export const schema = {
 
     singletonLangTemplate('siteSettings'),
     singletonLangTemplate('newsPost'),
-    singletonLangTemplate('schoolSectionPage'),
     singletonLangTemplate('navHeader'),
     singletonLangTemplate('homePage'),
 

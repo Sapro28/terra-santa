@@ -6,7 +6,6 @@ export const sectionVideoHeroType = defineType({
   title: 'فيديو المقدمة (Main Page Video)',
   type: 'object',
   fields: [
-    defineField({ name: 'kicker', title: 'نص صغير (اختياري)', type: 'string' }),
     defineField({
       name: 'title',
       title: 'العنوان',
@@ -32,38 +31,6 @@ export const sectionVideoHeroType = defineType({
       type: 'number',
       initialValue: 0.45,
       validation: (Rule) => Rule.min(0).max(0.9),
-    }),
-    defineField({
-      name: 'primaryCta',
-      title: 'زر أساسي (اختياري)',
-      type: 'object',
-      fields: [
-        defineField({ name: 'label', title: 'نص الزر', type: 'string' }),
-        defineField({ name: 'link', title: 'الرابط', type: 'link' }),
-        defineField({
-          name: 'href',
-          title: 'Legacy href (لا تستخدم)',
-          type: 'string',
-          readOnly: true,
-          hidden: true,
-        }),
-      ],
-    }),
-    defineField({
-      name: 'secondaryCta',
-      title: 'زر ثانوي (اختياري)',
-      type: 'object',
-      fields: [
-        defineField({ name: 'label', title: 'نص الزر', type: 'string' }),
-        defineField({ name: 'link', title: 'الرابط', type: 'link' }),
-        defineField({
-          name: 'href',
-          title: 'Legacy href (لا تستخدم)',
-          type: 'string',
-          readOnly: true,
-          hidden: true,
-        }),
-      ],
     }),
   ],
   preview: {
@@ -98,27 +65,27 @@ export const sectionDivisionsType = defineType({
           fields: [
             defineField({
               name: 'title',
-              title: 'العنوان',
+              title: 'القسم',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'text',
-              title: 'نص',
+              title: 'الصف',
               type: 'text',
-              rows: 3,
+              rows: 1,
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'hoverText',
               title: 'نص عند المرور (Hover)',
               type: 'text',
-              rows: 2,
+              rows: 3,
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'ctaLabel',
-              title: 'نص زر',
+              title: 'كلام الزر',
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),

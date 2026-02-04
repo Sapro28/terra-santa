@@ -14,8 +14,6 @@ export const navHeaderBySlugQuery = groq`
   }
 `;
 
-// For routes like /{headerSlug} we render the FIRST page under that header.
-// (Headers themselves only hold: title, slug, order.)
 export const firstSitePageByHeaderQuery = groq`
   *[_type == "sitePage" && language == $lang && header->slug == $headerSlug]
     | order(title asc)[0]{

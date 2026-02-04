@@ -8,11 +8,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-import {
-  headerNavQuery,
-  siteSettingsQuery,
-  schoolSectionPagesNavQuery,
-} from '@/sanity/lib/queries';
+import { headerNavQuery, siteSettingsQuery } from '@/sanity/lib/queries';
 import { sanityFetch, SanityLive } from '@/sanity/lib/live';
 import { sanityClient } from '@/sanity/lib/client';
 import VisualEditingComponent from '@/app/VisualEditing';
@@ -55,24 +51,10 @@ export default async function LocaleLayout({
       ).data
     : await sanityClient.fetch(headerNavQuery, { lang: locale });
 
-  const sectionPages = dm.isEnabled
-    ? (
-        await sanityFetch({
-          query: schoolSectionPagesNavQuery,
-          params: { lang: locale },
-        })
-      ).data
-    : await sanityClient.fetch(schoolSectionPagesNavQuery, { lang: locale });
-
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-        <Header
-          locale={locale}
-          settings={siteSettings}
-          headerNav={headerNav}
-          sectionPages={sectionPages}
-        />
+        <Header locale={locale} settings={siteSettings} headerNav={headerNav} />
         <main>{children}</main>
         <Footer settings={siteSettings} />
 

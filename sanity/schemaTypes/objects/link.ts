@@ -24,15 +24,7 @@ export const linkObject = defineType({
       name: 'internalRef',
       title: 'اختر صفحة (مُستحسن)',
       type: 'reference',
-      // NOTE:
-      // - navHeader is the "landing" page for a header group (ex: /admissions)
-      // - sitePage is a child page under a header group (ex: /admissions/fees)
-      // - schoolSectionPage is a section detail page (ex: /sections/primary)
-      to: [
-        { type: 'navHeader' },
-        { type: 'sitePage' },
-        { type: 'schoolSectionPage' },
-      ],
+      to: [{ type: 'navHeader' }, { type: 'sitePage' }],
       description: 'اختر صفحة من صفحات الموقع. سيتم إنشاء الرابط تلقائياً.',
       hidden: ({ parent }) => parent?.linkType !== 'internal',
     }),
@@ -98,10 +90,8 @@ export const linkObject = defineType({
       externalUrl: 'externalUrl',
       refType: 'internalRef._type',
       refTitle: 'internalRef.title',
-      // navHeader + sitePage use a string slug field, while schoolSectionPage uses slug.current
       refSlug: 'internalRef.slug',
       refSlugCurrent: 'internalRef.slug.current',
-      // sitePage has a header reference; navHeader itself does not.
       refHeaderSlug: 'internalRef.header->slug',
       refOrder: 'internalRef.order',
     },
@@ -136,12 +126,8 @@ export const linkObject = defineType({
 
       const slugInfo = (() => {
         if (!slugValue) return null;
-        // /sections/<slug>
-        if (refType === 'schoolSectionPage') return `/sections/${slugValue}`;
-        // /<header>/<child>
         if (refType === 'sitePage' && refHeaderSlug)
           return `/${refHeaderSlug}/${slugValue}`;
-        // /<header>
         return `/${slugValue}`;
       })();
 

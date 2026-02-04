@@ -52,7 +52,6 @@ export default async function HomePage({
       sections={home.sections || []}
       announcements={announcements}
       upcomingEvents={upcomingEvents}
-      pageTitle="Home"
     />
   );
 }
