@@ -7,9 +7,7 @@ import SectionRenderer from '@/components/sections/SectionRenderer';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import {
   latestAnnouncementsQuery,
-  navHeaderBySlugQuery,
-  firstSitePageByHeaderQuery,
-  sitePageByHeaderAndSlugQuery,
+  pageBySlugQuery,
   legacySitePageBySlugQuery,
   upcomingEventsQuery,
 } from '@/sanity/lib/queries';
@@ -18,11 +16,6 @@ type BuilderPage = {
   title?: string;
   slug?: string;
   sections?: Array<{ _type: string; [key: string]: any }>;
-};
-
-type NavHeader = {
-  title?: string;
-  slug?: string;
 };
 
 type Announcement = {
@@ -54,43 +47,13 @@ export default async function CatchAllCmsPage({
   ]);
 
   const segments = Array.isArray(slug) ? slug : [];
-  const first = segments[0] ?? '';
+  const slugPath = segments.join('/');
 
   if (segments.length === 1) {
-    const header = await client.fetch<NavHeader | null>(navHeaderBySlugQuery, {
-      slug: first,
+    const page = await client.fetch<BuilderPage | null>(pageBySlugQuery, {
+      slug: segments[0],
       lang,
     });
-
-    if (header) {
-      const firstChildPage = await client.fetch<BuilderPage | null>(
-        firstSitePageByHeaderQuery,
-        { headerSlug: first, lang },
-      );
-
-      if (!firstChildPage) notFound();
-
-      return (
-        <SectionRenderer
-          locale={locale}
-          sections={firstChildPage.sections || []}
-          announcements={announcements}
-          upcomingEvents={upcomingEvents}
-          pageTitle={firstChildPage.title || header.title}
-        />
-      );
-    }
-  }
-
-  if (segments.length === 2) {
-    const page = await client.fetch<BuilderPage | null>(
-      sitePageByHeaderAndSlugQuery,
-      {
-        headerSlug: segments[0],
-        slug: segments[1],
-        lang,
-      },
-    );
 
     if (page) {
       return (
@@ -105,13 +68,9 @@ export default async function CatchAllCmsPage({
     }
   }
 
-  const slugPath = segments.join('/');
   const legacyPage = await client.fetch<BuilderPage | null>(
     legacySitePageBySlugQuery,
-    {
-      slug: slugPath,
-      lang,
-    },
+    { slug: slugPath, lang },
   );
 
   if (!legacyPage) notFound();

@@ -396,9 +396,12 @@ export default function SectionRenderer({
 
           case 'sectionDivisions': {
             const s = section as SectionDivisions;
+            const divisions = s.divisions ?? [];
+            const firstRow = divisions.slice(0, 4);
+            const secondRow = divisions.slice(4);
 
             return (
-              <section key={idx} className="mx-auto max-w-6xl px-4">
+              <section key={idx} className="mx-auto max-w-7xl px-4">
                 <div className="mb-6">
                   {s.title ? (
                     <h2 className="text-2xl font-semibold">{s.title}</h2>
@@ -410,10 +413,35 @@ export default function SectionRenderer({
                   ) : null}
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                  {(s.divisions ?? []).map((d, i) => (
-                    <DivisionCard key={i} locale={locale} d={d} />
+                <div className="grid gap-6 sm:grid-cols-2 lg:hidden">
+                  {divisions.map((d, i) => (
+                    <div key={i} className="w-full">
+                      <DivisionCard locale={locale} d={d} />
+                    </div>
                   ))}
+                </div>
+
+                <div className="hidden lg:block">
+                  <div className="grid grid-cols-4 gap-6">
+                    {firstRow.map((d, i) => (
+                      <div
+                        key={i}
+                        className="w-full max-w-75 justify-self-center"
+                      >
+                        <DivisionCard locale={locale} d={d} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {secondRow.length ? (
+                    <div className="mt-6 flex justify-center gap-6">
+                      {secondRow.map((d, i) => (
+                        <div key={i} className="w-full max-w-75">
+                          <DivisionCard locale={locale} d={d} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               </section>
             );
@@ -516,13 +544,12 @@ export default function SectionRenderer({
                       className="flex items-center justify-between rounded-2xl border border-border bg-white p-5"
                     >
                       <div>
-                        <div className="font-semibold">{c.name}</div>
-                        <div className="mt-1 text-sm text-muted">{c.hex}</div>
+                        <div className="text-sm font-semibold">{c.name}</div>
+                        <div className="mt-1 text-xs text-muted">{c.hex}</div>
                       </div>
                       <div
                         className="h-10 w-10 rounded-xl border border-border"
-                        style={{ backgroundColor: c.hex }}
-                        aria-label={c.hex}
+                        style={{ background: c.hex }}
                       />
                     </div>
                   ))}

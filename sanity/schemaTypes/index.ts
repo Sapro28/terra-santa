@@ -1,13 +1,15 @@
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
+import { eventType } from './eventType';
 import { schoolSectionType } from './schoolSectionType';
 import { galleryCategoryType } from './galleryCategoryType';
-import { navHeaderType } from './navHeaderType';
 import { homePageType } from './homePageType';
-import { sitePageType } from './sitePageType';
-import { siteSettingsType } from './siteSettingsType';
 import { linkObject } from './objects/link';
 import { pageSections } from './pageSections';
+import { pageType } from './pageType';
+import { headerElementType } from './headerElementType';
+import { footerType } from './footerType';
+import { childLinkObject } from './objects/childLink';
 
 const singletonLangTemplate = (schemaType: string) => ({
   id: `${schemaType}-byLang`,
@@ -23,39 +25,28 @@ export const schema = {
   types: [
     blockContentType,
     linkObject,
+    childLinkObject,
     ...pageSections,
     newsPostType,
+    eventType,
     schoolSectionType,
     galleryCategoryType,
-    navHeaderType,
     homePageType,
-    sitePageType,
-    siteSettingsType,
+    pageType,
+    headerElementType,
+    footerType,
   ],
 
   templates: (prev: any[]) => [
     ...prev,
 
-    singletonLangTemplate('siteSettings'),
+    singletonLangTemplate('footer'),
     singletonLangTemplate('newsPost'),
-    singletonLangTemplate('navHeader'),
+    singletonLangTemplate('event'),
+    singletonLangTemplate('schoolSectionPage'),
     singletonLangTemplate('homePage'),
-
-    {
-      id: 'sitePage-byHeader',
-      title: 'sitePage (by header + language)',
-      schemaType: 'sitePage',
-      parameters: [
-        { name: 'lang', title: 'Language', type: 'string' },
-        { name: 'headerId', title: 'Header Document ID', type: 'string' },
-      ],
-      value: (params: any) => ({
-        language: params?.lang,
-        header: params?.headerId
-          ? { _type: 'reference', _ref: params.headerId }
-          : undefined,
-      }),
-    },
+    singletonLangTemplate('page'),
+    singletonLangTemplate('headerElement'),
 
     {
       id: 'galleryCategory-bySection',

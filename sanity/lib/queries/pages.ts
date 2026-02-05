@@ -7,6 +7,38 @@ export const homePageQuery = groq`
   }
 `;
 
+export const pageBySlugQuery = groq`
+  *[_type == "page" && language == $lang && slug == $slug][0]{
+    title,
+    slug,
+    "sections": sections[]{ ${sectionProjection} }
+  }
+`;
+
+export const headerNavQuery = groq`
+  *[_type == "headerElement" && language == $lang] | order(coalesce(order, 9999) asc, name asc) {
+    _id,
+    name,
+    linkType,
+    "internalPage": internalPage->{
+      _id,
+      title,
+      slug
+    },
+    externalUrl,
+    "childLinks": childLinks[]{
+      name,
+      linkType,
+      "internalPage": internalPage->{
+        _id,
+        title,
+        slug
+      },
+      externalUrl
+    }
+  }
+`;
+
 export const navHeaderBySlugQuery = groq`
   *[_type == "navHeader" && language == $lang && slug == $slug][0]{
     title,
@@ -33,18 +65,6 @@ export const sitePageByHeaderAndSlugQuery = groq`
   }
 `;
 
-export const headerNavQuery = groq`
-  *[_type == "navHeader" && language == $lang] | order(coalesce(order, 9999) asc, title asc) {
-    _id,
-    title,
-    "slug": slug,
-    "pages": *[_type == "sitePage" && language == $lang && header._ref == ^._id] | order(title asc) {
-      _id,
-      title,
-      "slug": slug
-    }
-  }
-`;
 export const legacySitePageBySlugQuery = groq`
   *[_type == "sitePage" && language == $lang && (slug == $slug || slug.current == $slug)][0]{
     title,

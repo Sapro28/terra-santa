@@ -8,84 +8,65 @@ const LABELS: Record<
   Lang,
   {
     langTitle: string;
-    pagesTitle: string;
-    settingsTitle: string;
-    headersTitle: string;
-    home: string;
-    about: string;
-    stages: string;
-    fees: string;
-    moodle: string;
-    dropdownItems: string;
-    headerGroups: string;
+    site: string;
+    header: string;
+    footer: string;
+    pages: string;
+    specialPages: string;
+    homePage: string;
+    content: string;
+    news: string;
+    events: string;
+    gallery: string;
   }
 > = {
   ar: {
     langTitle: 'العربية',
-    pagesTitle: 'القائمة',
-    settingsTitle: 'إعدادات الموقع',
-    headersTitle: 'الهيدر',
-    home: 'الصفحة الرئيسية',
-    about: 'صفحة عن المدرسة',
-    stages: 'صفحة المراحل',
-    fees: 'صفحة الرسوم',
-    moodle: 'صفحة مودل',
-    dropdownItems: 'صفحات الأقسام (عناصر القائمة المنسدلة)',
-    headerGroups: 'أقسام الهيدر (Admissions…)',
+    site: 'الموقع',
+    header: 'الهيدر',
+    footer: 'الفوتر',
+    pages: 'الصفحات',
+    specialPages: 'الصفحات الخاصة',
+    homePage: 'الصفحة الرئيسية',
+    content: 'المحتوى',
+    news: 'الأخبار / الإعلانات',
+    events: 'الفعاليات',
+    gallery: 'المعرض',
   },
   en: {
     langTitle: 'English',
-    pagesTitle: 'Menu',
-    settingsTitle: 'Site Settings',
-    headersTitle: 'Headers',
-    home: 'Home',
-    about: 'About',
-    stages: 'Stages / Sections',
-    fees: 'Fees',
-    moodle: 'Moodle',
-    dropdownItems: 'Section pages (dropdown items)',
-    headerGroups: 'Header groups',
+    site: 'Site',
+    header: 'Header',
+    footer: 'Footer',
+    pages: 'Pages',
+    specialPages: 'Special Pages',
+    homePage: 'Home Page',
+    content: 'Content',
+    news: 'News / Announcements',
+    events: 'Events',
+    gallery: 'Gallery',
   },
   it: {
     langTitle: 'Italiano',
-    pagesTitle: 'Menu',
-    settingsTitle: 'Impostazioni sito',
-    headersTitle: 'Header',
-    home: 'Home',
-    about: 'Chi siamo',
-    stages: 'Sezioni / Livelli',
-    fees: 'Tasse / Tariffe',
-    moodle: 'Moodle',
-    dropdownItems: 'Pagine sezioni (voci menu)',
-    headerGroups: 'Gruppi header',
+    site: 'Sito',
+    header: 'Header',
+    footer: 'Footer',
+    pages: 'Pagine',
+    specialPages: 'Pagine Speciali',
+    homePage: 'Pagina Principale',
+    content: 'Contenuto',
+    news: 'Notizie / Annunci',
+    events: 'Eventi',
+    gallery: 'Galleria',
   },
 };
 
 const SINGLETON_ID = {
-  siteSettings: (lang: Lang) => `siteSettings-${lang}`,
+  footer: (lang: Lang) => `footer-${lang}`,
+  homePage: (lang: Lang) => `homePage-${lang}`,
 };
 
 export const structure: StructureResolver = (S, context) => {
-  const headersManager = (lang: Lang) => {
-    const t = LABELS[lang];
-
-    return S.documentList()
-      .title(`${t.headersTitle} — ${t.langTitle}`)
-      .schemaType('navHeader')
-      .filter('_type == "navHeader" && language == $lang')
-      .params({ lang })
-      .defaultOrdering([
-        { field: 'order', direction: 'asc' },
-        { field: 'title', direction: 'asc' },
-      ])
-      .initialValueTemplates([
-        S.initialValueTemplateItem('navHeader-byLang', { lang }),
-      ])
-      .child((docId: string) =>
-        S.document().schemaType('navHeader').documentId(docId),
-      );
-  };
-
   const websiteByLanguage = () =>
     S.list()
       .title('الموقع (حسب اللغة)')
@@ -96,96 +77,112 @@ export const structure: StructureResolver = (S, context) => {
           return S.listItem()
             .title(t.langTitle)
             .icon(CogIcon)
-            .child(async () => {
-              const client = context.getClient({ apiVersion });
-
-              const headers: Array<{
-                _id: string;
-                title?: string;
-                order?: number;
-              }> = await client.fetch(
-                `*[_type == "navHeader" && language == $lang] | order(order asc, title asc) { _id, title, order }`,
-                { lang },
-              );
-
-              return S.list()
-                .title(`الموقع — ${t.langTitle}`)
+            .child(
+              S.list()
+                .title(`${t.site} — ${t.langTitle}`)
                 .items([
                   S.listItem()
-                    .title('Header')
-                    .icon(DocumentIcon)
-                    .child(headersManager(lang)),
-
-                  S.listItem()
-                    .title('Footer')
-                    .icon(DocumentIcon)
-                    .child(
-                      S.document()
-                        .schemaType('siteSettings')
-                        .documentId(SINGLETON_ID.siteSettings(lang))
-                        .title(`Footer — ${t.langTitle}`)
-                        .initialValueTemplate('siteSettings-byLang', { lang }),
-                    ),
-
-                  S.divider(),
-
-                  S.listItem()
-                    .title('Main Page')
-                    .icon(DocumentIcon)
+                    .title(t.header)
+                    .icon(DocumentsIcon)
                     .child(
                       S.documentList()
-                        .title(`Main Page — ${t.langTitle}`)
-                        .schemaType('homePage')
-                        .filter('_type == "homePage" && language == $lang')
+                        .title(`${t.header} — ${t.langTitle}`)
+                        .apiVersion(apiVersion)
+                        .schemaType('headerElement')
+                        .filter('_type == "headerElement" && language == $lang')
                         .params({ lang })
                         .defaultOrdering([
-                          { field: '_updatedAt', direction: 'desc' },
+                          { field: 'order', direction: 'asc' },
+                          { field: 'name', direction: 'asc' },
                         ])
                         .initialValueTemplates([
-                          S.initialValueTemplateItem('homePage-byLang', {
+                          S.initialValueTemplateItem('headerElement-byLang', {
                             lang,
                           }),
                         ])
                         .child((docId: string) =>
                           S.document()
-                            .schemaType('homePage')
-                            .documentId(docId)
-                            .title(`Main Page — ${t.langTitle}`),
+                            .schemaType('headerElement')
+                            .documentId(docId),
                         ),
+                    ),
+
+                  S.listItem()
+                    .title(t.footer)
+                    .icon(DocumentIcon)
+                    .child(
+                      S.document()
+                        .schemaType('footer')
+                        .documentId(SINGLETON_ID.footer(lang))
+                        .title(`${t.footer} — ${t.langTitle}`)
+                        .initialValueTemplate('footer-byLang', { lang }),
                     ),
 
                   S.divider(),
 
-                  ...headers.map((h) =>
-                    S.listItem()
-                      .title(h.title || 'Untitled header')
-                      .icon(DocumentsIcon)
-                      .child(
-                        S.documentList()
-                          .title(h.title || 'Pages')
-                          .schemaType('sitePage')
-                          .filter(
-                            '_type == "sitePage" && language == $lang && header._ref == $headerId',
-                          )
-                          .params({ lang, headerId: h._id })
-                          .defaultOrdering([
-                            { field: 'title', direction: 'asc' },
-                          ])
-                          .initialValueTemplates([
-                            S.initialValueTemplateItem('sitePage-byHeader', {
-                              lang,
-                              headerId: h._id,
-                            }),
-                          ])
-                          .child((pageId: string) =>
-                            S.document()
-                              .schemaType('sitePage')
-                              .documentId(pageId),
-                          ),
-                      ),
-                  ),
-                ]);
-            });
+                  S.listItem()
+                    .title(t.pages)
+                    .icon(DocumentsIcon)
+                    .child(
+                      S.documentList()
+                        .title(`${t.pages} — ${t.langTitle}`)
+                        .apiVersion(apiVersion)
+
+                        .schemaType('page')
+                        .filter('_type == "page" && language == $lang')
+                        .params({ lang })
+                        .defaultOrdering([{ field: 'title', direction: 'asc' }])
+                        .initialValueTemplates([
+                          S.initialValueTemplateItem('page-byLang', { lang }),
+                        ])
+                        .child((pageId: string) =>
+                          S.document().schemaType('page').documentId(pageId),
+                        ),
+                    ),
+
+                  S.divider(),
+                  S.listItem()
+                    .title(t.specialPages)
+                    .icon(DocumentIcon)
+                    .child(
+                      S.list()
+                        .title(`${t.specialPages} — ${t.langTitle}`)
+                        .items([
+                          S.listItem()
+                            .title(t.homePage)
+                            .icon(DocumentIcon)
+                            .child(
+                              S.documentList()
+                                .title(`${t.homePage} — ${t.langTitle}`)
+                                .apiVersion(apiVersion)
+
+                                .schemaType('homePage')
+                                .filter(
+                                  '_type == "homePage" && language == $lang',
+                                )
+                                .params({ lang })
+                                .defaultOrdering([
+                                  { field: '_updatedAt', direction: 'desc' },
+                                ])
+                                .initialValueTemplates([
+                                  S.initialValueTemplateItem(
+                                    'homePage-byLang',
+                                    {
+                                      lang,
+                                    },
+                                  ),
+                                ])
+                                .child((docId: string) =>
+                                  S.document()
+                                    .schemaType('homePage')
+                                    .documentId(docId)
+                                    .title(`${t.homePage} — ${t.langTitle}`),
+                                ),
+                            ),
+                        ]),
+                    ),
+                ]),
+            );
         }),
       );
 
@@ -199,7 +196,9 @@ export const structure: StructureResolver = (S, context) => {
             .icon(DocumentIcon)
             .child(
               S.documentList()
-                .title(`الأخبار / الإعلانات — ${LABELS[lang].langTitle}`)
+                .title(`${LABELS[lang].news} — ${LABELS[lang].langTitle}`)
+                .apiVersion(apiVersion)
+
                 .schemaType('newsPost')
                 .filter('_type == "newsPost" && language == $lang')
                 .params({ lang })
@@ -211,9 +210,35 @@ export const structure: StructureResolver = (S, context) => {
         ),
       );
 
+  const eventsByLanguage = () =>
+    S.list()
+      .title('الفعاليات (حسب اللغة)')
+      .items(
+        (Object.keys(LABELS) as Lang[]).map((lang) =>
+          S.listItem()
+            .title(LABELS[lang].langTitle)
+            .icon(DocumentIcon)
+            .child(
+              S.documentList()
+                .title(`${LABELS[lang].events} — ${LABELS[lang].langTitle}`)
+                .apiVersion(apiVersion)
+
+                .schemaType('event')
+                .filter('_type == "event" && language == $lang')
+                .params({ lang })
+                .defaultOrdering([{ field: 'startAt', direction: 'asc' }])
+                .initialValueTemplates([
+                  S.initialValueTemplateItem('event-byLang', { lang }),
+                ]),
+            ),
+        ),
+      );
+
   const galleryBySection = () =>
     S.documentList()
       .title('أقسام المدرسة')
+      .apiVersion(apiVersion)
+
       .schemaType('schoolSection')
       .filter('_type == "schoolSection"')
       .defaultOrdering([{ field: 'order', direction: 'asc' }])
@@ -225,6 +250,7 @@ export const structure: StructureResolver = (S, context) => {
         const galleryListFor = (lang: Lang) =>
           S.documentList()
             .title(`فعاليات — ${LABELS[lang].langTitle}`)
+            .apiVersion(apiVersion)
             .schemaType('galleryCategory')
             .filter(
               '_type == "galleryCategory" && section._ref == $sectionId && language == $lang',
@@ -271,6 +297,11 @@ export const structure: StructureResolver = (S, context) => {
                 .title('الأخبار / الإعلانات')
                 .icon(DocumentIcon)
                 .child(newsByLanguage()),
+
+              S.listItem()
+                .title('الفعاليات')
+                .icon(DocumentIcon)
+                .child(eventsByLanguage()),
 
               S.listItem()
                 .title('المعرض حسب القسم')

@@ -193,13 +193,13 @@ export const sectionAnnouncementsType = defineType({
       name: 'title',
       title: 'العنوان',
       type: 'string',
-      initialValue: 'آخر الفعاليات',
+      initialValue: 'أحدث الأخبار',
     }),
     defineField({
       name: 'emptyText',
-      title: 'نص عند عدم وجود فعاليات',
+      title: 'نص عند عدم وجود اخبار',
       type: 'string',
-      initialValue: 'لا توجد فعاليات حالياً',
+      initialValue: 'لا توجد اخبار حالياً',
     }),
     defineField({
       name: 'viewAllLabel',

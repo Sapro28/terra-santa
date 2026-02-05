@@ -1,25 +1,62 @@
 import Link from 'next/link';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
+import HeaderNavDropdownClient, {
+  type HeaderDropdownChildLink,
+} from './HeaderNavDropdown.client';
 import SectionsDropdownClient, {
   type SectionNavItem,
 } from './sections/SectionsDropdown.client';
 
-type HeaderNavPage = {
+type NavPageRef = {
   _id?: string;
   title?: string | null;
   slug?: string | null;
 };
 
-type HeaderNavGroup = {
+type ChildLink = {
+  name?: string | null;
+  linkType?: 'internal' | 'external' | 'none' | null;
+  internalPage?: NavPageRef | null;
+  externalUrl?: string | null;
+};
+
+type HeaderElement = {
   _id?: string;
-  title?: string | null;
-  slug?: string | null;
-  pages?: HeaderNavPage[] | null;
+  name?: string | null;
+  linkType?: 'internal' | 'external' | 'none' | null;
+  internalPage?: NavPageRef | null;
+  externalUrl?: string | null;
+  childLinks?: ChildLink[] | null;
 };
 
 type SiteSettings = {
   schoolName?: string;
 };
+
+function resolveHref(
+  locale: string,
+  linkType: HeaderElement['linkType'] | ChildLink['linkType'],
+  internalPage?: NavPageRef | null,
+  externalUrl?: string | null,
+) {
+  if (linkType === 'internal') {
+    const slug = (internalPage?.slug ?? '').trim();
+    if (!slug) return null;
+    return `/${locale}/${slug}`;
+  }
+
+  if (linkType === 'external') {
+    const url = (externalUrl ?? '').trim();
+    if (!url) return null;
+    return url;
+  }
+
+  return null;
+}
+
+function isExternalHref(href: string) {
+  return /^https?:\/\//i.test(href) || /^\/\//.test(href);
+}
 
 export default async function Header({
   locale,
@@ -29,14 +66,14 @@ export default async function Header({
 }: {
   locale: string;
   settings: SiteSettings | null;
-  headerNav?: HeaderNavGroup[] | null;
+  headerNav?: HeaderElement[] | null;
   sectionPages?: Array<{
     title?: string | null;
     slug?: string | null;
     order?: number | null;
   }> | null;
 }) {
-  const groups: HeaderNavGroup[] = headerNav ?? [];
+  const items: HeaderElement[] = headerNav ?? [];
 
   const sectionDropdownItems: SectionNavItem[] = (sectionPages || [])
     .map((s) => ({
@@ -60,56 +97,80 @@ export default async function Header({
 
         <div className="flex items-center gap-4">
           <nav className="flex items-center gap-6">
-            {groups.map((g) => {
-              const title = (g?.title ?? '').trim();
-              const slug = (g?.slug ?? '').trim();
-              if (!title || !slug) return null;
+            {items.map((item) => {
+              const label = (item?.name ?? '').trim();
+              if (!label) return null;
 
-              const pages = (g?.pages || []).filter(
-                (p) => (p?.title ?? '').trim() && (p?.slug ?? '').trim(),
+              const href = resolveHref(
+                locale,
+                item.linkType,
+                item.internalPage,
+                item.externalUrl,
               );
 
-              if (!pages.length) {
-                return (
-                  <Link
-                    key={slug}
-                    href={`/${locale}/${slug}`}
-                    className="text-sm font-semibold text-muted hover:text-(--fg)"
-                  >
-                    {title}
+              const childLinks: HeaderDropdownChildLink[] = (
+                item.childLinks ?? []
+              )
+                .map((c) => ({
+                  name: (c?.name ?? '').trim(),
+                  href: resolveHref(
+                    locale,
+                    c?.linkType,
+                    c?.internalPage,
+                    c?.externalUrl,
+                  ),
+                }))
+                .filter((c) => c.name);
+
+              const hasDropdown = childLinks.length > 0;
+              const ParentClassName = [
+                'relative inline-flex items-center px-1 py-2',
+                'text-sm font-semibold text-muted hover:text-(--fg)',
+                // underline
+                'after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5',
+                'after:origin-left after:scale-x-0 after:bg-[#8B5A2B] after:transition-transform after:duration-200',
+                'hover:after:scale-x-100',
+              ].join(' ');
+
+              const Parent =
+                href && !isExternalHref(href) ? (
+                  <Link href={href} className={ParentClassName}>
+                    {label}
                   </Link>
+                ) : href && isExternalHref(href) ? (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={ParentClassName}
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <span className={ParentClassName}>{label}</span>
                 );
+
+              if (!hasDropdown) {
+                return <div key={item._id ?? label}>{Parent}</div>;
               }
 
               return (
-                <div key={slug} className="relative group">
-                  <Link
-                    href={`/${locale}/${slug}`}
-                    className="text-sm font-semibold text-muted hover:text-(--fg)"
-                  >
-                    {title}
-                  </Link>
-
-                  <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-xl border border-border bg-white shadow-lg opacity-0 pointer-events-none transition-opacity duration-150 group-hover:opacity-100 group-hover:pointer-events-auto">
-                    <div className="py-2">
-                      {pages.map((p) => {
-                        const pTitle = (p?.title ?? '').trim();
-                        const pSlug = (p?.slug ?? '').trim();
-                        return (
-                          <Link
-                            key={`${slug}-${pSlug}`}
-                            href={`/${locale}/${slug}/${pSlug}`}
-                            className="block px-4 py-2 text-sm text-(--fg) hover:bg-muted/40"
-                          >
-                            {pTitle}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
+                <HeaderNavDropdownClient
+                  key={item._id ?? label}
+                  label={label}
+                  parentHref={href}
+                  childrenLinks={childLinks}
+                />
               );
             })}
+
+            {sectionDropdownItems.length ? (
+              <SectionsDropdownClient
+                locale={locale}
+                label="Sections"
+                items={sectionDropdownItems}
+              />
+            ) : null}
           </nav>
 
           <LocaleSwitcherClient locale={locale} />

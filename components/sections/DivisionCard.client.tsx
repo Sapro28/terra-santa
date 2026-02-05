@@ -40,9 +40,9 @@ export default function DivisionCard({
   const CardInner = (
     <div
       className={[
-        'group relative block overflow-hidden rounded-[28px]',
+        'group relative isolate block w-full overflow-hidden rounded-2xl',
         'ring-1 ring-black/10',
-        'shadow-[0_20px_60px_-28px_rgba(0,0,0,0.65)]',
+        'shadow-[0_18px_48px_-26px_rgba(0,0,0,0.65)]',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a3b] focus-visible:ring-offset-2',
         'bg-black',
       ].join(' ')}
@@ -50,7 +50,7 @@ export default function DivisionCard({
         title ? `${title}${subtitle ? ` — ${subtitle}` : ''}` : 'Division'
       }
     >
-      <div className="relative aspect-4/5 w-full">
+      <div className="relative h-75 w-full sm:h-80 lg:h-65">
         {d.imageUrl ? (
           <Image
             src={d.imageUrl}
@@ -61,23 +61,24 @@ export default function DivisionCard({
             priority={false}
             className={[
               'object-cover object-center',
-              'transition-transform duration-700 ease-out',
-              'group-hover:scale-[1.08]',
+              'transition-[transform,opacity] duration-700 ease-out',
+              'group-hover:opacity-0',
+              'group-hover:scale-[1.06]',
               'will-change-transform',
             ].join(' ')}
           />
         ) : null}
 
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-x-0 bottom-0 h-[58%] bg-linear-to-t from-black/85 via-black/35 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[72%] bg-linear-to-t from-black/90 via-black/45 to-transparent" />
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 text-center">
-          <div className="text-2xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-6 pb-6 pt-6 text-center">
+          <div className="line-clamp-2 text-base font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-md lg:text-lg">
             {title}
           </div>
           {subtitle ? (
-            <div className="mt-1 text-lg font-medium text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+            <div className="mt-1 line-clamp-2 text-xs font-semibold text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-sm">
               {subtitle}
             </div>
           ) : null}
@@ -86,40 +87,44 @@ export default function DivisionCard({
         <div
           className={[
             'absolute inset-0',
-            'opacity-0 translate-y-3',
+            'opacity-0 translate-y-2',
             'transition-all duration-500 ease-out',
             'group-hover:opacity-100 group-hover:translate-y-0',
             'pointer-events-none',
           ].join(' ')}
         >
-          <div className="absolute inset-0 bg-[#5b3a1e]" />
-          <div className="absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/25" />
-          <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-[#5b3a1e]" />
+            <div className="absolute inset-0 bg-linear-to-b from-white/10 via-transparent to-black/25" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/20 via-transparent to-transparent" />
 
-          <div
-            className="absolute inset-0 opacity-80"
-            style={{
-              backgroundImage: `url(${patternDataUri})`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center',
-              backgroundSize: '120%',
-              mixBlendMode: 'overlay',
-            }}
-          />
+            <div
+              className="absolute inset-0 opacity-35"
+              style={{
+                backgroundImage: `url(${patternDataUri})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: '120%',
+                mixBlendMode: 'soft-light',
+              }}
+            />
+          </div>
 
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
-            <div className="text-3xl font-extrabold tracking-tight text-white">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-7 py-10 text-center">
+            <div className="text-xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-2xl">
               {title}
             </div>
             {subtitle ? (
-              <div className="mt-1 text-xl font-semibold text-white/95">
+              <div className="mt-1 text-sm font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-base">
                 {subtitle}
               </div>
             ) : null}
 
-            <p className="mt-4 max-w-[30ch] text-sm leading-relaxed text-white/90">
-              {hoverText}
-            </p>
+            {hoverText ? (
+              <p className="mt-3 max-w-[42ch] text-[13px] leading-relaxed text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+                {hoverText}
+              </p>
+            ) : null}
 
             {cta ? (
               <div className="mt-6">
