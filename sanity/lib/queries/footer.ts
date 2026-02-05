@@ -13,7 +13,6 @@ export const footerQuery = groq`
   }
 `;
 
-// Legacy query for backward compatibility
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings" && _id == $id][0]{
     schoolName,

@@ -10,6 +10,8 @@ import { pageType } from './pageType';
 import { headerElementType } from './headerElementType';
 import { footerType } from './footerType';
 import { childLinkObject } from './objects/childLink';
+import { siteSettingsType } from './siteSettingsType';
+import { siteAssetsType } from './siteAssetsType';
 
 const singletonLangTemplate = (schemaType: string) => ({
   id: `${schemaType}-byLang`,
@@ -35,10 +37,19 @@ export const schema = {
     pageType,
     headerElementType,
     footerType,
+    siteSettingsType,
+    siteAssetsType,
   ],
 
   templates: (prev: any[]) => [
     ...prev,
+
+    {
+      id: 'siteAssets-singleton',
+      title: 'siteAssets (singleton)',
+      schemaType: 'siteAssets',
+      value: () => ({}),
+    },
 
     singletonLangTemplate('footer'),
     singletonLangTemplate('newsPost'),
@@ -47,6 +58,7 @@ export const schema = {
     singletonLangTemplate('homePage'),
     singletonLangTemplate('page'),
     singletonLangTemplate('headerElement'),
+    singletonLangTemplate('siteSettings'),
 
     {
       id: 'galleryCategory-bySection',

@@ -10,7 +10,7 @@ const LABELS: Record<
     langTitle: string;
     site: string;
     header: string;
-    footer: string;
+    settings: string;
     pages: string;
     specialPages: string;
     homePage: string;
@@ -24,7 +24,7 @@ const LABELS: Record<
     langTitle: 'العربية',
     site: 'الموقع',
     header: 'الهيدر',
-    footer: 'الفوتر',
+    settings: 'إعدادات الموقع',
     pages: 'الصفحات',
     specialPages: 'الصفحات الخاصة',
     homePage: 'الصفحة الرئيسية',
@@ -37,7 +37,7 @@ const LABELS: Record<
     langTitle: 'English',
     site: 'Site',
     header: 'Header',
-    footer: 'Footer',
+    settings: 'Site Settings',
     pages: 'Pages',
     specialPages: 'Special Pages',
     homePage: 'Home Page',
@@ -50,7 +50,7 @@ const LABELS: Record<
     langTitle: 'Italiano',
     site: 'Sito',
     header: 'Header',
-    footer: 'Footer',
+    settings: 'Impostazioni sito',
     pages: 'Pagine',
     specialPages: 'Pagine Speciali',
     homePage: 'Pagina Principale',
@@ -62,130 +62,12 @@ const LABELS: Record<
 };
 
 const SINGLETON_ID = {
-  footer: (lang: Lang) => `footer-${lang}`,
+  siteAssets: () => 'siteAssets',
   homePage: (lang: Lang) => `homePage-${lang}`,
+  siteSettings: (lang: Lang) => `siteSettings-${lang}`,
 };
 
 export const structure: StructureResolver = (S, context) => {
-  const websiteByLanguage = () =>
-    S.list()
-      .title('الموقع (حسب اللغة)')
-      .items(
-        (Object.keys(LABELS) as Lang[]).map((lang) => {
-          const t = LABELS[lang];
-
-          return S.listItem()
-            .title(t.langTitle)
-            .icon(CogIcon)
-            .child(
-              S.list()
-                .title(`${t.site} — ${t.langTitle}`)
-                .items([
-                  S.listItem()
-                    .title(t.header)
-                    .icon(DocumentsIcon)
-                    .child(
-                      S.documentList()
-                        .title(`${t.header} — ${t.langTitle}`)
-                        .apiVersion(apiVersion)
-                        .schemaType('headerElement')
-                        .filter('_type == "headerElement" && language == $lang')
-                        .params({ lang })
-                        .defaultOrdering([
-                          { field: 'order', direction: 'asc' },
-                          { field: 'name', direction: 'asc' },
-                        ])
-                        .initialValueTemplates([
-                          S.initialValueTemplateItem('headerElement-byLang', {
-                            lang,
-                          }),
-                        ])
-                        .child((docId: string) =>
-                          S.document()
-                            .schemaType('headerElement')
-                            .documentId(docId),
-                        ),
-                    ),
-
-                  S.listItem()
-                    .title(t.footer)
-                    .icon(DocumentIcon)
-                    .child(
-                      S.document()
-                        .schemaType('footer')
-                        .documentId(SINGLETON_ID.footer(lang))
-                        .title(`${t.footer} — ${t.langTitle}`)
-                        .initialValueTemplate('footer-byLang', { lang }),
-                    ),
-
-                  S.divider(),
-
-                  S.listItem()
-                    .title(t.pages)
-                    .icon(DocumentsIcon)
-                    .child(
-                      S.documentList()
-                        .title(`${t.pages} — ${t.langTitle}`)
-                        .apiVersion(apiVersion)
-
-                        .schemaType('page')
-                        .filter('_type == "page" && language == $lang')
-                        .params({ lang })
-                        .defaultOrdering([{ field: 'title', direction: 'asc' }])
-                        .initialValueTemplates([
-                          S.initialValueTemplateItem('page-byLang', { lang }),
-                        ])
-                        .child((pageId: string) =>
-                          S.document().schemaType('page').documentId(pageId),
-                        ),
-                    ),
-
-                  S.divider(),
-                  S.listItem()
-                    .title(t.specialPages)
-                    .icon(DocumentIcon)
-                    .child(
-                      S.list()
-                        .title(`${t.specialPages} — ${t.langTitle}`)
-                        .items([
-                          S.listItem()
-                            .title(t.homePage)
-                            .icon(DocumentIcon)
-                            .child(
-                              S.documentList()
-                                .title(`${t.homePage} — ${t.langTitle}`)
-                                .apiVersion(apiVersion)
-
-                                .schemaType('homePage')
-                                .filter(
-                                  '_type == "homePage" && language == $lang',
-                                )
-                                .params({ lang })
-                                .defaultOrdering([
-                                  { field: '_updatedAt', direction: 'desc' },
-                                ])
-                                .initialValueTemplates([
-                                  S.initialValueTemplateItem(
-                                    'homePage-byLang',
-                                    {
-                                      lang,
-                                    },
-                                  ),
-                                ])
-                                .child((docId: string) =>
-                                  S.document()
-                                    .schemaType('homePage')
-                                    .documentId(docId)
-                                    .title(`${t.homePage} — ${t.langTitle}`),
-                                ),
-                            ),
-                        ]),
-                    ),
-                ]),
-            );
-        }),
-      );
-
   const newsByLanguage = () =>
     S.list()
       .title('الأخبار / الإعلانات (حسب اللغة)')
@@ -198,7 +80,6 @@ export const structure: StructureResolver = (S, context) => {
               S.documentList()
                 .title(`${LABELS[lang].news} — ${LABELS[lang].langTitle}`)
                 .apiVersion(apiVersion)
-
                 .schemaType('newsPost')
                 .filter('_type == "newsPost" && language == $lang')
                 .params({ lang })
@@ -222,7 +103,6 @@ export const structure: StructureResolver = (S, context) => {
               S.documentList()
                 .title(`${LABELS[lang].events} — ${LABELS[lang].langTitle}`)
                 .apiVersion(apiVersion)
-
                 .schemaType('event')
                 .filter('_type == "event" && language == $lang')
                 .params({ lang })
@@ -238,7 +118,6 @@ export const structure: StructureResolver = (S, context) => {
     S.documentList()
       .title('أقسام المدرسة')
       .apiVersion(apiVersion)
-
       .schemaType('schoolSection')
       .filter('_type == "schoolSection"')
       .defaultOrdering([{ field: 'order', direction: 'asc' }])
@@ -282,10 +161,170 @@ export const structure: StructureResolver = (S, context) => {
   return S.list()
     .title('CMS')
     .items([
-      S.listItem().title('الموقع').icon(CogIcon).child(websiteByLanguage()),
+      // Main Website Section - organized by language
+      S.listItem()
+        .title('الموقع (حسب اللغة)')
+        .icon(CogIcon)
+        .child(
+          S.list()
+            .title('الموقع (حسب اللغة)')
+            .items([
+              // Global logo at the top - shared across all languages
+              S.listItem()
+                .title('شعار المدرسة / School Logo')
+                .icon(ImageIcon)
+                .child(
+                  S.document()
+                    .schemaType('siteAssets')
+                    .documentId(SINGLETON_ID.siteAssets())
+                    .title('شعار المدرسة / School Logo'),
+                ),
+
+              S.divider(),
+
+              // Language-specific sections
+              ...(Object.keys(LABELS) as Lang[]).map((lang) => {
+                const t = LABELS[lang];
+
+                return S.listItem()
+                  .title(t.langTitle)
+                  .icon(CogIcon)
+                  .child(
+                    S.list()
+                      .title(`${t.site} — ${t.langTitle}`)
+                      .items([
+                        // Site Settings (school name + footer)
+                        S.listItem()
+                          .title(t.settings)
+                          .icon(CogIcon)
+                          .child(
+                            S.document()
+                              .schemaType('siteSettings')
+                              .documentId(SINGLETON_ID.siteSettings(lang))
+                              .title(`${t.settings} — ${t.langTitle}`)
+                              .initialValueTemplate('siteSettings-byLang', {
+                                lang,
+                              }),
+                          ),
+
+                        S.divider(),
+
+                        // Header Elements
+                        S.listItem()
+                          .title(t.header)
+                          .icon(DocumentsIcon)
+                          .child(
+                            S.documentList()
+                              .title(`${t.header} — ${t.langTitle}`)
+                              .apiVersion(apiVersion)
+                              .schemaType('headerElement')
+                              .filter(
+                                '_type == "headerElement" && language == $lang',
+                              )
+                              .params({ lang })
+                              .defaultOrdering([
+                                { field: 'order', direction: 'asc' },
+                                { field: 'name', direction: 'asc' },
+                              ])
+                              .initialValueTemplates([
+                                S.initialValueTemplateItem(
+                                  'headerElement-byLang',
+                                  {
+                                    lang,
+                                  },
+                                ),
+                              ])
+                              .child((docId: string) =>
+                                S.document()
+                                  .schemaType('headerElement')
+                                  .documentId(docId),
+                              ),
+                          ),
+
+                        S.divider(),
+
+                        // Regular Pages
+                        S.listItem()
+                          .title(t.pages)
+                          .icon(DocumentsIcon)
+                          .child(
+                            S.documentList()
+                              .title(`${t.pages} — ${t.langTitle}`)
+                              .apiVersion(apiVersion)
+                              .schemaType('page')
+                              .filter('_type == "page" && language == $lang')
+                              .params({ lang })
+                              .defaultOrdering([
+                                { field: 'title', direction: 'asc' },
+                              ])
+                              .initialValueTemplates([
+                                S.initialValueTemplateItem('page-byLang', {
+                                  lang,
+                                }),
+                              ])
+                              .child((pageId: string) =>
+                                S.document()
+                                  .schemaType('page')
+                                  .documentId(pageId),
+                              ),
+                          ),
+
+                        S.divider(),
+
+                        // Special Pages
+                        S.listItem()
+                          .title(t.specialPages)
+                          .icon(DocumentIcon)
+                          .child(
+                            S.list()
+                              .title(`${t.specialPages} — ${t.langTitle}`)
+                              .items([
+                                S.listItem()
+                                  .title(t.homePage)
+                                  .icon(DocumentIcon)
+                                  .child(
+                                    S.documentList()
+                                      .title(`${t.homePage} — ${t.langTitle}`)
+                                      .apiVersion(apiVersion)
+                                      .schemaType('homePage')
+                                      .filter(
+                                        '_type == "homePage" && language == $lang',
+                                      )
+                                      .params({ lang })
+                                      .defaultOrdering([
+                                        {
+                                          field: '_updatedAt',
+                                          direction: 'desc',
+                                        },
+                                      ])
+                                      .initialValueTemplates([
+                                        S.initialValueTemplateItem(
+                                          'homePage-byLang',
+                                          {
+                                            lang,
+                                          },
+                                        ),
+                                      ])
+                                      .child((docId: string) =>
+                                        S.document()
+                                          .schemaType('homePage')
+                                          .documentId(docId)
+                                          .title(
+                                            `${t.homePage} — ${t.langTitle}`,
+                                          ),
+                                      ),
+                                  ),
+                              ]),
+                          ),
+                      ]),
+                  );
+              }),
+            ]),
+        ),
 
       S.divider(),
 
+      // Content Section
       S.listItem()
         .title('المحتوى')
         .icon(DocumentsIcon)

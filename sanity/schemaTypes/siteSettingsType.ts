@@ -13,6 +13,7 @@ export const siteSettingsType = defineType({
       name: 'schoolName',
       title: 'اسم المدرسة',
       type: 'string',
+      description: 'School name in this language / اسم المدرسة بهذه اللغة',
       options: {
         i18nTitle: {
           ar: 'اسم المدرسة',
@@ -26,6 +27,7 @@ export const siteSettingsType = defineType({
     defineField({
       name: 'footer',
       title: 'الفوتر (Footer)',
+      description: 'Footer content in this language / محتوى الفوتر بهذه اللغة',
       type: 'object',
       options: {
         i18nTitle: {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 import HeaderNavDropdownClient, {
   type HeaderDropdownChildLink,
@@ -31,6 +32,8 @@ type HeaderElement = {
 
 type SiteSettings = {
   schoolName?: string;
+  headerLogoUrl?: string | null;
+  headerLogoAlt?: string | null;
 };
 
 function resolveHref(
@@ -91,8 +94,20 @@ export default async function Header({
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href={`/${locale}`} className="font-semibold text-(--fg)">
-          {settings?.schoolName ?? 'School'}
+        <Link href={`/${locale}`} className="inline-flex items-center gap-2">
+          {settings?.headerLogoUrl ? (
+            <Image
+              src={settings.headerLogoUrl}
+              alt={settings?.headerLogoAlt ?? settings?.schoolName ?? 'School'}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-sm object-contain"
+              priority
+            />
+          ) : null}
+          <span className="font-semibold text-(--fg)">
+            {settings?.schoolName ?? 'School'}
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">
