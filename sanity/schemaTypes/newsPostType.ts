@@ -11,6 +11,21 @@ export const newsPostType = defineType({
     languageFieldLocked,
 
     defineField({
+      name: 'hidden',
+      type: 'boolean',
+      title: 'إخفاء (Hidden)',
+      initialValue: false,
+    }),
+
+    defineField({
+      name: 'urgent',
+      type: 'boolean',
+      title: 'عاجل (Urgent)',
+      description: 'إذا تم تفعيله، سيتم عرض الخبر أولاً.',
+      initialValue: false,
+    }),
+
+    defineField({
       name: 'title',
       type: 'string',
       title: 'العنوان',
