@@ -1,4 +1,5 @@
 import { defineField } from 'sanity';
+import LanguageAutoInput from '../components/LanguageAutoInput';
 
 export type Lang = 'ar' | 'en' | 'it';
 
@@ -7,10 +8,15 @@ const base = {
   title: 'اللغة',
   type: 'string',
   options: {
+    i18nTitle: {
+      ar: 'اللغة',
+      en: 'Language',
+      it: 'Lingua',
+    },
     list: [
       { title: 'العربية', value: 'ar' },
-      { title: 'الإنجليزية', value: 'en' },
-      { title: 'الإيطالية', value: 'it' },
+      { title: 'English', value: 'en' },
+      { title: 'Italiano', value: 'it' },
     ],
     layout: 'radio',
     direction: 'horizontal',
@@ -20,14 +26,18 @@ const base = {
 
 export const languageFieldEditable = defineField({
   ...base,
-  initialValue: 'ar',
   hidden: false,
   readOnly: false,
+  components: {
+    input: LanguageAutoInput,
+  },
 });
 
 export const languageFieldLocked = defineField({
   ...base,
-  initialValue: 'ar',
   hidden: false,
-  readOnly: true,
+  readOnly: ({ document }) => Boolean((document as any)?.language),
+  components: {
+    input: LanguageAutoInput,
+  },
 });

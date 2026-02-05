@@ -124,7 +124,6 @@ export const sectionDivisionsType = defineType({
     prepare({ title, count }) {
       return {
         title: title || 'Divisions',
-        subtitle: `${count ?? 0} item(s)`,
       };
     },
   },
@@ -178,7 +177,6 @@ export const sectionParentsTestimonialsType = defineType({
     prepare({ title, count }) {
       return {
         title: title || 'Parents Testimonials',
-        subtitle: `${count ?? 0} item(s)`,
       };
     },
   },

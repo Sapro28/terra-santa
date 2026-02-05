@@ -161,7 +161,6 @@ export const structure: StructureResolver = (S, context) => {
   return S.list()
     .title('CMS')
     .items([
-      // Main Website Section - organized by language
       S.listItem()
         .title('الموقع (حسب اللغة)')
         .icon(CogIcon)
@@ -169,7 +168,6 @@ export const structure: StructureResolver = (S, context) => {
           S.list()
             .title('الموقع (حسب اللغة)')
             .items([
-              // Global logo at the top - shared across all languages
               S.listItem()
                 .title('شعار المدرسة / School Logo')
                 .icon(ImageIcon)
@@ -181,8 +179,6 @@ export const structure: StructureResolver = (S, context) => {
                 ),
 
               S.divider(),
-
-              // Language-specific sections
               ...(Object.keys(LABELS) as Lang[]).map((lang) => {
                 const t = LABELS[lang];
 
@@ -193,7 +189,6 @@ export const structure: StructureResolver = (S, context) => {
                     S.list()
                       .title(`${t.site} — ${t.langTitle}`)
                       .items([
-                        // Site Settings (school name + footer)
                         S.listItem()
                           .title(t.settings)
                           .icon(CogIcon)
@@ -208,8 +203,6 @@ export const structure: StructureResolver = (S, context) => {
                           ),
 
                         S.divider(),
-
-                        // Header Elements
                         S.listItem()
                           .title(t.header)
                           .icon(DocumentsIcon)
@@ -242,8 +235,6 @@ export const structure: StructureResolver = (S, context) => {
                           ),
 
                         S.divider(),
-
-                        // Regular Pages
                         S.listItem()
                           .title(t.pages)
                           .icon(DocumentsIcon)
@@ -268,10 +259,6 @@ export const structure: StructureResolver = (S, context) => {
                                   .documentId(pageId),
                               ),
                           ),
-
-                        S.divider(),
-
-                        // Special Pages
                         S.listItem()
                           .title(t.specialPages)
                           .icon(DocumentIcon)
@@ -323,8 +310,6 @@ export const structure: StructureResolver = (S, context) => {
         ),
 
       S.divider(),
-
-      // Content Section
       S.listItem()
         .title('المحتوى')
         .icon(DocumentsIcon)
