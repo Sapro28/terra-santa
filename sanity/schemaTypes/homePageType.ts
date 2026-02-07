@@ -3,7 +3,7 @@ import { languageFieldLocked } from './languageField';
 
 export const homePageType = defineType({
   name: 'homePage',
-  title: 'الصفحة الرئيسية',
+  title: 'Home Page',
   type: 'document',
 
   fields: [
@@ -11,7 +11,14 @@ export const homePageType = defineType({
 
     defineField({
       name: 'sections',
-      title: 'الأقسام (Page Builder)',
+      title: 'Sections (Page Builder)',
+      options: {
+        i18nTitle: {
+          ar: 'الأقسام (Page Builder)',
+          en: 'Sections (Page Builder)',
+          it: 'Sezioni (Page Builder)',
+        },
+      },
       type: 'array',
       of: [
         defineArrayMember({ type: 'sectionVideoHero' }),
@@ -19,6 +26,7 @@ export const homePageType = defineType({
         defineArrayMember({ type: 'sectionParentsTestimonials' }),
         defineArrayMember({ type: 'sectionAnnouncements' }),
         defineArrayMember({ type: 'sectionUpcomingEvents' }),
+        defineArrayMember({ type: 'sectionLatestEvents' }),
         defineArrayMember({ type: 'sectionColors' }),
       ],
     }),
@@ -28,8 +36,12 @@ export const homePageType = defineType({
     select: { lang: 'language' },
     prepare({ lang }) {
       return {
-        title: 'الصفحة الرئيسية',
-        subtitle: lang ? `اللغة: ${lang}` : undefined,
+        title: 'Home Page',
+        subtitle: lang
+          ? lang === 'ar'
+            ? `اللغة: ${lang}`
+            : `Language: ${lang}`
+          : undefined,
       };
     },
   },

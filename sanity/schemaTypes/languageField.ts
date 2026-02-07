@@ -5,7 +5,7 @@ export type Lang = 'ar' | 'en' | 'it';
 
 const base = {
   name: 'language',
-  title: 'اللغة',
+  title: 'Language',
   type: 'string',
   options: {
     i18nTitle: {

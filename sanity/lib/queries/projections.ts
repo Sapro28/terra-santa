@@ -74,7 +74,26 @@ export const sectionProjection = `
   _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
 
   // Upcoming Events
-  _type == "sectionUpcomingEvents" => { title, emptyText, viewAllLabel, limit },
+  _type == "sectionUpcomingEvents" => {
+    title,
+    emptyText,
+    viewAllLabel,
+    limit,
+    "sectionId": section._ref,
+    "sectionTitle": section->title,
+    "sectionSlug": section->slug
+  },
+
+  // Latest Events
+  _type == "sectionLatestEvents" => {
+    title,
+    emptyText,
+    viewAllLabel,
+    limit,
+    "sectionId": section._ref,
+    "sectionTitle": section->title,
+    "sectionSlug": section->slug
+  },
 
   // Parents Testimonials
   _type == "sectionParentsTestimonials" => { title, testimonials[]{text} }

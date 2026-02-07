@@ -1,19 +1,13 @@
 import React from 'react';
 import type { FieldProps } from 'sanity';
 import { useFormValue } from 'sanity';
+import { inferStudioLang } from '../lib/studioLang';
 
 export default function I18nField(props: FieldProps) {
   const language = useFormValue(['language']) as string | undefined;
   const docId = useFormValue(['_id']) as string | undefined;
 
-  const inferredFromId = (() => {
-    const suffix = docId?.split('-').pop();
-    return suffix === 'ar' || suffix === 'en' || suffix === 'it'
-      ? suffix
-      : undefined;
-  })();
-
-  const lang = language || inferredFromId || 'ar';
+  const lang = inferStudioLang({ documentLang: language, documentId: docId });
   const opts = (props.schemaType.options || {}) as any;
 
   const i18nTitle = opts.i18nTitle?.[lang];

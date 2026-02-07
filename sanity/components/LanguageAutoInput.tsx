@@ -1,24 +1,22 @@
 import React, { useEffect, useMemo } from 'react';
+import { inferLangFromId, inferStudioLang, type Lang } from '../lib/studioLang';
 import type { StringInputProps } from 'sanity';
 import { PatchEvent, set, setIfMissing } from 'sanity';
 import { useFormValue } from 'sanity';
 
-type Lang = 'ar' | 'en' | 'it';
-
-function inferLangFromId(docId?: string | null): Lang | undefined {
-  if (!docId) return undefined;
-
-  const suffix = docId.split('-').pop();
-  if (suffix === 'ar' || suffix === 'en' || suffix === 'it') return suffix;
-
-  return undefined;
-}
 export default function LanguageAutoInput(props: StringInputProps) {
   const docId = useFormValue(['_id']) as string | undefined;
 
   const inferred = useMemo(() => inferLangFromId(docId), [docId]);
+  const inferredFromStudio = useMemo(
+    () => inferStudioLang({ documentId: docId }),
+    [docId],
+  );
 
   useEffect(() => {
+    const disabled = Boolean((props as any)?.elementProps?.disabled);
+    if (props.readOnly || disabled) return;
+
     const v = props.value as any;
 
     const isEmpty =
@@ -26,15 +24,21 @@ export default function LanguageAutoInput(props: StringInputProps) {
       v === null ||
       (typeof v === 'string' && v.trim() === '');
 
-    if (inferred && isEmpty) {
-      props.onChange(PatchEvent.from(set(inferred)));
+    const target = inferred || inferredFromStudio;
+
+    if (!target) return;
+
+    if (v === target) return;
+
+    if (isEmpty) {
+      props.onChange(PatchEvent.from(set(target)));
       return;
     }
 
-    if (inferred && v === undefined) {
-      props.onChange(PatchEvent.from(setIfMissing(inferred)));
+    if (v === undefined) {
+      props.onChange(PatchEvent.from(setIfMissing(target)));
     }
-  }, [props.value, inferred]);
+  }, [props.value, inferred, inferredFromStudio, props.readOnly]);
 
   return props.renderDefault(props);
 }

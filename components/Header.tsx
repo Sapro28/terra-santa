@@ -119,7 +119,6 @@ export default async function Header({
               const ParentClassName = [
                 'relative inline-flex items-center px-1 py-2',
                 'text-sm font-semibold text-muted hover:text-(--fg)',
-                // underline
                 'after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5',
                 'after:origin-left after:scale-x-0 after:bg-[#8B5A2B] after:transition-transform after:duration-200',
                 'hover:after:scale-x-100',

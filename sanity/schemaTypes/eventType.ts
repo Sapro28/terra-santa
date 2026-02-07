@@ -11,13 +11,6 @@ export const eventType = defineType({
     languageFieldLocked,
 
     defineField({
-      name: 'hidden',
-      type: 'boolean',
-      title: 'إخفاء (Hidden)',
-      initialValue: false,
-    }),
-
-    defineField({
       name: 'title',
       type: 'string',
       title: 'العنوان',
@@ -53,6 +46,21 @@ export const eventType = defineType({
             ? 'الرابط المختصر لا يمكن أن يحتوي على "/"'
             : true;
         }),
+    }),
+
+    defineField({
+      name: 'sections',
+      title: 'الأقسام (Sections)',
+      type: 'array',
+      of: [
+        {
+          type: 'reference',
+          to: [{ type: 'schoolSection' }],
+        },
+      ],
+      options: { layout: 'tags' },
+      validation: (Rule) => Rule.min(1).required(),
+      description: 'اختر قسمًا واحدًا أو أكثر لربط الفعالية به.',
     }),
 
     defineField({
@@ -131,12 +139,20 @@ export const eventType = defineType({
       title: 'title',
       lang: 'language',
       startAt: 'startAt',
+      sections: 'sections',
     },
-    prepare({ title, lang, startAt }) {
+    prepare({ title, lang, startAt, sections }) {
+      const sectionTitles =
+        (sections || [])
+          .map((s: any) => s?.title)
+          .filter(Boolean)
+          .join(', ') || null;
+
       return {
         title: title || 'بدون عنوان',
         subtitle: [
           lang ? `لغة: ${lang}` : null,
+          sectionTitles ? `الأقسام: ${sectionTitles}` : null,
           startAt ? `يبدأ: ${startAt}` : null,
         ]
           .filter(Boolean)

@@ -1,33 +1,53 @@
+import type {} from '../types/sanity-i18n-options';
+
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { SCHOOL_SECTION_SLUG_OPTIONS } from '../lib/sectionSlugs';
 
 export const sectionVideoHeroType = defineType({
   name: 'sectionVideoHero',
-  title: 'فيديو المقدمة (Main Page Video)',
+  title: 'Video Hero',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
-      title: 'العنوان',
+      title: 'Title',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'subtitle',
-      title: 'النص التعريفي (اختياري)',
+      title: 'Subtitle (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'النص التعريفي (اختياري)',
+          en: 'Subtitle (optional)',
+          it: 'Sottotitolo (opzionale)',
+        },
+      },
       type: 'text',
       rows: 3,
     }),
     defineField({
       name: 'video',
-      title: 'ملف الفيديو',
+      title: 'Video file',
       type: 'file',
-      options: { accept: 'video/*' },
+      options: {
+        accept: 'video/*',
+        i18nTitle: { ar: 'ملف الفيديو', en: 'Video file', it: 'File video' },
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'overlayOpacity',
-      title: 'شفافية التعتيم (Overlay) (0 - 0.9)',
+      title: 'Overlay opacity (0 - 0.9)',
+      options: {
+        i18nTitle: {
+          ar: 'شفافية التعتيم (Overlay) (0 - 0.9)',
+          en: 'Overlay opacity (0 - 0.9)',
+          it: 'Opacità overlay (0 - 0.9)',
+        },
+      },
       type: 'number',
       initialValue: 0.45,
       validation: (Rule) => Rule.min(0).max(0.9),
@@ -43,19 +63,34 @@ export const sectionVideoHeroType = defineType({
 
 export const sectionDivisionsType = defineType({
   name: 'sectionDivisions',
-  title: 'اقصام المدرسة (Academic Divisions)',
+  title: 'Academic Divisions',
   type: 'object',
   fields: [
-    defineField({ name: 'title', title: 'العنوان', type: 'string' }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
+    }),
     defineField({
       name: 'subtitle',
-      title: 'نص تعريفي (اختياري)',
+      title: 'Subtitle (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'نص تعريفي (اختياري)',
+          en: 'Subtitle (optional)',
+          it: 'Sottotitolo (opzionale)',
+        },
+      },
       type: 'text',
       rows: 2,
     }),
     defineField({
       name: 'divisions',
-      title: 'التقسيمات',
+      title: 'Divisions',
+      options: {
+        i18nTitle: { ar: 'التقسيمات', en: 'Divisions', it: 'Divisioni' },
+      },
       type: 'array',
       of: [
         defineArrayMember({
@@ -65,37 +100,71 @@ export const sectionDivisionsType = defineType({
           fields: [
             defineField({
               name: 'title',
-              title: 'القسم',
+              title: 'Division name',
+              options: {
+                i18nTitle: {
+                  ar: 'القسم',
+                  en: 'Division name',
+                  it: 'Nome divisione',
+                },
+              },
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'text',
-              title: 'الصف',
+              title: 'Grades',
+              options: {
+                i18nTitle: { ar: 'الصف', en: 'Grades', it: 'Classi' },
+              },
               type: 'text',
               rows: 1,
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'hoverText',
-              title: 'نص عند المرور (Hover)',
+              title: 'Hover text',
+              options: {
+                i18nTitle: {
+                  ar: 'نص عند المرور (Hover)',
+                  en: 'Hover text',
+                  it: 'Testo hover',
+                },
+              },
               type: 'text',
               rows: 3,
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'ctaLabel',
-              title: 'كلام الزر',
+              title: 'Button label',
+              options: {
+                i18nTitle: {
+                  ar: 'كلام الزر',
+                  en: 'Button label',
+                  it: 'Testo pulsante',
+                },
+              },
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'sectionSlug',
-              title: 'Section slug (destination page)',
+              title: 'Destination section',
               type: 'string',
               description:
-                'اختر القسم الذي تذهب إليه هذه البطاقة (صفحة /sections/<slug>).',
+                'Choose which section page this card links to (/sections/<slug>).',
               options: {
+                i18nTitle: {
+                  ar: 'القسم الوجهة',
+                  en: 'Destination section',
+                  it: 'Sezione destinazione',
+                },
+                i18nDescription: {
+                  ar: 'اختر القسم الذي تذهب إليه هذه البطاقة (صفحة /sections/<slug>).',
+                  en: 'Choose which section page this card links to (/sections/<slug>).',
+                  it: 'Scegli la sezione a cui collega questa scheda (/sections/<slug>).',
+                },
                 list: SCHOOL_SECTION_SLUG_OPTIONS,
                 layout: 'dropdown',
               },
@@ -103,10 +172,13 @@ export const sectionDivisionsType = defineType({
             }),
             defineField({
               name: 'image',
-              title: 'صورة',
+              title: 'Image',
               type: 'image',
               validation: (Rule) => Rule.required(),
-              options: { hotspot: true },
+              options: {
+                hotspot: true,
+                i18nTitle: { ar: 'صورة', en: 'Image', it: 'Immagine' },
+              },
               fields: [
                 defineField({ name: 'alt', title: 'Alt', type: 'string' }),
               ],
@@ -131,28 +203,42 @@ export const sectionDivisionsType = defineType({
 
 export const sectionParentsTestimonialsType = defineType({
   name: 'sectionParentsTestimonials',
-  title: 'شهادات أولياء الأمور (Parents Testimonial)',
+  title: 'Parents Testimonials',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
-      title: 'العنوان',
+      title: 'Title',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
       initialValue: 'آراء أولياء الأمور',
     }),
     defineField({
       name: 'testimonials',
-      title: 'الشهادات',
+      title: 'Testimonials',
+      options: {
+        i18nTitle: { ar: 'الشهادات', en: 'Testimonials', it: 'Testimonianze' },
+      },
       type: 'array',
       of: [
         defineArrayMember({
           type: 'object',
           name: 'testimonial',
-          title: 'شهادة',
+          title: 'Testimonial',
+          options: {
+            i18nTitle: { ar: 'شهادة', en: 'Testimonial', it: 'Testimonianza' },
+          },
           fields: [
             defineField({
               name: 'text',
-              title: 'نص الشهادة',
+              title: 'Testimonial text',
+              options: {
+                i18nTitle: {
+                  ar: 'نص الشهادة',
+                  en: 'Testimonial text',
+                  it: 'Testo testimonianza',
+                },
+              },
               type: 'text',
               rows: 4,
               validation: (Rule) => Rule.required(),
@@ -184,30 +270,52 @@ export const sectionParentsTestimonialsType = defineType({
 
 export const sectionAnnouncementsType = defineType({
   name: 'sectionAnnouncements',
-  title: 'آخر الاخبار (Latest News)',
+  title: 'Latest News',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
-      title: 'العنوان',
+      title: 'Title',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
       initialValue: 'أحدث الأخبار',
     }),
     defineField({
       name: 'emptyText',
-      title: 'نص عند عدم وجود اخبار',
+      title: 'Empty-state text (when there is no news)',
+      options: {
+        i18nTitle: {
+          ar: 'نص عند عدم وجود اخبار',
+          en: 'Empty-state text',
+          it: 'Testo quando non ci sono notizie',
+        },
+      },
       type: 'string',
       initialValue: 'لا توجد اخبار حالياً',
     }),
     defineField({
       name: 'viewAllLabel',
-      title: 'زر: عرض الكل',
+      title: 'Button: View all',
+      options: {
+        i18nTitle: {
+          ar: 'زر: عرض الكل',
+          en: 'Button: View all',
+          it: 'Pulsante: Vedi tutto',
+        },
+      },
       type: 'string',
       initialValue: 'عرض الكل',
     }),
     defineField({
       name: 'limit',
-      title: 'العدد (اختياري)',
+      title: 'Count (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'العدد (اختياري)',
+          en: 'Count (optional)',
+          it: 'Numero (opzionale)',
+        },
+      },
       type: 'number',
       initialValue: 3,
       validation: (Rule) => Rule.min(1).max(12),
@@ -226,30 +334,61 @@ export const sectionAnnouncementsType = defineType({
 
 export const sectionUpcomingEventsType = defineType({
   name: 'sectionUpcomingEvents',
-  title: 'الفعاليات القادمة (Upcoming Events)',
+  title: 'Upcoming Events',
   type: 'object',
   fields: [
     defineField({
+      name: 'section',
+      title: 'Filter by division (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'فلترة حسب القسم (اختياري)',
+          en: 'Filter by division (optional)',
+          it: 'Filtra per divisione (opzionale)',
+        },
+      } as any,
+      type: 'reference',
+      to: [{ type: 'schoolSection' }],
+      description:
+        'إذا اخترت قسمًا هنا، سيعرض هذا الجزء الفعاليات القادمة الخاصة بهذا القسم فقط.',
+    }),
+    defineField({
       name: 'title',
-      title: 'العنوان',
+      title: 'Title',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
       initialValue: 'الفعاليات القادمة',
     }),
     defineField({
       name: 'emptyText',
-      title: 'نص عند عدم وجود فعاليات قادمة',
+      title: 'Empty-state text (when there are no upcoming events)',
+      options: {
+        i18nTitle: {
+          ar: 'نص عند عدم وجود فعاليات قادمة',
+          en: 'Empty-state text',
+          it: 'Testo quando non ci sono eventi in arrivo',
+        },
+      },
       type: 'string',
       initialValue: 'لا توجد فعاليات قادمة حالياً',
     }),
     defineField({
       name: 'viewAllLabel',
-      title: 'زر: عرض الكل',
+      title: 'Button: View all',
+      options: {
+        i18nTitle: {
+          ar: 'زر: عرض الكل',
+          en: 'Button: View all',
+          it: 'Pulsante: Vedi tutto',
+        },
+      },
       type: 'string',
       initialValue: 'عرض الكل',
     }),
     defineField({
       name: 'limit',
-      title: 'العدد',
+      title: 'Count',
+      options: { i18nTitle: { ar: 'العدد', en: 'Count', it: 'Numero' } },
       type: 'number',
       initialValue: 3,
       readOnly: true,
@@ -258,28 +397,133 @@ export const sectionUpcomingEventsType = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title' },
-    prepare({ title }) {
-      return { title: title || 'Upcoming Events', subtitle: 'limit: 3' };
+    select: { title: 'title', sectionTitle: 'section.title' },
+    prepare({ title, sectionTitle }) {
+      return {
+        title: title || 'Upcoming Events',
+        subtitle: [
+          sectionTitle ? `القسم: ${sectionTitle}` : 'كل الأقسام',
+          'limit: 3',
+        ]
+          .filter(Boolean)
+          .join(' — '),
+      };
+    },
+  },
+});
+
+export const sectionLatestEventsType = defineType({
+  name: 'sectionLatestEvents',
+  title: 'Latest Events',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'section',
+      title: 'Filter by division (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'فلترة حسب القسم (اختياري)',
+          en: 'Filter by division (optional)',
+          it: 'Filtra per divisione (opzionale)',
+        },
+      } as any,
+      type: 'reference',
+      to: [{ type: 'schoolSection' }],
+      description:
+        'إذا اخترت قسمًا هنا، سيعرض هذا الجزء آخر الفعاليات الخاصة بهذا القسم فقط.',
+    }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
+      type: 'string',
+      initialValue: 'آخر الفعاليات',
+    }),
+    defineField({
+      name: 'emptyText',
+      title: 'Empty-state text (when there are no events)',
+      options: {
+        i18nTitle: {
+          ar: 'نص عند عدم وجود فعاليات',
+          en: 'Empty-state text',
+          it: 'Testo quando non ci sono eventi',
+        },
+      },
+      type: 'string',
+      initialValue: 'لا توجد فعاليات حالياً',
+    }),
+    defineField({
+      name: 'viewAllLabel',
+      title: 'Button: View all',
+      options: {
+        i18nTitle: {
+          ar: 'زر: عرض الكل',
+          en: 'Button: View all',
+          it: 'Pulsante: Vedi tutto',
+        },
+      },
+      type: 'string',
+      initialValue: 'عرض كل الفعاليات',
+    }),
+    defineField({
+      name: 'limit',
+      title: 'Count (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'العدد (اختياري)',
+          en: 'Count (optional)',
+          it: 'Numero (opzionale)',
+        },
+      },
+      type: 'number',
+      initialValue: 6,
+      validation: (Rule) => Rule.min(1).max(24),
+    }),
+  ],
+  preview: {
+    select: { title: 'title', sectionTitle: 'section.title', limit: 'limit' },
+    prepare({ title, sectionTitle, limit }) {
+      return {
+        title: title || 'Latest Events',
+        subtitle: [
+          sectionTitle ? `القسم: ${sectionTitle}` : 'كل الأقسام',
+          `limit: ${limit ?? 6}`,
+        ]
+          .filter(Boolean)
+          .join(' — '),
+      };
     },
   },
 });
 
 export const sectionColorsType = defineType({
   name: 'sectionColors',
-  title: 'ألوان المدرسة (School Colors)',
+  title: 'School Colors',
   type: 'object',
   fields: [
-    defineField({ name: 'title', title: 'العنوان', type: 'string' }),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
+    }),
     defineField({
       name: 'subtitle',
-      title: 'نص تعريفي (اختياري)',
+      title: 'Subtitle (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'نص تعريفي (اختياري)',
+          en: 'Subtitle (optional)',
+          it: 'Sottotitolo (opzionale)',
+        },
+      },
       type: 'text',
       rows: 2,
     }),
     defineField({
       name: 'colors',
-      title: 'الألوان',
+      title: 'Colors',
+      options: { i18nTitle: { ar: 'الألوان', en: 'Colors', it: 'Colori' } },
       type: 'array',
       of: [
         defineArrayMember({
@@ -289,7 +533,8 @@ export const sectionColorsType = defineType({
           fields: [
             defineField({
               name: 'name',
-              title: 'الاسم',
+              title: 'Name',
+              options: { i18nTitle: { ar: 'الاسم', en: 'Name', it: 'Nome' } },
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
@@ -325,5 +570,6 @@ export const pageSections = [
   sectionParentsTestimonialsType,
   sectionAnnouncementsType,
   sectionUpcomingEventsType,
+  sectionLatestEventsType,
   sectionColorsType,
 ];

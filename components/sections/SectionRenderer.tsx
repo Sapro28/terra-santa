@@ -72,6 +72,20 @@ type SectionUpcomingEvents = SectionBase & {
   emptyText?: string;
   viewAllLabel?: string;
   limit?: number;
+  sectionId?: string;
+  sectionTitle?: string;
+  sectionSlug?: string;
+};
+
+type SectionLatestEvents = SectionBase & {
+  _type: 'sectionLatestEvents';
+  title?: string;
+  emptyText?: string;
+  viewAllLabel?: string;
+  limit?: number;
+  sectionId?: string;
+  sectionTitle?: string;
+  sectionSlug?: string;
 };
 
 type SectionColors = SectionBase & {
@@ -87,6 +101,7 @@ type Section =
   | SectionParentsTestimonials
   | SectionAnnouncements
   | SectionUpcomingEvents
+  | SectionLatestEvents
   | SectionColors
   | (SectionBase & Record<string, any>);
 
@@ -280,12 +295,18 @@ export default function SectionRenderer({
   sections,
   announcements,
   upcomingEvents,
+  upcomingEventsBySectionId,
+  latestEvents,
+  latestEventsBySectionId,
   pageTitle,
 }: {
   locale: string;
   sections?: Section[] | null;
   announcements?: Announcement[];
   upcomingEvents?: Announcement[];
+  upcomingEventsBySectionId?: Record<string, Announcement[]>;
+  latestEvents?: Announcement[];
+  latestEventsBySectionId?: Record<string, Announcement[]>;
   pageTitle?: string;
 }) {
   if (!sections?.length) return null;
@@ -505,7 +526,15 @@ export default function SectionRenderer({
             const limit =
               typeof s.limit === 'number' && s.limit > 0 ? s.limit : 3;
 
-            const posts = (upcomingEvents ?? []).slice(0, limit);
+            const baseList = s.sectionId
+              ? upcomingEventsBySectionId?.[s.sectionId]
+              : upcomingEvents;
+
+            const posts = (baseList ?? []).slice(0, limit);
+
+            const viewAllHref = s.sectionSlug
+              ? `/${locale}/events?section=${encodeURIComponent(s.sectionSlug)}`
+              : `/${locale}/events`;
 
             return (
               <NewsList
@@ -515,7 +544,36 @@ export default function SectionRenderer({
                 emptyText={s.emptyText ?? 'No upcoming events.'}
                 viewAllLabel={s.viewAllLabel ?? 'View all events →'}
                 posts={posts}
-                viewAllHref={`/${locale}/events`}
+                viewAllHref={viewAllHref}
+                itemHrefBase="events"
+              />
+            );
+          }
+
+          case 'sectionLatestEvents': {
+            const s = section as SectionLatestEvents;
+            const limit =
+              typeof s.limit === 'number' && s.limit > 0 ? s.limit : 6;
+
+            const baseList = s.sectionId
+              ? latestEventsBySectionId?.[s.sectionId]
+              : latestEvents;
+
+            const posts = (baseList ?? []).slice(0, limit);
+
+            const viewAllHref = s.sectionSlug
+              ? `/${locale}/events?section=${encodeURIComponent(s.sectionSlug)}`
+              : `/${locale}/events`;
+
+            return (
+              <NewsList
+                key={idx}
+                locale={locale}
+                title={s.title ?? 'Latest events'}
+                emptyText={s.emptyText ?? 'No events yet.'}
+                viewAllLabel={s.viewAllLabel ?? 'View all events →'}
+                posts={posts}
+                viewAllHref={viewAllHref}
                 itemHrefBase="events"
               />
             );

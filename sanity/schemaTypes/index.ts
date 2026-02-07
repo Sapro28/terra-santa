@@ -1,3 +1,4 @@
+import type {} from '../types/sanity-i18n-options';
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
 import { eventType } from './eventType';

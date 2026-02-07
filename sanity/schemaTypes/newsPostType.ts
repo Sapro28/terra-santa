@@ -102,19 +102,21 @@ export const newsPostType = defineType({
     defineField({
       name: 'publishedAt',
       type: 'datetime',
-      title: 'تاريخ النشر',
+      title: 'وقت النشر',
       description:
         'إذا كان محددًا، لن يظهر الخبر قبل هذا التاريخ. إذا لم يكن محددًا، سيظهر فورًا.',
       components: { input: SafeDatetimeInput },
+      validation: (Rule) => Rule.required(),
     }),
 
     defineField({
       name: 'expiresAt',
       type: 'datetime',
-      title: 'انتهاء (اختياري)',
+      title: 'وقت الانتهاء ',
       description:
         'اختياري — إذا تم تحديده، لن يظهر الـ Popup بعد هذا التاريخ.',
       components: { input: SafeDatetimeInput },
+      validation: (Rule) => Rule.required(),
     }),
   ],
 

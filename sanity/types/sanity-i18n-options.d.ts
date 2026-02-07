@@ -37,4 +37,39 @@ declare module 'sanity' {
     i18nTitle?: I18nMap;
     i18nDescription?: I18nMap;
   }
+
+  interface ReferenceOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface ImageOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface FileOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface SlugOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface DatetimeOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface DateOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
+
+  interface DocumentOptions {
+    i18nTitle?: I18nMap;
+    i18nDescription?: I18nMap;
+  }
 }
