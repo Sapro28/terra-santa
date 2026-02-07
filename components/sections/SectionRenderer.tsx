@@ -198,6 +198,7 @@ function NewsList({
   viewAllLabel,
   posts,
   viewAllHref,
+  itemHrefBase,
 }: {
   locale: string;
   title: string;
@@ -205,6 +206,7 @@ function NewsList({
   viewAllLabel: string;
   posts: Announcement[];
   viewAllHref: string;
+  itemHrefBase: string;
 }) {
   return (
     <section>
@@ -218,7 +220,7 @@ function NewsList({
             {posts.map((post) => (
               <li key={post._id} className="p-4">
                 <Link
-                  href={`/${locale}/news/${post.slug ?? ''}`}
+                  href={`/${locale}/${itemHrefBase}/${post.slug ?? ''}`}
                   className="flex gap-4 hover:opacity-90"
                 >
                   <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-(--paper)">
@@ -493,6 +495,7 @@ export default function SectionRenderer({
                 viewAllLabel={s.viewAllLabel ?? 'View all news →'}
                 posts={posts}
                 viewAllHref={`/${locale}/news`}
+                itemHrefBase="news"
               />
             );
           }
@@ -510,9 +513,10 @@ export default function SectionRenderer({
                 locale={locale}
                 title={s.title ?? 'Upcoming events'}
                 emptyText={s.emptyText ?? 'No upcoming events.'}
-                viewAllLabel={s.viewAllLabel ?? 'View all news →'}
+                viewAllLabel={s.viewAllLabel ?? 'View all events →'}
                 posts={posts}
-                viewAllHref={`/${locale}/news`}
+                viewAllHref={`/${locale}/events`}
+                itemHrefBase="events"
               />
             );
           }

@@ -4,9 +4,6 @@ import LocaleSwitcherClient from './LocaleSwitcherClient';
 import HeaderNavDropdownClient, {
   type HeaderDropdownChildLink,
 } from './HeaderNavDropdown.client';
-import SectionsDropdownClient, {
-  type SectionNavItem,
-} from './sections/SectionsDropdown.client';
 
 type NavPageRef = {
   _id?: string;
@@ -65,31 +62,12 @@ export default async function Header({
   locale,
   settings,
   headerNav,
-  sectionPages,
 }: {
   locale: string;
   settings: SiteSettings | null;
   headerNav?: HeaderElement[] | null;
-  sectionPages?: Array<{
-    title?: string | null;
-    slug?: string | null;
-    order?: number | null;
-  }> | null;
 }) {
   const items: HeaderElement[] = headerNav ?? [];
-
-  const sectionDropdownItems: SectionNavItem[] = (sectionPages || [])
-    .map((s) => ({
-      title: (s?.title ?? '').trim(),
-      slug: (s?.slug ?? '').trim(),
-      order: typeof s?.order === 'number' ? s.order : 0,
-    }))
-    .filter((s) => s.title && s.slug)
-    .sort(
-      (a, b) =>
-        (a.order ?? 0) - (b.order ?? 0) || a.title.localeCompare(b.title),
-    )
-    .map(({ title, slug }) => ({ title, slug }));
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
@@ -178,14 +156,6 @@ export default async function Header({
                 />
               );
             })}
-
-            {sectionDropdownItems.length ? (
-              <SectionsDropdownClient
-                locale={locale}
-                label="Sections"
-                items={sectionDropdownItems}
-              />
-            ) : null}
           </nav>
 
           <LocaleSwitcherClient locale={locale} />

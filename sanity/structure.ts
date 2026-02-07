@@ -162,11 +162,11 @@ export const structure: StructureResolver = (S, context) => {
     .title('CMS')
     .items([
       S.listItem()
-        .title('الموقع (حسب اللغة)')
+        .title('الموقع')
         .icon(CogIcon)
         .child(
           S.list()
-            .title('الموقع (حسب اللغة)')
+            .title('الموقع')
             .items([
               S.listItem()
                 .title('شعار المدرسة / School Logo')

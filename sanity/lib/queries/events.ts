@@ -19,3 +19,41 @@ export const upcomingEventsQuery = groq`
     "mainImageAlt": mainImage.alt
   }
 `;
+
+export const eventsListQuery = groq`
+  *[
+    _type == "event" &&
+    hidden != true &&
+    language == $lang &&
+    defined(startAt)
+  ]
+  | order(startAt asc) {
+    _id,
+    title,
+    "slug": slug.current,
+    "description": excerpt,
+    "eventDate": startAt,
+    "endDate": endAt,
+    location,
+    "mainImageUrl": mainImage.asset->url,
+    "mainImageAlt": mainImage.alt
+  }
+`;
+
+export const eventBySlugQuery = groq`
+  *[
+    _type == "event" &&
+    hidden != true &&
+    language == $lang &&
+    slug.current == $slug
+  ][0]{
+    title,
+    "description": excerpt,
+    content,
+    "eventDate": startAt,
+    "endDate": endAt,
+    location,
+    "mainImageUrl": mainImage.asset->url,
+    "mainImageAlt": mainImage.alt
+  }
+`;
