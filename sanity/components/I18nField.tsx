@@ -1,11 +1,24 @@
 import React from 'react';
 import type { FieldProps } from 'sanity';
 import { useFormValue } from 'sanity';
-import { inferStudioLang } from '../lib/studioLang';
+import {
+  inferLangFromId,
+  inferStudioLang,
+  SUPPORTED_LANGS,
+} from '../lib/studioLang';
 
 export default function I18nField(props: FieldProps) {
   const language = useFormValue(['language']) as string | undefined;
   const docId = useFormValue(['_id']) as string | undefined;
+  try {
+    const direct = (language || '').trim();
+    if (SUPPORTED_LANGS.includes(direct as any)) {
+      window?.localStorage?.setItem('studio.currentLang', direct);
+    } else {
+      const fromId = inferLangFromId(docId);
+      if (fromId) window?.localStorage?.setItem('studio.currentLang', fromId);
+    }
+  } catch {}
 
   const lang = inferStudioLang({ documentLang: language, documentId: docId });
   const opts = (props.schemaType.options || {}) as any;

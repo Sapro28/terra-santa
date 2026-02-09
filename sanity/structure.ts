@@ -10,7 +10,7 @@ const LABELS: Record<
     langTitle: string;
     site: string;
     header: string;
-    settings: string;
+    footer: string;
     pages: string;
     specialPages: string;
     homePage: string;
@@ -23,8 +23,8 @@ const LABELS: Record<
   ar: {
     langTitle: 'العربية',
     site: 'الموقع',
-    header: 'الهيدر',
-    settings: 'إعدادات الموقع',
+    header: 'رأس الصفحة',
+    footer: 'تذييل الصفحة',
     pages: 'الصفحات',
     specialPages: 'الصفحات الخاصة',
     homePage: 'الصفحة الرئيسية',
@@ -37,7 +37,7 @@ const LABELS: Record<
     langTitle: 'English',
     site: 'Site',
     header: 'Header',
-    settings: 'Site Settings',
+    footer: 'Footer',
     pages: 'Pages',
     specialPages: 'Special Pages',
     homePage: 'Home Page',
@@ -50,7 +50,7 @@ const LABELS: Record<
     langTitle: 'Italiano',
     site: 'Sito',
     header: 'Header',
-    settings: 'Impostazioni sito',
+    footer: 'Footer',
     pages: 'Pagine',
     specialPages: 'Pagine Speciali',
     homePage: 'Pagina Principale',
@@ -190,20 +190,6 @@ export const structure: StructureResolver = (S, context) => {
                       .title(`${t.site} — ${t.langTitle}`)
                       .items([
                         S.listItem()
-                          .title(t.settings)
-                          .icon(CogIcon)
-                          .child(
-                            S.document()
-                              .schemaType('siteSettings')
-                              .documentId(SINGLETON_ID.siteSettings(lang))
-                              .title(`${t.settings} — ${t.langTitle}`)
-                              .initialValueTemplate('siteSettings-byLang', {
-                                lang,
-                              }),
-                          ),
-
-                        S.divider(),
-                        S.listItem()
                           .title(t.header)
                           .icon(DocumentsIcon)
                           .child(
@@ -236,6 +222,20 @@ export const structure: StructureResolver = (S, context) => {
 
                         S.divider(),
                         S.listItem()
+                          .title(t.footer)
+                          .icon(CogIcon)
+                          .child(
+                            S.document()
+                              .schemaType('siteSettings')
+                              .documentId(SINGLETON_ID.siteSettings(lang))
+                              .title(`${t.footer} — ${t.langTitle}`)
+                              .initialValueTemplate('siteSettings-byLang', {
+                                lang,
+                              }),
+                          ),
+
+                        S.divider(),
+                        S.listItem()
                           .title(t.pages)
                           .icon(DocumentsIcon)
                           .child(
@@ -259,6 +259,8 @@ export const structure: StructureResolver = (S, context) => {
                                   .documentId(pageId),
                               ),
                           ),
+
+                        S.divider(),
                         S.listItem()
                           .title(t.specialPages)
                           .icon(DocumentIcon)

@@ -9,7 +9,11 @@ export const footerQuery = groq`
     hoursTitle,
     hoursLine1,
     hoursLine2,
-    rights
+    rights,
+    socialLinks[]{
+      platform,
+      url
+    }
   }
 `;
 
@@ -23,7 +27,11 @@ export const siteSettingsQuery = groq`
       hoursTitle,
       hoursLine1,
       hoursLine2,
-      rights
+      rights,
+      socialLinks[]{
+        platform,
+        url
+      }
     }
   }
 `;

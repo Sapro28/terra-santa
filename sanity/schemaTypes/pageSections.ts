@@ -3,6 +3,14 @@ import type {} from '../types/sanity-i18n-options';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { SCHOOL_SECTION_SLUG_OPTIONS } from '../lib/sectionSlugs';
 
+type Lang = 'ar' | 'en' | 'it';
+function i18nInitialValue(map: Record<Lang, string>) {
+  return ({ document }: { document?: any }) => {
+    const l = (document?.language || 'ar') as Lang;
+    return map[l] ?? map.ar;
+  };
+}
+
 export const sectionVideoHeroType = defineType({
   name: 'sectionVideoHero',
   title: 'Video Hero',
@@ -211,7 +219,11 @@ export const sectionParentsTestimonialsType = defineType({
       title: 'Title',
       options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
-      initialValue: 'آراء أولياء الأمور',
+      initialValue: i18nInitialValue({
+        ar: 'آراء أولياء الأمور',
+        en: "Parents' Testimonials",
+        it: 'Testimonianze dei genitori',
+      }),
     }),
     defineField({
       name: 'testimonials',
@@ -278,7 +290,11 @@ export const sectionAnnouncementsType = defineType({
       title: 'Title',
       options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
-      initialValue: 'أحدث الأخبار',
+      initialValue: i18nInitialValue({
+        ar: 'أحدث الأخبار',
+        en: 'Latest news',
+        it: 'Ultime notizie',
+      }),
     }),
     defineField({
       name: 'emptyText',
@@ -291,7 +307,11 @@ export const sectionAnnouncementsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'لا توجد اخبار حالياً',
+      initialValue: i18nInitialValue({
+        ar: 'لا توجد اخبار حالياً',
+        en: 'There is no news at the moment.',
+        it: 'Nessuna notizia al momento.',
+      }),
     }),
     defineField({
       name: 'viewAllLabel',
@@ -304,7 +324,11 @@ export const sectionAnnouncementsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'عرض الكل',
+      initialValue: i18nInitialValue({
+        ar: 'عرض الكل',
+        en: 'View all',
+        it: 'Vedi tutto',
+      }),
     }),
     defineField({
       name: 'limit',
@@ -338,26 +362,15 @@ export const sectionUpcomingEventsType = defineType({
   type: 'object',
   fields: [
     defineField({
-      name: 'section',
-      title: 'Filter by division (optional)',
-      options: {
-        i18nTitle: {
-          ar: 'فلترة حسب القسم (اختياري)',
-          en: 'Filter by division (optional)',
-          it: 'Filtra per divisione (opzionale)',
-        },
-      } as any,
-      type: 'reference',
-      to: [{ type: 'schoolSection' }],
-      description:
-        'إذا اخترت قسمًا هنا، سيعرض هذا الجزء الفعاليات القادمة الخاصة بهذا القسم فقط.',
-    }),
-    defineField({
       name: 'title',
       title: 'Title',
       options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
-      initialValue: 'الفعاليات القادمة',
+      initialValue: i18nInitialValue({
+        ar: 'الفعاليات القادمة',
+        en: 'Upcoming events',
+        it: 'Eventi in arrivo',
+      }),
     }),
     defineField({
       name: 'emptyText',
@@ -370,7 +383,11 @@ export const sectionUpcomingEventsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'لا توجد فعاليات قادمة حالياً',
+      initialValue: i18nInitialValue({
+        ar: 'لا توجد فعاليات قادمة حالياً',
+        en: 'There are no upcoming events at the moment.',
+        it: 'Nessun evento in arrivo al momento.',
+      }),
     }),
     defineField({
       name: 'viewAllLabel',
@@ -383,7 +400,11 @@ export const sectionUpcomingEventsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'عرض الكل',
+      initialValue: i18nInitialValue({
+        ar: 'عرض الكل',
+        en: 'View all',
+        it: 'Vedi tutto',
+      }),
     }),
     defineField({
       name: 'limit',
@@ -398,15 +419,10 @@ export const sectionUpcomingEventsType = defineType({
   ],
   preview: {
     select: { title: 'title', sectionTitle: 'section.title' },
-    prepare({ title, sectionTitle }) {
+    prepare({ title }) {
       return {
         title: title || 'Upcoming Events',
-        subtitle: [
-          sectionTitle ? `القسم: ${sectionTitle}` : 'كل الأقسام',
-          'limit: 3',
-        ]
-          .filter(Boolean)
-          .join(' — '),
+        subtitle: ['limit: 3'].filter(Boolean).join(' — '),
       };
     },
   },
@@ -437,7 +453,11 @@ export const sectionLatestEventsType = defineType({
       title: 'Title',
       options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
-      initialValue: 'آخر الفعاليات',
+      initialValue: i18nInitialValue({
+        ar: 'آخر الفعاليات',
+        en: 'Latest events',
+        it: 'Ultimi eventi',
+      }),
     }),
     defineField({
       name: 'emptyText',
@@ -450,7 +470,11 @@ export const sectionLatestEventsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'لا توجد فعاليات حالياً',
+      initialValue: i18nInitialValue({
+        ar: 'لا توجد فعاليات حالياً',
+        en: 'There are no events at the moment.',
+        it: 'Nessun evento al momento.',
+      }),
     }),
     defineField({
       name: 'viewAllLabel',
@@ -463,7 +487,11 @@ export const sectionLatestEventsType = defineType({
         },
       },
       type: 'string',
-      initialValue: 'عرض كل الفعاليات',
+      initialValue: i18nInitialValue({
+        ar: 'عرض كل الفعاليات',
+        en: 'View all events',
+        it: 'Vedi tutti gli eventi',
+      }),
     }),
     defineField({
       name: 'limit',

@@ -121,6 +121,64 @@ export const siteSettingsType = defineType({
             },
           },
         }),
+
+        defineField({
+          name: 'socialLinks',
+          title: 'روابط التواصل الاجتماعي',
+          description:
+            'Social links. Only links that are filled will show in the footer / روابط التواصل الاجتماعي. سيتم عرض الروابط المعبأة فقط في الفوتر',
+          type: 'array',
+          options: {
+            i18nTitle: {
+              ar: 'روابط التواصل الاجتماعي',
+              en: 'Social links',
+              it: 'Link social',
+            },
+          },
+          of: [
+            {
+              type: 'object',
+              name: 'socialLink',
+              fields: [
+                defineField({
+                  name: 'platform',
+                  title: 'المنصة',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Facebook', value: 'facebook' },
+                      { title: 'Instagram', value: 'instagram' },
+                      { title: 'YouTube', value: 'youtube' },
+                      { title: 'TikTok', value: 'tiktok' },
+                      { title: 'Vimeo', value: 'vimeo' },
+                      { title: 'LinkedIn', value: 'linkedin' },
+                      { title: 'X (Twitter)', value: 'x' },
+                    ],
+                    layout: 'dropdown',
+                  },
+                  validation: (Rule) => Rule.required(),
+                }),
+
+                defineField({
+                  name: 'url',
+                  title: 'الرابط',
+                  type: 'url',
+                  validation: (Rule) =>
+                    Rule.uri({
+                      scheme: ['http', 'https'],
+                      allowRelative: false,
+                    }),
+                }),
+              ],
+              preview: {
+                select: {
+                  title: 'platform',
+                  subtitle: 'url',
+                },
+              },
+            },
+          ],
+        }),
       ],
     }),
   ],

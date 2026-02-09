@@ -14,6 +14,18 @@ export default function LanguageAutoInput(props: StringInputProps) {
   );
 
   useEffect(() => {
+    try {
+      const v = props.value as any as Lang | undefined;
+      if (v && ['ar', 'en', 'it'].includes(v)) {
+        window?.localStorage?.setItem('studio.currentLang', v);
+      } else {
+        const inferred =
+          inferLangFromId(docId) || inferStudioLang({ documentId: docId });
+        if (inferred)
+          window?.localStorage?.setItem('studio.currentLang', inferred);
+      }
+    } catch {}
+
     const disabled = Boolean((props as any)?.elementProps?.disabled);
     if (props.readOnly || disabled) return;
 
@@ -27,6 +39,10 @@ export default function LanguageAutoInput(props: StringInputProps) {
     const target = inferred || inferredFromStudio;
 
     if (!target) return;
+
+    try {
+      window?.localStorage?.setItem('studio.currentLang', target);
+    } catch {}
 
     if (v === target) return;
 
