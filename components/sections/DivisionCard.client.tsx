@@ -34,8 +34,6 @@ export default function DivisionCard({
   const [canHover, setCanHover] = useState(true);
 
   useEffect(() => {
-    // Touch devices typically don't support hover. This lets us make the whole
-    // card tappable on mobile while keeping the desktop "Learn more" CTA click.
     const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
     const update = () => setCanHover(mq.matches);
     update();
@@ -54,8 +52,6 @@ export default function DivisionCard({
 
   const isNavigable = href !== '#';
   const makeWholeCardClickable = useMemo(() => {
-    // Mobile/no-hover: tap anywhere.
-    // Desktop: keep click target limited to the CTA when present.
     if (!isNavigable) return false;
     if (!canHover) return true;
     return !cta;
