@@ -448,22 +448,21 @@ export default function SectionRenderer({
                 <div className="hidden lg:block">
                   <div className="grid grid-cols-4 gap-6">
                     {firstRow.map((d, i) => (
-                      <div
-                        key={i}
-                        className="w-full max-w-76 justify-self-center"
-                      >
+                      <div key={i} className="w-full">
                         <DivisionCard locale={locale} d={d} />
                       </div>
                     ))}
                   </div>
 
                   {secondRow.length ? (
-                    <div className="mt-6 flex justify-center gap-6">
-                      {secondRow.map((d, i) => (
-                        <div key={i} className="w-full max-w-76">
-                          <DivisionCard locale={locale} d={d} />
-                        </div>
-                      ))}
+                    <div className="mt-6 mx-auto max-w-5xl">
+                      <div className="grid grid-cols-3 gap-6">
+                        {secondRow.map((d, i) => (
+                          <div key={i} className="w-full">
+                            <DivisionCard locale={locale} d={d} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ) : null}
                 </div>

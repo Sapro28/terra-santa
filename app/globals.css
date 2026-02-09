@@ -146,3 +146,23 @@ a {
     @apply bg-background text-foreground;
   }
 }
+
+@media (hover: hover) and (pointer: fine) {
+  .division-card:hover .division-hover {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .division-card:hover .division-image {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+
+  .division-card:hover .division-shine {
+    opacity: 1;
+  }
+
+  .division-card:hover .division-cta {
+    transform: scale(1.03);
+  }
+}

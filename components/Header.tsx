@@ -4,6 +4,9 @@ import LocaleSwitcherClient from './LocaleSwitcherClient';
 import HeaderNavDropdownClient, {
   type HeaderDropdownChildLink,
 } from './HeaderNavDropdown.client';
+import MobileNavDrawerClient, {
+  type MobileNavItem,
+} from './MobileNavDrawer.client';
 
 type NavPageRef = {
   _id?: string;
@@ -69,9 +72,43 @@ export default async function Header({
 }) {
   const items: HeaderElement[] = headerNav ?? [];
 
+  const mobileItems: MobileNavItem[] = items
+    .map((item) => {
+      const label = (item?.name ?? '').trim();
+      if (!label) return null;
+
+      const href = resolveHref(
+        locale,
+        item.linkType,
+        item.internalPage,
+        item.externalUrl,
+      );
+
+      const children = (item.childLinks ?? [])
+        .map((c) => {
+          const name = (c?.name ?? '').trim();
+          if (!name) return null;
+          const childHref = resolveHref(
+            locale,
+            c?.linkType,
+            c?.internalPage,
+            c?.externalUrl,
+          );
+          return { name, href: childHref };
+        })
+        .filter(Boolean) as Array<{ name: string; href: string | null }>;
+
+      return {
+        label,
+        href,
+        children: children.length ? children : undefined,
+      };
+    })
+    .filter(Boolean) as MobileNavItem[];
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href={`/${locale}`} className="inline-flex items-center gap-2">
           {settings?.headerLogoUrl ? (
             <Image
@@ -88,8 +125,13 @@ export default async function Header({
           </span>
         </Link>
 
-        <div className="flex items-center gap-4">
-          <nav className="flex items-center gap-6">
+        <div className="flex items-center gap-3">
+          <MobileNavDrawerClient
+            items={mobileItems}
+            localeSwitcher={<LocaleSwitcherClient locale={locale} />}
+          />
+
+          <nav className="hidden items-center gap-6 md:flex">
             {items.map((item) => {
               const label = (item?.name ?? '').trim();
               if (!label) return null;
@@ -157,7 +199,9 @@ export default async function Header({
             })}
           </nav>
 
-          <LocaleSwitcherClient locale={locale} />
+          <div className="hidden md:block">
+            <LocaleSwitcherClient locale={locale} />
+          </div>
         </div>
       </div>
     </header>
