@@ -57,7 +57,9 @@ export const sectionProjection = `
       text,
       hoverText,
       ctaLabel,
-      sectionSlug,
+      // New (preferred): destination page
+      "pageSlug": page->slug,
+      "pageTitle": page->title,
       "imageUrl": image.asset->url,
       "imageAlt": image.alt
     }

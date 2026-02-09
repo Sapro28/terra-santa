@@ -1,7 +1,6 @@
 import type {} from '../types/sanity-i18n-options';
 
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { SCHOOL_SECTION_SLUG_OPTIONS } from '../lib/sectionSlugs';
 
 type Lang = 'ar' | 'en' | 'it';
 function i18nInitialValue(map: Record<Lang, string>) {
@@ -157,26 +156,44 @@ export const sectionDivisionsType = defineType({
               validation: (Rule) => Rule.required(),
             }),
             defineField({
-              name: 'sectionSlug',
-              title: 'Destination section',
-              type: 'string',
+              name: 'page',
+              title: 'Destination page',
+              type: 'reference',
+              to: [{ type: 'page' }],
               description:
-                'Choose which section page this card links to (/sections/<slug>).',
+                'Select the CMS Page this card should link to (recommended).',
               options: {
                 i18nTitle: {
-                  ar: 'القسم الوجهة',
-                  en: 'Destination section',
-                  it: 'Sezione destinazione',
+                  ar: 'الصفحة الوجهة',
+                  en: 'Destination page',
+                  it: 'Pagina di destinazione',
                 },
                 i18nDescription: {
-                  ar: 'اختر القسم الذي تذهب إليه هذه البطاقة (صفحة /sections/<slug>).',
-                  en: 'Choose which section page this card links to (/sections/<slug>).',
-                  it: 'Scegli la sezione a cui collega questa scheda (/sections/<slug>).',
+                  ar: 'اختر الصفحة (Page) التي يجب أن تفتح عند الضغط على هذه البطاقة.',
+                  en: 'Select the Page that should open when this card is clicked.',
+                  it: 'Seleziona la pagina (Page) da aprire cliccando questa scheda.',
                 },
-                list: SCHOOL_SECTION_SLUG_OPTIONS,
-                layout: 'dropdown',
+                filter: (({ document }: { document?: any }) => {
+                  const lang = document?.language;
+                  return lang
+                    ? {
+                        filter: '_type == "page" && language == $lang',
+                        params: { lang },
+                      }
+                    : { filter: '_type == "page"', params: {} };
+                }) as any,
               },
-              validation: (Rule) => Rule.required(),
+              validation: (Rule) =>
+                Rule.required().custom((value, ctx) => {
+                  const hasPage = Boolean((value as any)?._ref);
+                  if (hasPage) return true;
+
+                  return ctx?.document?.language === 'it'
+                    ? 'Seleziona una pagina di destinazione.'
+                    : ctx?.document?.language === 'en'
+                      ? 'Select a destination page.'
+                      : 'اختر صفحة وجهة.';
+                }),
             }),
             defineField({
               name: 'image',

@@ -44,7 +44,8 @@ type SectionDivisions = SectionBase & {
   divisions?: Array<{
     title?: string;
     text?: string;
-    sectionSlug?: string;
+    pageSlug?: string;
+    pageTitle?: string;
     imageUrl?: string;
     imageAlt?: string;
     hoverText?: string;
@@ -398,7 +399,7 @@ export default function SectionRenderer({
                           <CtaButton
                             resolved={primaryResolved}
                             label={s.primaryCta.label}
-                            className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-black hover:opacity-90"
+                            className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-white hover:opacity-90"
                           />
                         ) : null}
 
@@ -449,7 +450,7 @@ export default function SectionRenderer({
                     {firstRow.map((d, i) => (
                       <div
                         key={i}
-                        className="w-full max-w-75 justify-self-center"
+                        className="w-full max-w-76 justify-self-center"
                       >
                         <DivisionCard locale={locale} d={d} />
                       </div>
@@ -459,7 +460,7 @@ export default function SectionRenderer({
                   {secondRow.length ? (
                     <div className="mt-6 flex justify-center gap-6">
                       {secondRow.map((d, i) => (
-                        <div key={i} className="w-full max-w-75">
+                        <div key={i} className="w-full max-w-76">
                           <DivisionCard locale={locale} d={d} />
                         </div>
                       ))}

@@ -6,7 +6,7 @@ import Link from 'next/link';
 type Division = {
   title?: string;
   text?: string;
-  sectionSlug?: string;
+  pageSlug?: string;
   imageUrl?: string;
   imageAlt?: string;
 
@@ -14,10 +14,11 @@ type Division = {
   ctaLabel?: string;
 };
 
-const buildSectionHref = (locale: string, sectionSlug?: string) => {
-  const slug = (sectionSlug ?? '').trim();
-  if (!slug) return null;
-  return `/${locale}/sections/${slug}`;
+const buildDivisionHref = (locale: string, opts: { pageSlug?: string }) => {
+  const pageSlug = (opts.pageSlug ?? '').trim();
+  if (pageSlug) return `/${locale}/${pageSlug}`;
+
+  return null;
 };
 
 export default function DivisionCard({
@@ -27,7 +28,10 @@ export default function DivisionCard({
   locale: string;
   d: Division;
 }) {
-  const href = buildSectionHref(locale, d.sectionSlug) ?? '#';
+  const href =
+    buildDivisionHref(locale, {
+      pageSlug: d.pageSlug,
+    }) ?? '#';
 
   const title = d.title ?? '';
   const subtitle = d.text ?? '';
@@ -50,7 +54,7 @@ export default function DivisionCard({
         title ? `${title}${subtitle ? ` — ${subtitle}` : ''}` : 'Division'
       }
     >
-      <div className="relative h-75 w-full sm:h-80 lg:h-65">
+      <div className="relative aspect-4/3 w-full">
         {d.imageUrl ? (
           <Image
             src={d.imageUrl}
@@ -60,7 +64,8 @@ export default function DivisionCard({
             quality={95}
             priority={false}
             className={[
-              'object-cover object-center',
+              // `object-contain` keeps the whole image visible (no cropping).
+              'object-contain object-center',
               'transition-[transform,opacity] duration-700 ease-out',
               'group-hover:opacity-0',
               'group-hover:scale-[1.06]',
@@ -90,7 +95,6 @@ export default function DivisionCard({
             'opacity-0 translate-y-2',
             'transition-all duration-500 ease-out',
             'group-hover:opacity-100 group-hover:translate-y-0',
-            'pointer-events-none',
           ].join(' ')}
         >
           <div className="absolute inset-0 z-0">
@@ -128,21 +132,46 @@ export default function DivisionCard({
 
             {cta ? (
               <div className="mt-6">
-                <span
-                  className={[
-                    'inline-flex items-center justify-center',
-                    'rounded-full px-6 py-2.5',
-                    'text-sm font-extrabold tracking-widest',
-                    'text-white',
-                    'border border-white/75',
-                    'shadow-[0_14px_30px_-18px_rgba(0,0,0,0.8)]',
-                    'bg-white/0',
-                    'transition-transform duration-300 ease-out',
-                    'group-hover:scale-[1.03]',
-                  ].join(' ')}
-                >
-                  {cta}
-                </span>
+                {href !== '#' ? (
+                  <Link
+                    href={href}
+                    className={[
+                      'inline-flex items-center justify-center',
+                      'rounded-full px-6 py-2.5',
+                      'text-sm font-extrabold tracking-widest',
+                      'text-[#f6efe8]',
+                      'border border-[#f6efe8]/70',
+                      'shadow-[0_14px_30px_-18px_rgba(0,0,0,0.8)]',
+                      'bg-[#7a4b2c]/25',
+                      'transition-colors duration-200 ease-out',
+                      'hover:bg-[#a46a44]/35',
+                      'transition-transform duration-300 ease-out',
+                      'group-hover:scale-[1.03]',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#5b3a1e]',
+                    ].join(' ')}
+                    aria-label={
+                      title
+                        ? `${cta} — ${title}`
+                        : cta || 'Learn more about this division'
+                    }
+                  >
+                    {cta}
+                  </Link>
+                ) : (
+                  <span
+                    className={[
+                      'inline-flex items-center justify-center',
+                      'rounded-full px-6 py-2.5',
+                      'text-sm font-extrabold tracking-widest',
+                      'text-[#f6efe8]',
+                      'border border-[#f6efe8]/70',
+                      'shadow-[0_14px_30px_-18px_rgba(0,0,0,0.8)]',
+                      'bg-[#7a4b2c]/25',
+                    ].join(' ')}
+                  >
+                    {cta}
+                  </span>
+                )}
               </div>
             ) : null}
           </div>
@@ -155,13 +184,5 @@ export default function DivisionCard({
     </div>
   );
 
-  if (href === '#') {
-    return CardInner;
-  }
-
-  return (
-    <Link href={href} className="block" aria-label={title || 'Division'}>
-      {CardInner}
-    </Link>
-  );
+  return CardInner;
 }
