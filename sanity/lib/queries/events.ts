@@ -161,7 +161,6 @@ export const eventBySlugQuery = groq`
     "eventDate": startAt,
     "endDate": endAt,
     location,
-    registrationLink,
     "mainImageUrl": mainImage.asset->url,
     "mainImageAlt": mainImage.alt,
 

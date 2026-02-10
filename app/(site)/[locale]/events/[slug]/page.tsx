@@ -11,7 +11,6 @@ type EventDetail = {
   eventDate?: string;
   endDate?: string;
   location?: string;
-  registrationLink?: string;
   mainImageUrl?: string;
   mainImageAlt?: string;
   media?: Array<
@@ -104,17 +103,6 @@ export default async function EventDetailPage({
         <p className="text-xl text-gray-700 mb-8 leading-relaxed">
           {event.description}
         </p>
-      )}
-
-      {event.registrationLink && (
-        <a
-          href={event.registrationLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mb-8 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          {lang === 'ar' ? 'سجل الآن' : 'Register Now'}
-        </a>
       )}
 
       {event.content && (

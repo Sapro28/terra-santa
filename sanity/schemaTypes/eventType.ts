@@ -180,19 +180,6 @@ export const eventType = defineType({
     }),
 
     defineField({
-      name: 'registrationLink',
-      type: 'url',
-      title: 'Registration link (optional)',
-      options: {
-        i18nTitle: {
-          ar: 'رابط التسجيل (اختياري)',
-          en: 'Registration link (optional)',
-          it: 'Link registrazione (opzionale)',
-        },
-      },
-    }),
-
-    defineField({
       name: 'media',
       title: 'Media (photos / videos)',
       type: 'array',
