@@ -546,72 +546,166 @@ export const sectionLatestEventsType = defineType({
   },
 });
 
-export const sectionColorsType = defineType({
-  name: 'sectionColors',
-  title: 'School Colors',
+export const homeOurCampusType = defineType({
+  name: 'homeOurCampus',
+  title: 'Our Campus',
   type: 'object',
   fields: [
     defineField({
-      name: 'title',
-      title: 'Title',
+      name: 'heading',
+      title: 'Heading',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Heading', it: 'Titolo' } },
       type: 'string',
-      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
+      initialValue: i18nInitialValue({
+        ar: 'حَرَمُنا',
+        en: 'Our Campus',
+        it: 'Il nostro campus',
+      }),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'subtitle',
-      title: 'Subtitle (optional)',
+      name: 'intro',
+      title: 'Intro text (optional)',
       options: {
         i18nTitle: {
-          ar: 'نص تعريفي (اختياري)',
-          en: 'Subtitle (optional)',
-          it: 'Sottotitolo (opzionale)',
+          ar: 'نص تمهيدي (اختياري)',
+          en: 'Intro text (optional)',
+          it: 'Testo introduttivo (opzionale)',
         },
       },
       type: 'text',
-      rows: 2,
+      rows: 3,
     }),
     defineField({
-      name: 'colors',
-      title: 'Colors',
-      options: { i18nTitle: { ar: 'الألوان', en: 'Colors', it: 'Colori' } },
+      name: 'slides',
+      title: 'Campus slides',
+      options: {
+        i18nTitle: {
+          ar: 'شرائح الحَرَم',
+          en: 'Campus slides',
+          it: 'Slide campus',
+        },
+      },
       type: 'array',
       of: [
         defineArrayMember({
           type: 'object',
-          name: 'color',
-          title: 'Color',
+          name: 'campusSlide',
+          title: 'Campus slide',
           fields: [
             defineField({
-              name: 'name',
-              title: 'Name',
-              options: { i18nTitle: { ar: 'الاسم', en: 'Name', it: 'Nome' } },
+              name: 'title',
+              title: 'Title',
+              options: {
+                i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' },
+              },
               type: 'string',
               validation: (Rule) => Rule.required(),
             }),
             defineField({
-              name: 'hex',
-              title: 'HEX',
+              name: 'subtitle',
+              title: 'Subtitle (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'نص تعريفي (اختياري)',
+                  en: 'Subtitle (optional)',
+                  it: 'Sottotitolo (opzionale)',
+                },
+              },
               type: 'string',
-              validation: (Rule) =>
-                Rule.required().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, {
-                  name: 'hex',
-                  invert: false,
+            }),
+            defineField({
+              name: 'address',
+              title: 'Address (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'العنوان (اختياري)',
+                  en: 'Address (optional)',
+                  it: 'Indirizzo (opzionale)',
+                },
+              },
+              type: 'string',
+            }),
+            defineField({
+              name: 'body',
+              title: 'Body text (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'النص (اختياري)',
+                  en: 'Body text (optional)',
+                  it: 'Testo (opzionale)',
+                },
+              },
+              type: 'text',
+              rows: 5,
+            }),
+            defineField({
+              name: 'images',
+              title: 'Images (collage)',
+              options: {
+                i18nTitle: {
+                  ar: 'الصور',
+                  en: 'Images (collage)',
+                  it: 'Immagini',
+                },
+              },
+              type: 'array',
+              of: [
+                defineArrayMember({
+                  type: 'image',
+                  options: { hotspot: true },
+                  fields: [
+                    defineField({ name: 'alt', title: 'Alt', type: 'string' }),
+                  ],
                 }),
+              ],
+              validation: (Rule) => Rule.min(1).max(8),
             }),
           ],
           preview: {
-            select: { title: 'name', subtitle: 'hex' },
+            select: { title: 'title', subtitle: 'subtitle', media: 'images.0' },
+            prepare({ title, subtitle, media }) {
+              return { title: title || 'Campus', subtitle, media };
+            },
           },
         }),
       ],
     }),
+
+    defineField({
+      name: 'ctaLabel',
+      title: 'Button label (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'كلام الزر (اختياري)',
+          en: 'Button label (optional)',
+          it: 'Testo bottone (opzionale)',
+        },
+      },
+      type: 'string',
+    }),
+
+    defineField({
+      name: 'ctaLink',
+      title: 'Button link (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'رابط الزر (اختياري)',
+          en: 'Button link (optional)',
+          it: 'Link bottone (opzionale)',
+        },
+      },
+      type: 'link',
+      hidden: ({ parent }) => !parent?.ctaLabel,
+    }),
+
+    defineField({
+      name: 'ctaHref',
+      title: 'Legacy href (optional)',
+      type: 'string',
+      hidden: ({ parent }) => !parent?.ctaLabel,
+    }),
   ],
-  preview: {
-    select: { title: 'title', count: 'colors.length' },
-    prepare({ title, count }) {
-      return { title: title || 'Colors', subtitle: `${count ?? 0} color(s)` };
-    },
-  },
 });
 
 export const pageSections = [
@@ -621,5 +715,5 @@ export const pageSections = [
   sectionAnnouncementsType,
   sectionUpcomingEventsType,
   sectionLatestEventsType,
-  sectionColorsType,
+  homeOurCampusType,
 ];

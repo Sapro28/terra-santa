@@ -48,30 +48,6 @@ export const sectionProjection = `
     }
   },
 
-  // Divisions
-  _type == "sectionDivisions" => {
-    title,
-    subtitle,
-    divisions[]{
-      title,
-      text,
-      hoverText,
-      ctaLabel,
-      // New (preferred): destination page
-      "pageSlug": page->slug,
-      "pageTitle": page->title,
-      "imageUrl": image.asset->url,
-      "imageAlt": image.alt
-    }
-  },
-
-  // Colors
-  _type == "sectionColors" => {
-    title,
-    subtitle,
-    colors[]{name, hex}
-  },
-
   // Announcements
   _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
 

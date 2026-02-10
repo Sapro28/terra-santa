@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 
 import { locales, type Locale } from '@/i18n/config';
 
+import HomeDivisionsSection from '@/components/home/HomeDivisionsSection';
+import OurCampusSection from '@/components/home/OurCampusSection.client';
 import SectionRenderer from '@/components/sections/SectionRenderer';
 
 import { getSanityClient } from '@/sanity/lib/getClient';
@@ -16,6 +18,8 @@ import {
 
 type HomePageDoc = {
   sections?: Array<{ _type: string; [key: string]: any }>;
+  divisions?: any;
+  ourCampus?: any;
 };
 
 type Announcement = {
@@ -48,27 +52,45 @@ export default async function HomePage({
 
   if (!home) notFound();
 
+  // Filter out deprecated blocks if they still exist in content.
+  const rawSections = home.sections || [];
+  const sections = rawSections.filter(
+    (s) => s?._type !== 'sectionColors' && s?._type !== 'sectionDivisions',
+  );
+
+  // Split hero (fixed to the top) from the rest, to keep a consistent Home layout.
+  const heroIdx = sections.findIndex((s) => s?._type === 'sectionVideoHero');
+  const hero = heroIdx >= 0 ? [sections[heroIdx]] : [];
+  const restSections =
+    heroIdx >= 0 ? sections.filter((_, i) => i !== heroIdx) : sections;
+
   // Section-aware event lists (optional per block)
-  const sections = home.sections || [];
   const upcomingSectionIds = new Set<string>();
   const latestSectionIdToLimit = new Map<string, number>();
   let needsGlobalUpcoming = false;
   let needsGlobalLatest = false;
   let globalLatestLimit = 0;
 
-  for (const s of sections) {
+  for (const s of restSections) {
     if (s?._type === 'sectionUpcomingEvents') {
-      if (s.sectionId) upcomingSectionIds.add(String(s.sectionId));
+      if ((s as any).sectionId)
+        upcomingSectionIds.add(String((s as any).sectionId));
       else needsGlobalUpcoming = true;
     }
 
     if (s?._type === 'sectionLatestEvents') {
       const limit =
-        typeof s.limit === 'number' && s.limit > 0 ? s.limit : 6;
+        typeof (s as any).limit === 'number' && (s as any).limit > 0
+          ? (s as any).limit
+          : 6;
 
-      if (s.sectionId) {
-        const prev = latestSectionIdToLimit.get(String(s.sectionId)) ?? 0;
-        latestSectionIdToLimit.set(String(s.sectionId), Math.max(prev, limit));
+      if ((s as any).sectionId) {
+        const prev =
+          latestSectionIdToLimit.get(String((s as any).sectionId)) ?? 0;
+        latestSectionIdToLimit.set(
+          String((s as any).sectionId),
+          Math.max(prev, limit),
+        );
       } else {
         needsGlobalLatest = true;
         globalLatestLimit = Math.max(globalLatestLimit, limit);
@@ -76,52 +98,73 @@ export default async function HomePage({
     }
   }
 
-  const [upcomingEvents, latestEvents, upcomingEventsBySectionId, latestEventsBySectionId] =
-    await Promise.all([
-      needsGlobalUpcoming
-        ? client.fetch<Announcement[]>(upcomingEventsQuery, { lang })
-        : Promise.resolve([]),
-      needsGlobalLatest
-        ? client.fetch<Announcement[]>(latestEventsQuery, {
-            lang,
-            limit: Math.max(globalLatestLimit, 1),
-          })
-        : Promise.resolve([]),
-      (async () => {
-        const entries = await Promise.all(
-          [...upcomingSectionIds].map(async (sectionId) => {
-            const items = await client.fetch<Announcement[]>(
-              upcomingEventsBySectionIdQuery,
-              { lang, sectionId },
-            );
-            return [sectionId, items] as const;
-          }),
-        );
-        return Object.fromEntries(entries);
-      })(),
-      (async () => {
-        const entries = await Promise.all(
-          [...latestSectionIdToLimit.entries()].map(async ([sectionId, limit]) => {
+  const [
+    upcomingEvents,
+    latestEvents,
+    upcomingEventsBySectionId,
+    latestEventsBySectionId,
+  ] = await Promise.all([
+    needsGlobalUpcoming
+      ? client.fetch<Announcement[]>(upcomingEventsQuery, { lang })
+      : Promise.resolve([]),
+    needsGlobalLatest
+      ? client.fetch<Announcement[]>(latestEventsQuery, {
+          lang,
+          limit: Math.max(globalLatestLimit, 1),
+        })
+      : Promise.resolve([]),
+    (async () => {
+      const entries = await Promise.all(
+        [...upcomingSectionIds].map(async (sectionId) => {
+          const items = await client.fetch<Announcement[]>(
+            upcomingEventsBySectionIdQuery,
+            { lang, sectionId },
+          );
+          return [sectionId, items] as const;
+        }),
+      );
+      return Object.fromEntries(entries);
+    })(),
+    (async () => {
+      const entries = await Promise.all(
+        [...latestSectionIdToLimit.entries()].map(
+          async ([sectionId, limit]) => {
             const items = await client.fetch<Announcement[]>(
               latestEventsBySectionIdQuery,
               { lang, sectionId, limit },
             );
             return [sectionId, items] as const;
-          }),
-        );
-        return Object.fromEntries(entries);
-      })(),
-    ]);
+          },
+        ),
+      );
+      return Object.fromEntries(entries);
+    })(),
+  ]);
 
   return (
-    <SectionRenderer
-      locale={locale}
-      sections={sections}
-      announcements={announcements}
-      upcomingEvents={upcomingEvents}
-      upcomingEventsBySectionId={upcomingEventsBySectionId}
-      latestEvents={latestEvents}
-      latestEventsBySectionId={latestEventsBySectionId}
-    />
+    <>
+      <SectionRenderer
+        locale={locale}
+        sections={hero}
+        announcements={announcements}
+        upcomingEvents={upcomingEvents}
+        upcomingEventsBySectionId={upcomingEventsBySectionId}
+        latestEvents={latestEvents}
+        latestEventsBySectionId={latestEventsBySectionId}
+      />
+
+      <HomeDivisionsSection locale={locale} data={home.divisions} />
+      <OurCampusSection locale={locale} data={home.ourCampus} />
+
+      <SectionRenderer
+        locale={locale}
+        sections={restSections}
+        announcements={announcements}
+        upcomingEvents={upcomingEvents}
+        upcomingEventsBySectionId={upcomingEventsBySectionId}
+        latestEvents={latestEvents}
+        latestEventsBySectionId={latestEventsBySectionId}
+      />
+    </>
   );
 }

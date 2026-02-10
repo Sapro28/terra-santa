@@ -3,7 +3,52 @@ import { sectionProjection } from './projections';
 
 export const homePageQuery = groq`
   *[_type == "homePage" && language == $lang][0]{
-    "sections": sections[]{ ${sectionProjection} }
+    "sections": sections[]{ ${sectionProjection} },
+
+    divisions{
+      title,
+      subtitle,
+      divisions[]{
+        title,
+        text,
+        hoverText,
+        ctaLabel,
+        "pageSlug": page->slug,
+        "pageTitle": page->title,
+        "imageUrl": image.asset->url,
+        "imageAlt": image.alt
+      }
+    },
+
+    ourCampus{
+      heading,
+      intro,
+      slides[]{
+        title,
+        subtitle,
+        address,
+        body,
+        "images": images[]{
+          "url": asset->url,
+          "alt": alt
+        }
+      },
+      ctaLabel,
+      ctaHref,
+      ctaLink{
+        linkType,
+        internalRef->{
+          _type,
+          title,
+          "slug": coalesce(slug.current, slug),
+          "headerSlug": header->slug
+        },
+        routeKey,
+        internalPath,
+        externalUrl,
+        openInNewTab
+      }
+    }
   }
 `;
 

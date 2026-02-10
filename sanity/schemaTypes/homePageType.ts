@@ -22,13 +22,37 @@ export const homePageType = defineType({
       type: 'array',
       of: [
         defineArrayMember({ type: 'sectionVideoHero' }),
-        defineArrayMember({ type: 'sectionDivisions' }),
         defineArrayMember({ type: 'sectionParentsTestimonials' }),
         defineArrayMember({ type: 'sectionAnnouncements' }),
         defineArrayMember({ type: 'sectionUpcomingEvents' }),
         defineArrayMember({ type: 'sectionLatestEvents' }),
-        defineArrayMember({ type: 'sectionColors' }),
       ],
+    }),
+
+    defineField({
+      name: 'divisions',
+      title: 'Academic Divisions (fixed on Home)',
+      options: {
+        i18nTitle: {
+          ar: 'الأقسام الدراسية (ثابتة في الرئيسية)',
+          en: 'Academic Divisions (fixed on Home)',
+          it: 'Divisioni accademiche (fisso in Home)',
+        },
+      },
+      type: 'sectionDivisions',
+    }),
+
+    defineField({
+      name: 'ourCampus',
+      title: 'Our Campus (fixed on Home)',
+      options: {
+        i18nTitle: {
+          ar: 'حَرَمُنا (ثابت في الرئيسية)',
+          en: 'Our Campus (fixed on Home)',
+          it: 'Il nostro campus (fisso in Home)',
+        },
+      },
+      type: 'homeOurCampus',
     }),
   ],
 
