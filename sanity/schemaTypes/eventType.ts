@@ -155,19 +155,6 @@ export const eventType = defineType({
     }),
 
     defineField({
-      name: 'registrationLink',
-      type: 'url',
-      title: 'Registration link (optional)',
-      options: {
-        i18nTitle: {
-          ar: 'رابط التسجيل (اختياري)',
-          en: 'Registration link (optional)',
-          it: 'Link di registrazione (opzionale)',
-        },
-      },
-    }),
-
-    defineField({
       name: 'startAt',
       type: 'datetime',
       title: 'Start time',
@@ -190,19 +177,19 @@ export const eventType = defineType({
         },
       },
       components: { input: SafeDatetimeInput },
-      validation: (Rule) =>
-        Rule.custom((endAt: any, ctx: any) => {
-          if (!endAt) return true;
-          const startAt = ctx?.document?.startAt;
-          if (!startAt) return true;
-          return endAt > startAt
-            ? true
-            : ((ctx?.document?.language === 'it'
-                ? "L'ora di fine deve essere dopo l'ora di inizio."
-                : ctx?.document?.language === 'en'
-                  ? 'End time must be after start time.'
-                  : 'وقت النهاية يجب أن يكون بعد وقت البداية') as any);
-        }),
+    }),
+
+    defineField({
+      name: 'registrationLink',
+      type: 'url',
+      title: 'Registration link (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'رابط التسجيل (اختياري)',
+          en: 'Registration link (optional)',
+          it: 'Link registrazione (opzionale)',
+        },
+      },
     }),
 
     defineField({
@@ -334,12 +321,13 @@ export const eventType = defineType({
       title: 'title',
       lang: 'language',
       startAt: 'startAt',
-      sectionTitles: 'sections[]->title',
+      sectionTitles: 'sections',
     },
     prepare({ title, lang, startAt, sectionTitles }) {
-      const sectionsLabel = Array.isArray(sectionTitles)
-        ? sectionTitles.filter(Boolean).join(', ')
-        : null;
+      const sectionsCount = Array.isArray(sectionTitles)
+        ? sectionTitles.length
+        : 0;
+      const sectionsLabel = sectionsCount ? `${sectionsCount}` : null;
 
       return {
         title: title || 'Untitled',

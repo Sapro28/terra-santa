@@ -25,5 +25,5 @@ export const previewClient = createClient({
   apiVersion,
   useCdn: false,
   token: process.env.SANITY_VIEWER_TOKEN,
-  perspective: 'drafts',
+  perspective: 'previewDrafts',
 });

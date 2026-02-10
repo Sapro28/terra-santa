@@ -24,7 +24,7 @@ export const linkObject = defineType({
       name: 'internalRef',
       title: 'اختر صفحة (مُستحسن)',
       type: 'reference',
-      to: [{ type: 'page' }, { type: 'headerElement' }],
+      to: [{ type: 'page' }, { type: 'eventsPage' }, { type: 'headerElement' }],
       description: 'اختر صفحة من صفحات الموقع. سيتم إنشاء الرابط تلقائياً.',
       hidden: ({ parent }) => parent?.linkType !== 'internal',
     }),
@@ -37,7 +37,9 @@ export const linkObject = defineType({
         list: [
           { title: 'الرئيسية', value: 'home' },
           { title: 'من نحن', value: 'about' },
+          { title: 'الأقسام', value: 'sections' },
           { title: 'الأخبار', value: 'news' },
+          { title: 'الفعاليات', value: 'events' },
           { title: 'الرسوم', value: 'fees' },
           { title: 'مودل', value: 'moodle' },
         ],

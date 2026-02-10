@@ -14,8 +14,8 @@ import {
   popupAnnouncementQuery,
   siteSettingsQuery,
 } from '@/sanity/lib/queries';
-import { sanityFetch, SanityLive } from '@/sanity/lib/live';
-import { sanityClient } from '@/sanity/lib/client';
+import { SanityLive } from '@/sanity/lib/live';
+import { getSanityClient } from '@/sanity/lib/getClient';
 import VisualEditingComponent from '@/app/VisualEditing';
 
 import { locales, type Locale } from '@/i18n/config';
@@ -35,35 +35,21 @@ export default async function LocaleLayout({
   const dm = await draftMode();
   if (dm.isEnabled) noStore();
 
+  // Always fetch through the same client selection logic (draft vs published)
+  // to avoid situations where parts of the page are in preview while others
+  // are still using the published/CDN client.
+  const client = await getSanityClient();
+
   const messages = await getMessages();
-  const siteSettings = dm.isEnabled
-    ? (
-        await sanityFetch({
-          query: siteSettingsQuery,
-          params: { id: `siteSettings-${locale}` },
-        })
-      ).data
-    : await sanityClient.fetch(siteSettingsQuery, {
-        id: `siteSettings-${locale}`,
-      });
+  const siteSettings = await client.fetch(siteSettingsQuery, {
+    id: `siteSettings-${locale}`,
+  });
 
-  const headerNav = dm.isEnabled
-    ? (
-        await sanityFetch({
-          query: headerNavQuery,
-          params: { lang: locale },
-        })
-      ).data
-    : await sanityClient.fetch(headerNavQuery, { lang: locale });
+  const headerNav = await client.fetch(headerNavQuery, { lang: locale });
 
-  const popupAnnouncement = dm.isEnabled
-    ? (
-        await sanityFetch({
-          query: popupAnnouncementQuery,
-          params: { lang: locale },
-        })
-      ).data
-    : await sanityClient.fetch(popupAnnouncementQuery, { lang: locale });
+  const popupAnnouncement = await client.fetch(popupAnnouncementQuery, {
+    lang: locale,
+  });
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

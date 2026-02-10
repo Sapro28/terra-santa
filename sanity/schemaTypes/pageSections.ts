@@ -1,11 +1,16 @@
 import type {} from '../types/sanity-i18n-options';
 
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { inferStudioLang, SUPPORTED_LANGS, type Lang } from '../lib/studioLang';
 
-type Lang = 'ar' | 'en' | 'it';
 function i18nInitialValue(map: Record<Lang, string>) {
   return ({ document }: { document?: any }) => {
-    const l = (document?.language || 'ar') as Lang;
+    const raw = (document?.language ?? '').toString().trim();
+
+    const l: Lang = SUPPORTED_LANGS.includes(raw as Lang)
+      ? (raw as Lang)
+      : inferStudioLang({ documentLang: raw, documentId: document?._id });
+
     return map[l] ?? map.ar;
   };
 }
@@ -182,7 +187,7 @@ export const sectionDivisionsType = defineType({
                       }
                     : { filter: '_type == "page"', params: {} };
                 }) as any,
-              },
+              } as any,
               validation: (Rule) =>
                 Rule.required().custom((value, ctx) => {
                   const hasPage = Boolean((value as any)?._ref);

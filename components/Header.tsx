@@ -32,8 +32,7 @@ type HeaderElement = {
 
 type SiteSettings = {
   schoolName?: string;
-  headerLogoUrl?: string | null;
-  headerLogoAlt?: string | null;
+  headerLogos?: Array<{ url?: string | null; alt?: string | null }> | null;
 };
 
 function resolveHref(
@@ -71,6 +70,12 @@ export default async function Header({
   headerNav?: HeaderElement[] | null;
 }) {
   const items: HeaderElement[] = headerNav ?? [];
+
+  const logos = (settings?.headerLogos ?? []).filter(
+    (l) => (l?.url ?? '').trim().length > 0,
+  );
+  const primaryLogo = logos[0] ?? null;
+  const secondaryLogo = logos[1] ?? null;
 
   const mobileItems: MobileNavItem[] = items
     .map((item) => {
@@ -110,10 +115,10 @@ export default async function Header({
     <header className="sticky top-0 z-50 border-b border-border bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href={`/${locale}`} className="inline-flex items-center gap-2">
-          {settings?.headerLogoUrl ? (
+          {primaryLogo?.url ? (
             <Image
-              src={settings.headerLogoUrl}
-              alt={settings?.headerLogoAlt ?? settings?.schoolName ?? 'School'}
+              src={primaryLogo.url}
+              alt={primaryLogo.alt ?? settings?.schoolName ?? 'School'}
               width={40}
               height={40}
               className="h-10 w-10 rounded-sm object-contain"
@@ -202,6 +207,16 @@ export default async function Header({
           <div className="hidden md:block">
             <LocaleSwitcherClient locale={locale} />
           </div>
+          {secondaryLogo?.url ? (
+            <Image
+              src={secondaryLogo.url}
+              alt={secondaryLogo.alt ?? settings?.schoolName ?? 'School'}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-sm object-contain"
+              priority
+            />
+          ) : null}
         </div>
       </div>
     </header>

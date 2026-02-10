@@ -5,7 +5,6 @@ import { documentInternationalization } from '@sanity/document-internationalizat
 import { dataset, projectId } from './sanity/env';
 import { schema } from './sanity/schemaTypes';
 import { myTheme } from './sanity/theme';
-import { presentationTool } from 'sanity/presentation';
 import { structure } from './sanity/structure';
 import I18nField from './sanity/components/I18nField';
 
@@ -99,15 +98,5 @@ export default defineConfig({
 
     structureTool({ structure }),
     visionTool(),
-
-    presentationTool({
-      previewUrl: {
-        origin: process.env.SANITY_STUDIO_SITE_URL || 'http://localhost:3000',
-        initial: '/ar',
-        previewMode: {
-          enable: '/api/draft-mode/enable',
-        },
-      },
-    }),
   ],
 });

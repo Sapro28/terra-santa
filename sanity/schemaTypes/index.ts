@@ -2,6 +2,7 @@ import type {} from '../types/sanity-i18n-options';
 import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
 import { eventType } from './eventType';
+import { eventsPageType } from './eventsPageType';
 import { schoolSectionType } from './schoolSectionType';
 import { homePageType } from './homePageType';
 import { linkObject } from './objects/link';
@@ -31,6 +32,7 @@ export const schema = {
     ...pageSections,
     newsPostType,
     eventType,
+    eventsPageType,
     schoolSectionType,
     homePageType,
     pageType,
@@ -53,6 +55,7 @@ export const schema = {
     singletonLangTemplate('footer'),
     singletonLangTemplate('newsPost'),
     singletonLangTemplate('event'),
+    singletonLangTemplate('eventsPage'),
     singletonLangTemplate('schoolSectionPage'),
     singletonLangTemplate('homePage'),
     singletonLangTemplate('page'),

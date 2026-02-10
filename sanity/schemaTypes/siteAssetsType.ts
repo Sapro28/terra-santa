@@ -9,20 +9,45 @@ export const siteAssetsType = defineType({
 
   fields: [
     defineField({
-      name: 'headerLogo',
-      title: 'شعار المدرسة / School Logo',
+      name: 'headerLogos',
+      title: 'شعارات المدرسة',
       description:
-        'This logo will appear in the header for all languages / سيظهر هذا الشعار في الهيدر لجميع اللغات',
+        'These logos will appear in the header for all languages / ستظهر هذه الشعارات في الهيدر لجميع اللغات',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt text',
+              type: 'string',
+              description:
+                'Alternative text for accessibility / النص البديل لإمكانية الوصول',
+            }),
+          ],
+        },
+      ],
+      validation: (Rule) => Rule.min(1).required(),
+    }),
+
+    // Backward-compatibility: keep the previous single image field so existing datasets
+    // don't break if they haven't been updated yet.
+    defineField({
+      name: 'headerLogo',
+      title: 'شعار المدرسة (قديم)',
+      description:
+        'Legacy single-logo field. Prefer using "شعارات المدرسة" / حقل قديم لشعار واحد. يفضل استخدام "شعارات المدرسة"',
       type: 'image',
+      hidden: true,
+      readOnly: true,
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
       fields: [
         defineField({
           name: 'alt',
           title: 'Alt text',
           type: 'string',
-          description:
-            'Alternative text for accessibility / النص البديل لإمكانية الوصول',
         }),
       ],
     }),
@@ -30,13 +55,14 @@ export const siteAssetsType = defineType({
 
   preview: {
     select: {
-      media: 'headerLogo',
+      media: 'headerLogos.0',
+      legacyMedia: 'headerLogo',
     },
-    prepare({ media }) {
+    prepare({ media, legacyMedia }) {
       return {
-        title: 'School Logo / شعار المدرسة',
+        title: 'شعارات المدرسة',
         subtitle: 'Shared across all languages / مشترك عبر جميع اللغات',
-        media,
+        media: media ?? legacyMedia,
       };
     },
   },

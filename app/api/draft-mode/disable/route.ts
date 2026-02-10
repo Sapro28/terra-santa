@@ -1,6 +1,10 @@
 import { draftMode } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   (await draftMode()).disable();
-  return new Response('Draft mode disabled');
+  const url = new URL(request.nextUrl);
+  const redirect = url.searchParams.get('redirect') || '/';
+
+  return NextResponse.redirect(new URL(redirect, request.url));
 }

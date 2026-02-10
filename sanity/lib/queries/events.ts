@@ -93,6 +93,8 @@ export const eventsListQuery = groq`
     "eventDate": startAt,
     "endDate": endAt,
     location,
+    "sectionSlugs": sections[]->slug,
+    "sectionTitles": sections[]->title,
     "mainImageUrl": mainImage.asset->url,
     "mainImageAlt": mainImage.alt,
     "photoCount": count(media[_type == "photo"]),
@@ -116,10 +118,26 @@ export const eventsListBySectionSlugQuery = groq`
     "eventDate": startAt,
     "endDate": endAt,
     location,
+    "sectionSlugs": sections[]->slug,
+    "sectionTitles": sections[]->title,
     "mainImageUrl": mainImage.asset->url,
     "mainImageAlt": mainImage.alt,
     "photoCount": count(media[_type == "photo"]),
     "videoCount": count(media[_type == "video"])
+  }
+`;
+
+export const schoolSectionsListQuery = groq`
+  *[_type == "schoolSection"] | order(coalesce(order, 9999) asc, title asc) {
+    title,
+    slug
+  }
+`;
+
+export const eventsPageByLanguageQuery = groq`
+  *[_type == "eventsPage" && language == $lang][0]{
+    title,
+    slug
   }
 `;
 

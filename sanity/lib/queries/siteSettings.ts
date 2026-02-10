@@ -3,15 +3,27 @@ import { groq } from 'next-sanity';
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings" && _id == $id][0]{
     schoolName,
-    // Prefer the shared logo (siteAssets), but fall back to the per-language logo if set.
-    "headerLogoUrl": coalesce(
-      *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogo.asset->url,
-      headerLogo.asset->url
-    ),
-    "headerLogoAlt": coalesce(
-      *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogo.alt,
-      headerLogo.alt,
-      ""
+    // Prefer shared logos from the singleton (siteAssets), but fall back to legacy fields if needed.
+    "headerLogos": coalesce(
+      *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogos[]{
+        "url": asset->url,
+        "alt": coalesce(alt, "")
+      },
+      select(
+        defined(*[_type == "siteAssets" && _id == "siteAssets"][0].headerLogo.asset->url) => [
+          {
+            "url": *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogo.asset->url,
+            "alt": coalesce(*[_type == "siteAssets" && _id == "siteAssets"][0].headerLogo.alt, "")
+          }
+        ],
+        []
+      ),
+      select(
+        defined(headerLogo.asset->url) => [
+          { "url": headerLogo.asset->url, "alt": coalesce(headerLogo.alt, "") }
+        ],
+        []
+      )
     ),
     footer{
       addressLine1,

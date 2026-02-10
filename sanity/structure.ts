@@ -60,6 +60,7 @@ const LABELS: Record<
 const SINGLETON_ID = {
   siteAssets: () => 'siteAssets',
   homePage: (lang: Lang) => `homePage-${lang}`,
+  eventsPage: (lang: Lang) => `eventsPage-${lang}`,
   siteSettings: (lang: Lang) => `siteSettings-${lang}`,
 };
 
@@ -122,13 +123,13 @@ export const structure: StructureResolver = (S, context) => {
             .title('الموقع')
             .items([
               S.listItem()
-                .title('شعار المدرسة / School Logo')
+                .title('شعارات المدرسة')
                 .icon(ImageIcon)
                 .child(
                   S.document()
                     .schemaType('siteAssets')
                     .documentId(SINGLETON_ID.siteAssets())
-                    .title('شعار المدرسة / School Logo'),
+                    .title('شعارات المدرسة'),
                 ),
 
               S.divider(),
@@ -256,6 +257,30 @@ export const structure: StructureResolver = (S, context) => {
                                           ),
                                       ),
                                   ),
+
+                                S.listItem()
+                                  .title(
+                                    lang === 'ar'
+                                      ? 'صفحة الفعاليات'
+                                      : lang === 'it'
+                                        ? 'Pagina Eventi'
+                                        : 'Events Page',
+                                  )
+                                  .icon(DocumentIcon)
+                                  .child(
+                                    S.document()
+                                      .schemaType('eventsPage')
+                                      .documentId(SINGLETON_ID.eventsPage(lang))
+                                      .title(
+                                        `${LABELS[lang].events} — ${t.langTitle}`,
+                                      )
+                                      .initialValueTemplate(
+                                        'eventsPage-byLang',
+                                        {
+                                          lang,
+                                        },
+                                      ),
+                                  ),
                               ]),
                           ),
                       ]),
@@ -277,7 +302,7 @@ export const structure: StructureResolver = (S, context) => {
                 .icon(DocumentIcon)
                 .child(
                   S.documentList()
-                    .title('School Divisions')
+                    .title('أقسام المدرسة')
                     .apiVersion(apiVersion)
                     .schemaType('schoolSection')
                     .filter('_type == "schoolSection"')

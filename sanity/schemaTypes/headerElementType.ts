@@ -56,7 +56,7 @@ export const headerElementType = defineType({
       name: 'internalPage',
       title: 'Choose Page / اختر صفحة',
       type: 'reference',
-      to: [{ type: 'page' }],
+      to: [{ type: 'page' }, { type: 'eventsPage' }],
       description:
         'Choose the internal page this link leads to. اختر الصفحة الداخلية التي يؤدي إليها هذا الرابط.',
       hidden: ({ parent }) => parent?.linkType !== 'internal',
@@ -72,9 +72,9 @@ export const headerElementType = defineType({
         disableNew: true,
         filter: ({ document }) => {
           const lang = (document as any)?.language;
-          if (!lang) return { filter: '_type == "page"' };
+          if (!lang) return { filter: '_type in ["page", "eventsPage"]' };
           return {
-            filter: '_type == "page" && language == $lang',
+            filter: '_type in ["page", "eventsPage"] && language == $lang',
             params: { lang },
           };
         },

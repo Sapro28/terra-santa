@@ -8,6 +8,24 @@ const intl = createMiddleware({ locales, defaultLocale });
 export const proxy = (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
+  // If a locale prefix is accidentally added in front of special Next.js paths
+  // (e.g. /ar/api/..., /en/_next/...), strip the locale and redirect.
+  //
+  // This prevents flaky draft/preview behavior where draft mode is enabled via
+  // /api/draft-mode/enable but some links/navigation end up at /{locale}/api/...
+  // which doesn't match the Next route and results in published-only rendering.
+  const segs = pathname.split('/');
+  const maybeLocale = segs[1];
+  const maybeSpecial = segs[2];
+  if (maybeLocale && locales.includes(maybeLocale as any)) {
+    if (maybeSpecial === 'api' || maybeSpecial === '_next') {
+      const url = request.nextUrl.clone();
+      // Remove the locale segment: /{locale}/{special}/... -> /{special}/...
+      url.pathname = `/${segs.slice(2).join('/')}`;
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (pathname === '/studio' || pathname.startsWith('/studio/')) {
     return NextResponse.next();
   }
