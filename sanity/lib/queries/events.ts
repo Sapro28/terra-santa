@@ -94,7 +94,9 @@ export const eventsListQuery = groq`
     "endDate": endAt,
     location,
     "mainImageUrl": mainImage.asset->url,
-    "mainImageAlt": mainImage.alt
+    "mainImageAlt": mainImage.alt,
+    "photoCount": count(media[_type == "photo"]),
+    "videoCount": count(media[_type == "video"])
   }
 `;
 
@@ -115,7 +117,9 @@ export const eventsListBySectionSlugQuery = groq`
     "endDate": endAt,
     location,
     "mainImageUrl": mainImage.asset->url,
-    "mainImageAlt": mainImage.alt
+    "mainImageAlt": mainImage.alt,
+    "photoCount": count(media[_type == "photo"]),
+    "videoCount": count(media[_type == "video"])
   }
 `;
 
@@ -139,7 +143,18 @@ export const eventBySlugQuery = groq`
     "eventDate": startAt,
     "endDate": endAt,
     location,
+    registrationLink,
     "mainImageUrl": mainImage.asset->url,
-    "mainImageAlt": mainImage.alt
+    "mainImageAlt": mainImage.alt,
+
+    media[] {
+      _type,
+      alt,
+      caption,
+      capturedAt,
+      title,
+      "imageUrl": select(_type == "photo" => asset->url),
+      "videoUrl": select(_type == "video" => asset->url)
+    }
   }
 `;

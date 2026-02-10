@@ -9,7 +9,7 @@ import { presentationTool } from 'sanity/presentation';
 import { structure } from './sanity/structure';
 import I18nField from './sanity/components/I18nField';
 
-const I18N_SCHEMA_TYPES = new Set(['newsPost', 'galleryCategory']);
+const I18N_SCHEMA_TYPES = new Set(['newsPost']);
 const STRUCTURE_ONLY_TYPES = new Set(['navHeader', 'sitePage']);
 
 export default defineConfig({
@@ -42,8 +42,8 @@ export default defineConfig({
 
       if (doc?._type === 'newsPost' && slug) {
         redirect = `/${locale}/news/${encodeURIComponent(slug)}`;
-      } else if (doc?._type === 'galleryCategory' && slug) {
-        redirect = `/${locale}/gallery/${encodeURIComponent(slug)}`;
+      } else if (doc?._type === 'event' && slug) {
+        redirect = `/${locale}/events/${encodeURIComponent(slug)}`;
       } else if (doc?._type === 'homePage') {
         redirect = `/${locale}`;
       } else if (doc?._type === 'navHeader') {
@@ -92,7 +92,7 @@ export default defineConfig({
         { id: 'en', title: 'English' },
         { id: 'it', title: 'Italiano' },
       ],
-      schemaTypes: ['newsPost', 'galleryCategory'],
+      schemaTypes: ['newsPost'],
       languageField: 'language',
       weakReferences: true,
     }),

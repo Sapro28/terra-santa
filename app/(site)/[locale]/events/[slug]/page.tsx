@@ -14,6 +14,22 @@ type EventDetail = {
   registrationLink?: string;
   mainImageUrl?: string;
   mainImageAlt?: string;
+  media?: Array<
+    | {
+        _type: 'photo';
+        imageUrl?: string;
+        alt?: string;
+        caption?: string;
+        capturedAt?: string;
+      }
+    | {
+        _type: 'video';
+        title?: string;
+        videoUrl?: string;
+        caption?: string;
+        capturedAt?: string;
+      }
+  >;
 };
 
 export default async function EventDetailPage({
@@ -106,6 +122,70 @@ export default async function EventDetailPage({
           <PortableText value={event.content} />
         </div>
       )}
+
+      {event.media?.length ? (
+        <section className="mt-10 space-y-4">
+          <h2 className="text-2xl font-bold">
+            {lang === 'ar'
+              ? 'الصور والفيديوهات'
+              : lang === 'it'
+                ? 'Foto e video'
+                : 'Photos & Videos'}
+          </h2>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {event.media.map((item, idx) => {
+              if (item._type === 'photo') {
+                return (
+                  <figure
+                    key={`photo-${idx}`}
+                    className="overflow-hidden rounded-2xl border border-border bg-white"
+                  >
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.alt ?? event.title ?? ''}
+                        className="h-56 w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
+                    {item.caption ? (
+                      <figcaption className="p-3 text-xs text-muted">
+                        {item.caption}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                );
+              }
+
+              return (
+                <div
+                  key={`video-${idx}`}
+                  className="overflow-hidden rounded-2xl border border-border bg-white"
+                >
+                  {item.videoUrl ? (
+                    <video
+                      controls
+                      preload="metadata"
+                      className="h-56 w-full object-cover"
+                      src={item.videoUrl}
+                    />
+                  ) : null}
+
+                  <div className="p-4">
+                    <div className="text-sm font-semibold">
+                      {item.title ?? (lang === 'ar' ? 'فيديو' : 'Video')}
+                    </div>
+                    {item.caption ? (
+                      <p className="mt-2 text-xs text-muted">{item.caption}</p>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       <div className="mt-12 pt-8 border-t">
         <a

@@ -114,8 +114,6 @@ function routeKeyToPathSegment(routeKey?: string | null) {
       return 'about';
     case 'sections':
       return 'sections';
-    case 'gallery':
-      return 'gallery';
     case 'news':
       return 'news';
     case 'fees':

@@ -11,6 +11,20 @@ export const eventType = defineType({
     languageFieldLocked,
 
     defineField({
+      name: 'hidden',
+      type: 'boolean',
+      title: 'Hidden (do not show on site)',
+      initialValue: false,
+      options: {
+        i18nTitle: {
+          ar: 'مخفي (لا يظهر في الموقع)',
+          en: 'Hidden (do not show on site)',
+          it: 'Nascosto (non mostrare sul sito)',
+        },
+      },
+    }),
+
+    defineField({
       name: 'title',
       type: 'string',
       title: 'Title',
@@ -141,6 +155,19 @@ export const eventType = defineType({
     }),
 
     defineField({
+      name: 'registrationLink',
+      type: 'url',
+      title: 'Registration link (optional)',
+      options: {
+        i18nTitle: {
+          ar: 'رابط التسجيل (اختياري)',
+          en: 'Registration link (optional)',
+          it: 'Link di registrazione (opzionale)',
+        },
+      },
+    }),
+
+    defineField({
       name: 'startAt',
       type: 'datetime',
       title: 'Start time',
@@ -177,6 +204,116 @@ export const eventType = defineType({
                   : 'وقت النهاية يجب أن يكون بعد وقت البداية') as any);
         }),
     }),
+
+    defineField({
+      name: 'media',
+      title: 'Media (photos / videos)',
+      type: 'array',
+      options: {
+        i18nTitle: {
+          ar: 'الوسائط (صور / فيديوهات)',
+          en: 'Media (photos / videos)',
+          it: 'Media (foto / video)',
+        },
+        i18nDescription: {
+          ar: 'أضف صورًا أو فيديوهات لهذه الفعالية. تظهر داخل صفحة الفعالية.',
+          en: 'Add photos or videos for this event. Shown on the event details page.',
+          it: 'Aggiungi foto o video per questo evento. Verranno mostrati nella pagina dettaglio.',
+        },
+      },
+      of: [
+        {
+          name: 'photo',
+          title: 'Photo',
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+              options: {
+                i18nTitle: {
+                  ar: 'نص بديل (ALT)',
+                  en: 'Alt text',
+                  it: 'Testo alt',
+                },
+              },
+            }),
+            defineField({
+              name: 'caption',
+              type: 'string',
+              title: 'Caption (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'وصف قصير (اختياري)',
+                  en: 'Caption (optional)',
+                  it: 'Didascalia (opzionale)',
+                },
+              },
+            }),
+            defineField({
+              name: 'capturedAt',
+              type: 'datetime',
+              title: 'Captured at (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'تاريخ الالتقاط (اختياري)',
+                  en: 'Captured at (optional)',
+                  it: 'Data di acquisizione (opzionale)',
+                },
+              },
+              components: { input: SafeDatetimeInput },
+            }),
+          ],
+        },
+        {
+          name: 'video',
+          title: 'Video',
+          type: 'file',
+          options: { accept: 'video/*' },
+          fields: [
+            defineField({
+              name: 'title',
+              type: 'string',
+              title: 'Title (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'عنوان (اختياري)',
+                  en: 'Title (optional)',
+                  it: 'Titolo (opzionale)',
+                },
+              },
+            }),
+            defineField({
+              name: 'caption',
+              type: 'string',
+              title: 'Caption (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'وصف قصير (اختياري)',
+                  en: 'Caption (optional)',
+                  it: 'Didascalia (opzionale)',
+                },
+              },
+            }),
+            defineField({
+              name: 'capturedAt',
+              type: 'datetime',
+              title: 'Captured at (optional)',
+              options: {
+                i18nTitle: {
+                  ar: 'تاريخ الالتقاط (اختياري)',
+                  en: 'Captured at (optional)',
+                  it: 'Data di acquisizione (opzionale)',
+                },
+              },
+              components: { input: SafeDatetimeInput },
+            }),
+          ],
+        },
+      ],
+    }),
   ],
 
   orderings: [
@@ -197,20 +334,18 @@ export const eventType = defineType({
       title: 'title',
       lang: 'language',
       startAt: 'startAt',
-      sections: 'sections',
+      sectionTitles: 'sections[]->title',
     },
-    prepare({ title, lang, startAt, sections }) {
-      const sectionTitles =
-        (sections || [])
-          .map((s: any) => s?.title)
-          .filter(Boolean)
-          .join(', ') || null;
+    prepare({ title, lang, startAt, sectionTitles }) {
+      const sectionsLabel = Array.isArray(sectionTitles)
+        ? sectionTitles.filter(Boolean).join(', ')
+        : null;
 
       return {
         title: title || 'Untitled',
         subtitle: [
           lang ? `Lang: ${lang}` : null,
-          sectionTitles ? `Sections: ${sectionTitles}` : null,
+          sectionsLabel ? `Sections: ${sectionsLabel}` : null,
           startAt ? `Starts: ${startAt}` : null,
         ]
           .filter(Boolean)

@@ -3,7 +3,6 @@ import { blockContentType } from './blockContentType';
 import { newsPostType } from './newsPostType';
 import { eventType } from './eventType';
 import { schoolSectionType } from './schoolSectionType';
-import { galleryCategoryType } from './galleryCategoryType';
 import { homePageType } from './homePageType';
 import { linkObject } from './objects/link';
 import { pageSections } from './pageSections';
@@ -33,7 +32,6 @@ export const schema = {
     newsPostType,
     eventType,
     schoolSectionType,
-    galleryCategoryType,
     homePageType,
     pageType,
     headerElementType,
@@ -60,21 +58,5 @@ export const schema = {
     singletonLangTemplate('page'),
     singletonLangTemplate('headerElement'),
     singletonLangTemplate('siteSettings'),
-
-    {
-      id: 'galleryCategory-bySection',
-      title: 'Gallery Category (by section)',
-      schemaType: 'galleryCategory',
-      parameters: [
-        { name: 'lang', title: 'Language', type: 'string' },
-        { name: 'sectionId', title: 'Section Document ID', type: 'string' },
-      ],
-      value: (params: any) => ({
-        language: params?.lang,
-        section: params?.sectionId
-          ? { _type: 'reference', _ref: params.sectionId }
-          : undefined,
-      }),
-    },
   ],
 };

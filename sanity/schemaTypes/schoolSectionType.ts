@@ -35,9 +35,9 @@ export const schoolSectionType = defineType({
           it: 'Slug sezione (collega a /sections/<slug>)',
         },
         i18nDescription: {
-          ar: 'اختَر الـSlug المطابق لصفحة القسم (يجب أن يكون من القائمة). هذا يساعدنا على ربط الفعاليات/المعرض بقسم معين.',
-          en: 'Choose the slug that matches the division page (must be from the list). This helps us link events/gallery to a specific division.',
-          it: 'Scegli lo slug che corrisponde alla pagina della divisione (deve essere dalla lista). Aiuta a collegare eventi/galleria a una divisione specifica.',
+          ar: 'اختَر الـSlug المطابق لصفحة القسم (يجب أن يكون من القائمة). هذا يساعدنا على ربط الفعاليات بقسم معين.',
+          en: 'Choose the slug that matches the division page (must be from the list). This helps us link events to a specific division.',
+          it: 'Scegli lo slug che corrisponde alla pagina della divisione (deve essere dalla lista). Aiuta a collegare eventi a una divisione specifica.',
         },
         list: SCHOOL_SECTION_SLUG_OPTIONS,
         layout: 'dropdown',
@@ -53,26 +53,6 @@ export const schoolSectionType = defineType({
           const count = await client.fetch<number>(query, { slug: v, id });
           return count > 0 ? 'هذا الـSlug مستخدم بالفعل في قسم آخر.' : true;
         }),
-    }),
-
-    defineField({
-      name: 'key',
-      title: 'Key (optional)',
-      type: 'slug',
-      description: 'Optional — a stable value used in code.',
-      options: {
-        source: 'title',
-        i18nTitle: {
-          ar: 'مفتاح (اختياري)',
-          en: 'Key (optional)',
-          it: 'Chiave (opzionale)',
-        },
-        i18nDescription: {
-          ar: 'اختياري — قيمة ثابتة لتستخدمها بالبرمجة (مثل primary / middle / high).',
-          en: 'Optional — a stable value used in code (e.g. primary / middle / high).',
-          it: 'Opzionale — valore stabile usato nel codice (es. primary / middle / high).',
-        },
-      },
     }),
 
     defineField({

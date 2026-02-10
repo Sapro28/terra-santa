@@ -37,7 +37,6 @@ export const linkObject = defineType({
         list: [
           { title: 'الرئيسية', value: 'home' },
           { title: 'من نحن', value: 'about' },
-          { title: 'المعرض', value: 'gallery' },
           { title: 'الأخبار', value: 'news' },
           { title: 'الرسوم', value: 'fees' },
           { title: 'مودل', value: 'moodle' },

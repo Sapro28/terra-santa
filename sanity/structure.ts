@@ -17,7 +17,6 @@ const LABELS: Record<
     content: string;
     news: string;
     events: string;
-    gallery: string;
   }
 > = {
   ar: {
@@ -31,7 +30,6 @@ const LABELS: Record<
     content: 'المحتوى',
     news: 'الأخبار / الإعلانات',
     events: 'الفعاليات',
-    gallery: 'المعرض',
   },
   en: {
     langTitle: 'English',
@@ -44,7 +42,6 @@ const LABELS: Record<
     content: 'Content',
     news: 'News / Announcements',
     events: 'Events',
-    gallery: 'Gallery',
   },
   it: {
     langTitle: 'Italiano',
@@ -57,7 +54,6 @@ const LABELS: Record<
     content: 'Contenuto',
     news: 'Notizie / Annunci',
     events: 'Eventi',
-    gallery: 'Galleria',
   },
 };
 
@@ -114,52 +110,9 @@ export const structure: StructureResolver = (S, context) => {
         ),
       );
 
-  const galleryBySection = () =>
-    S.documentList()
-      .title('أقسام المدرسة')
-      .apiVersion(apiVersion)
-      .schemaType('schoolSection')
-      .filter('_type == "schoolSection"')
-      .defaultOrdering([{ field: 'order', direction: 'asc' }])
-      .child((sectionId?: string) => {
-        if (!sectionId) {
-          return S.list().title('المعرض').items([]);
-        }
-
-        const galleryListFor = (lang: Lang) =>
-          S.documentList()
-            .title(`فعاليات — ${LABELS[lang].langTitle}`)
-            .apiVersion(apiVersion)
-            .schemaType('galleryCategory')
-            .filter(
-              '_type == "galleryCategory" && section._ref == $sectionId && language == $lang',
-            )
-            .params({ sectionId, lang })
-            .defaultOrdering([
-              { field: 'date', direction: 'desc' },
-              { field: '_createdAt', direction: 'desc' },
-            ])
-            .initialValueTemplates([
-              S.initialValueTemplateItem('galleryCategory-bySection', {
-                lang,
-                sectionId,
-              }),
-            ]);
-
-        return S.list()
-          .title('المعرض')
-          .items(
-            (Object.keys(LABELS) as Lang[]).map((lang) =>
-              S.listItem()
-                .title(LABELS[lang].langTitle)
-                .icon(ImageIcon)
-                .child(galleryListFor(lang)),
-            ),
-          );
-      });
-
   return S.list()
     .title('CMS')
+
     .items([
       S.listItem()
         .title('الموقع')
@@ -320,6 +273,23 @@ export const structure: StructureResolver = (S, context) => {
             .title('المحتوى')
             .items([
               S.listItem()
+                .title('أقسام المدرسة')
+                .icon(DocumentIcon)
+                .child(
+                  S.documentList()
+                    .title('School Divisions')
+                    .apiVersion(apiVersion)
+                    .schemaType('schoolSection')
+                    .filter('_type == "schoolSection"')
+                    .defaultOrdering([{ field: 'order', direction: 'asc' }])
+                    .child((docId: string) =>
+                      S.document()
+                        .schemaType('schoolSection')
+                        .documentId(docId),
+                    ),
+                ),
+
+              S.listItem()
                 .title('الأخبار / الإعلانات')
                 .icon(DocumentIcon)
                 .child(newsByLanguage()),
@@ -328,11 +298,6 @@ export const structure: StructureResolver = (S, context) => {
                 .title('الفعاليات')
                 .icon(DocumentIcon)
                 .child(eventsByLanguage()),
-
-              S.listItem()
-                .title('المعرض حسب القسم')
-                .icon(ImageIcon)
-                .child(galleryBySection()),
             ]),
         ),
     ]);
