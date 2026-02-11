@@ -4,10 +4,17 @@ export const sectionProjection = `
   // Video Hero
   _type == "sectionVideoHero" => {
     kicker,
-    title,
-    subtitle,
+    "title": coalesce(title, caption),
+    "subtitle": coalesce(subtitle, ""),
     overlayOpacity,
-    "videoUrl": video.asset->url,
+    useGlobalVideo,
+    "videoUrl": coalesce(
+      select(
+        useGlobalVideo == true => *[_type == "siteAssets" && _id == "siteAssets"][0].heroVideo.asset->url
+      ),
+      video.asset->url,
+      *[_type == "siteAssets" && _id == "siteAssets"][0].heroVideo.asset->url
+    ),
 
     primaryCta{
       label,

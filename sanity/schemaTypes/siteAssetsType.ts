@@ -2,15 +2,15 @@ import { defineType, defineField } from 'sanity';
 
 export const siteAssetsType = defineType({
   name: 'siteAssets',
-  title: 'أصول الموقع / Site Assets',
+  title: 'الهوية والأصول العامة / Branding & Global Assets',
   type: 'document',
   description:
-    'Global assets shared across all languages / الأصول المشتركة عبر جميع اللغات',
+    'Global assets shared across all languages (logos, global hero video, etc.) / الأصول المشتركة عبر جميع اللغات (الشعارات، فيديو الهيرو العام، ...)',
 
   fields: [
     defineField({
       name: 'headerLogos',
-      title: 'شعارات المدرسة',
+      title: 'شعارات المدرسة (الهيدر) / Header logos',
       description:
         'These logos will appear in the header for all languages / ستظهر هذه الشعارات في الهيدر لجميع اللغات',
       type: 'array',
@@ -34,10 +34,11 @@ export const siteAssetsType = defineType({
 
     defineField({
       name: 'footerLogos',
-      title: 'شعارات الفوتر / Footer Logos',
+      title: 'شعارات الفوتر (قديم) / Footer logos (legacy)',
       description:
-        'Logos shown in the site footer (e.g., accreditations/partners) / شعارات تظهر في الفوتر مثل الاعتمادات',
+        'Legacy footer logos field. Prefer using Site Settings → Footer → Columns → Images for accreditations/partners. / حقل قديم. يفضّل استخدام (إعدادات الموقع → الفوتر → الأعمدة → الصور).',
       type: 'array',
+      hidden: true,
       of: [
         {
           type: 'image',
@@ -60,6 +61,15 @@ export const siteAssetsType = defineType({
           ],
         },
       ],
+    }),
+
+    defineField({
+      name: 'heroVideo',
+      title: 'فيديو الهيرو العام / Global hero video',
+      description:
+        'Optional global fallback video used by Video Hero sections when "Use global video" is enabled. / فيديو افتراضي عام لقسم Video Hero.',
+      type: 'file',
+      options: { accept: 'video/*' },
     }),
 
     defineField({

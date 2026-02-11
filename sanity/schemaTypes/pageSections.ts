@@ -20,35 +20,71 @@ export const sectionVideoHeroType = defineType({
   title: 'Video Hero',
   type: 'object',
   fields: [
+    // Legacy field kept so existing content doesn't get lost.
+    defineField({
+      name: 'caption',
+      title: 'Caption (legacy)',
+      type: 'text',
+      rows: 2,
+      hidden: true,
+      readOnly: true,
+    }),
+
+    defineField({
+      name: 'kicker',
+      title: 'Kicker',
+      type: 'string',
+      description: 'Small text above the main title (optional).',
+      options: {
+        i18nTitle: { ar: 'عنوان صغير', en: 'Kicker', it: 'Soprattitolo' },
+      },
+    }),
+
     defineField({
       name: 'title',
       title: 'Title',
-      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       type: 'string',
+      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       validation: (Rule) => Rule.required(),
     }),
+
     defineField({
       name: 'subtitle',
-      title: 'Subtitle (optional)',
-      options: {
-        i18nTitle: {
-          ar: 'النص التعريفي (اختياري)',
-          en: 'Subtitle (optional)',
-          it: 'Sottotitolo (opzionale)',
-        },
-      },
+      title: 'Subtitle',
       type: 'text',
       rows: 3,
+      options: { i18nTitle: { ar: 'وصف', en: 'Subtitle', it: 'Sottotitolo' } },
     }),
+
+    defineField({
+      name: 'useGlobalVideo',
+      title: 'Use global video',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'When enabled, the video will be pulled from Site Assets → Global hero video. Disable to upload a per-page video.',
+      options: {
+        i18nTitle: {
+          ar: 'استخدم الفيديو العام',
+          en: 'Use global video',
+          it: 'Usa video globale',
+        },
+      },
+    }),
+
     defineField({
       name: 'video',
-      title: 'Video file',
+      title: 'Video file (override)',
       type: 'file',
       options: {
         accept: 'video/*',
-        i18nTitle: { ar: 'ملف الفيديو', en: 'Video file', it: 'File video' },
+        i18nTitle: {
+          ar: 'ملف الفيديو (بديل)',
+          en: 'Video file (override)',
+          it: 'File video (override)',
+        },
       },
-      validation: (Rule) => Rule.required(),
+      hidden: ({ parent }) => parent?.useGlobalVideo === true,
     }),
     defineField({
       name: 'overlayOpacity',
@@ -64,11 +100,64 @@ export const sectionVideoHeroType = defineType({
       initialValue: 0.45,
       validation: (Rule) => Rule.min(0).max(0.9),
     }),
+
+    defineField({
+      name: 'primaryCta',
+      title: 'Primary CTA',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'label',
+          title: 'Label',
+          type: 'string',
+        }),
+        defineField({
+          name: 'link',
+          title: 'Link',
+          type: 'link',
+        }),
+        defineField({
+          name: 'href',
+          title: 'Legacy href (deprecated)',
+          type: 'string',
+          hidden: true,
+          readOnly: true,
+        }),
+      ],
+    }),
+
+    defineField({
+      name: 'secondaryCta',
+      title: 'Secondary CTA',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'label',
+          title: 'Label',
+          type: 'string',
+        }),
+        defineField({
+          name: 'link',
+          title: 'Link',
+          type: 'link',
+        }),
+        defineField({
+          name: 'href',
+          title: 'Legacy href (deprecated)',
+          type: 'string',
+          hidden: true,
+          readOnly: true,
+        }),
+      ],
+    }),
   ],
   preview: {
-    select: { title: 'title' },
-    prepare({ title }) {
-      return { title: title || 'Video Hero' };
+    select: { title: 'title', useGlobalVideo: 'useGlobalVideo' },
+    prepare({ title, useGlobalVideo }) {
+      return {
+        title: title || 'Video Hero',
+        subtitle: useGlobalVideo ? 'Global video' : 'Custom video',
+      };
     },
   },
 });

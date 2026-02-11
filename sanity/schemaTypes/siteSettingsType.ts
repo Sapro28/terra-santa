@@ -3,130 +3,217 @@ import { languageFieldLocked } from './languageField';
 
 export const siteSettingsType = defineType({
   name: 'siteSettings',
-  title: 'إعدادات الموقع',
+  title: 'Site settings',
   type: 'document',
 
   fields: [
     languageFieldLocked,
 
     defineField({
-      name: 'schoolName',
-      title: 'اسم المدرسة',
-      type: 'string',
-      description: 'School name in this language / اسم المدرسة بهذه اللغة',
-      options: {
-        i18nTitle: {
-          ar: 'اسم المدرسة',
-          en: 'School name',
-          it: 'Nome della scuola',
-        },
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
       name: 'footer',
-      title: 'الفوتر (Footer)',
-      description: 'Footer content in this language / محتوى الفوتر بهذه اللغة',
+      title: 'Footer',
+      description: 'Footer content in this language',
       type: 'object',
       options: {
-        i18nTitle: {
-          ar: 'الفوتر (Footer)',
-          en: 'Footer',
-          it: 'Footer',
-        },
+        i18nTitle: { ar: 'الفوتر', en: 'Footer', it: 'Footer' },
       },
       fields: [
         defineField({
-          name: 'addressLine1',
-          title: 'العنوان (سطر 1)',
+          name: 'brandName',
+          title: 'Brand / School name',
+          description: 'The name shown in the footer',
           type: 'string',
           options: {
             i18nTitle: {
-              ar: 'العنوان (سطر 1)',
-              en: 'Address (line 1)',
-              it: 'Indirizzo (riga 1)',
+              ar: 'اسم العلامة / المدرسة',
+              en: 'Brand / School name',
+              it: 'Nome brand / scuola',
             },
           },
+          validation: (Rule) => Rule.required(),
         }),
+
         defineField({
-          name: 'phone',
-          title: 'الهاتف',
-          type: 'string',
+          name: 'brandLogo',
+          title: 'Brand / School logo',
+          description: 'The logo shown in the footer',
+          type: 'image',
           options: {
+            hotspot: true,
             i18nTitle: {
-              ar: 'الهاتف',
-              en: 'Phone',
-              it: 'Telefono',
+              ar: 'شعار العلامة / المدرسة',
+              en: 'Brand / School logo',
+              it: 'Logo brand / scuola',
             },
           },
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt text',
+              type: 'string',
+            }),
+          ],
+          validation: (Rule) => Rule.required(),
         }),
+
         defineField({
-          name: 'tagline',
-          title: 'وصف مختصر',
-          type: 'string',
+          name: 'leftText',
+          title: 'Footer text (left)',
+          description: 'Rich text shown under the logo on the left side',
+          type: 'blockContent',
           options: {
             i18nTitle: {
-              ar: 'وصف مختصر',
-              en: 'Short description',
-              it: 'Descrizione breve',
+              ar: 'نص الفوتر (يسار)',
+              en: 'Footer text (left)',
+              it: 'Testo footer (sinistra)',
             },
           },
         }),
+
         defineField({
-          name: 'hoursTitle',
-          title: 'ساعات العمل (عنوان)',
-          type: 'string',
+          name: 'columns',
+          title: 'Footer columns',
+          description: 'Add as many columns as you want',
+          type: 'array',
           options: {
             i18nTitle: {
-              ar: 'ساعات العمل (عنوان)',
-              en: 'Hours (title)',
-              it: 'Orari (titolo)',
+              ar: 'أعمدة الفوتر',
+              en: 'Footer columns',
+              it: 'Colonne footer',
             },
           },
-        }),
-        defineField({
-          name: 'hoursLine1',
-          title: 'ساعات العمل (سطر 1)',
-          type: 'string',
-          options: {
-            i18nTitle: {
-              ar: 'ساعات العمل (سطر 1)',
-              en: 'Hours (line 1)',
-              it: 'Orari (riga 1)',
+          of: [
+            {
+              type: 'object',
+              name: 'footerColumn',
+              fields: [
+                defineField({
+                  name: 'title',
+                  title: 'Title',
+                  type: 'string',
+                  validation: (Rule) => Rule.required(),
+                }),
+
+                defineField({
+                  name: 'body',
+                  title: 'Text',
+                  type: 'blockContent',
+                }),
+
+                defineField({
+                  name: 'links',
+                  title: 'Links',
+                  type: 'array',
+                  of: [
+                    {
+                      type: 'object',
+                      name: 'footerLink',
+                      fields: [
+                        defineField({
+                          name: 'label',
+                          title: 'Label',
+                          type: 'string',
+                          validation: (Rule) => Rule.required(),
+                        }),
+                        defineField({
+                          name: 'url',
+                          title: 'URL',
+                          type: 'url',
+                          validation: (Rule) =>
+                            Rule.uri({
+                              scheme: ['http', 'https'],
+                              allowRelative: true,
+                            }),
+                        }),
+                      ],
+                      preview: { select: { title: 'label', subtitle: 'url' } },
+                    },
+                  ],
+                }),
+
+                defineField({
+                  name: 'images',
+                  title: 'Images / Logos',
+                  description:
+                    'Optional images (logos) to show under the column',
+                  type: 'array',
+                  of: [
+                    {
+                      type: 'image',
+                      options: { hotspot: true },
+                      fields: [
+                        defineField({
+                          name: 'alt',
+                          title: 'Alt text',
+                          type: 'string',
+                        }),
+                        defineField({
+                          name: 'link',
+                          title: 'Link (optional)',
+                          type: 'url',
+                        }),
+                      ],
+                    },
+                  ],
+                }),
+              ],
+              preview: { select: { title: 'title' } },
             },
-          },
+          ],
         }),
-        defineField({
-          name: 'hoursLine2',
-          title: 'ساعات العمل (سطر 2)',
-          type: 'string',
-          options: {
-            i18nTitle: {
-              ar: 'ساعات العمل (سطر 2)',
-              en: 'Hours (line 2)',
-              it: 'Orari (riga 2)',
-            },
-          },
-        }),
+
         defineField({
           name: 'rights',
-          title: 'حقوق النشر',
+          title: 'Copyright',
           type: 'string',
           options: {
+            i18nTitle: { ar: 'حقوق النشر', en: 'Copyright', it: 'Copyright' },
+          },
+        }),
+
+        defineField({
+          name: 'bottomLinks',
+          title: 'Bottom links',
+          description: 'Small links shown in the bottom bar of the footer',
+          type: 'array',
+          options: {
             i18nTitle: {
-              ar: 'حقوق النشر',
-              en: 'Rights',
-              it: 'Diritti',
+              ar: 'روابط أسفل الفوتر',
+              en: 'Bottom links',
+              it: 'Link in basso',
             },
           },
+          of: [
+            {
+              type: 'object',
+              name: 'footerBottomLink',
+              fields: [
+                defineField({
+                  name: 'label',
+                  title: 'Label',
+                  type: 'string',
+                  validation: (Rule) => Rule.required(),
+                }),
+                defineField({
+                  name: 'url',
+                  title: 'URL',
+                  type: 'url',
+                  validation: (Rule) =>
+                    Rule.uri({
+                      scheme: ['http', 'https'],
+                      allowRelative: true,
+                    }),
+                }),
+              ],
+              preview: { select: { title: 'label', subtitle: 'url' } },
+            },
+          ],
         }),
 
         defineField({
           name: 'socialLinks',
-          title: 'روابط التواصل الاجتماعي',
-          description:
-            'Social links. Only links that are filled will show in the footer / روابط التواصل الاجتماعي. سيتم عرض الروابط المعبأة فقط في الفوتر',
+          title: 'Social links',
+          description: 'Only links that are filled will show in the footer',
           type: 'array',
           options: {
             i18nTitle: {
@@ -142,7 +229,7 @@ export const siteSettingsType = defineType({
               fields: [
                 defineField({
                   name: 'platform',
-                  title: 'المنصة',
+                  title: 'Platform',
                   type: 'string',
                   options: {
                     list: [
@@ -161,7 +248,7 @@ export const siteSettingsType = defineType({
 
                 defineField({
                   name: 'url',
-                  title: 'الرابط',
+                  title: 'URL',
                   type: 'url',
                   validation: (Rule) =>
                     Rule.uri({
@@ -170,12 +257,7 @@ export const siteSettingsType = defineType({
                     }),
                 }),
               ],
-              preview: {
-                select: {
-                  title: 'platform',
-                  subtitle: 'url',
-                },
-              },
+              preview: { select: { title: 'platform', subtitle: 'url' } },
             },
           ],
         }),

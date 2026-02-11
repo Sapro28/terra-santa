@@ -38,7 +38,7 @@ export default async function CatchAllCmsPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string[] }>;
-}): Promise<JSX.Element> {
+}) {
   noStore();
 
   const { locale, slug } = await params;

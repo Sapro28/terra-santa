@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { mavenPro } from '@/app/fonts';
 
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 import HeaderNavDropdownClient, {
@@ -75,8 +76,10 @@ export default function Header({
 }) {
   const isRtl = locale === 'ar';
   const items: HeaderElement[] = headerNav ?? [];
-
-  const schoolName = (settings?.schoolName ?? 'School').trim();
+  const rawSchoolName = (settings?.schoolName ?? '').trim();
+  const schoolName = /^terra\s+santa$/i.test(rawSchoolName)
+    ? 'Terra Santa School'
+    : rawSchoolName || 'Terra Santa School';
   const nameWords = React.useMemo(
     () => schoolName.split(/\s+/).filter(Boolean),
     [schoolName],
@@ -120,12 +123,10 @@ export default function Header({
       };
     })
     .filter(Boolean) as MobileNavItem[];
-  const [overHero, setOverHero] = React.useState(() => {
-    if (typeof window === 'undefined') return true;
-    return window.scrollY < 32;
-  });
 
-  React.useLayoutEffect(() => {
+  const [overHero, setOverHero] = React.useState(true);
+
+  React.useEffect(() => {
     const hero = document.querySelector<HTMLElement>('[data-video-hero]');
     if (!hero) {
       setOverHero(false);
@@ -162,8 +163,8 @@ export default function Header({
 
   const headerHeight = overHero ? '96px' : '72px';
   const logoClass = overHero
-    ? 'h-14 w-14 object-contain sm:h-16 sm:w-16 md:h-[68px] md:w-[68px]'
-    : 'h-10 w-10 object-contain sm:h-11 sm:w-11 md:h-12 md:w-12';
+    ? 'h-16 w-16 object-contain sm:h-20 sm:w-20 md:h-24 md:w-24'
+    : 'h-12 w-12 object-contain sm:h-14 sm:w-14 md:h-16 md:w-16';
 
   const brandWrapClass = overHero
     ? 'text-base sm:text-lg md:text-xl'
@@ -184,8 +185,8 @@ export default function Header({
             <Image
               src={primaryLogo.url}
               alt={primaryLogo.alt ?? schoolName ?? 'School'}
-              width={96}
-              height={96}
+              width={192}
+              height={192}
               className={logoClass}
               priority
             />
@@ -198,10 +199,11 @@ export default function Header({
               className={[
                 'flex flex-col',
                 isRtl ? 'items-end' : 'items-start',
-                'font-semibold uppercase',
+                'uppercase',
                 'tracking-[0.22em]',
                 'leading-[1.05]',
                 brandWrapClass,
+                mavenPro.className,
               ].join(' ')}
             >
               {(nameWords.length ? nameWords : ['School']).map((w, idx) => (

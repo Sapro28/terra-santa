@@ -1,47 +1,60 @@
-import { useTranslations, useLocale } from 'next-intl';
+import { PortableText } from '@portabletext/react';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 
-type SiteSettings = {
-  schoolName?: string;
-  footerLogos?: Array<{
-    url?: string | null;
-    alt?: string | null;
-    link?: string | null;
-  }> | null;
-  footer?: {
-    addressLine1?: string;
-    phone?: string;
-    tagline?: string;
-    hoursLine1?: string;
-    hoursLine2?: string;
-    rights?: string;
-    socialLinks?: Array<{
-      platform?:
-        | 'facebook'
-        | 'instagram'
-        | 'youtube'
-        | 'tiktok'
-        | 'vimeo'
-        | 'linkedin'
-        | 'x';
-      url?: string;
-    }>;
-  };
+type ImageLink = {
+  url?: string | null;
+  alt?: string | null;
+  link?: string | null;
 };
+
+type FooterColumn = {
+  title?: string | null;
+  body?: any;
+  links?: Array<{ label?: string | null; url?: string | null } | null> | null;
+  images?: Array<ImageLink | null> | null;
+};
+
+type FooterData = {
+  brandName?: string | null;
+  brandLogo?: { url?: string | null; alt?: string | null } | null;
+  leftText?: any;
+  rights?: string | null;
+  bottomLinks?: Array<{
+    label?: string | null;
+    url?: string | null;
+  } | null> | null;
+  columns?: Array<FooterColumn | null> | null;
+  socialLinks?: Array<{
+    platform?:
+      | 'facebook'
+      | 'instagram'
+      | 'youtube'
+      | 'tiktok'
+      | 'vimeo'
+      | 'linkedin'
+      | 'x'
+      | null;
+    url?: string | null;
+  } | null> | null;
+};
+
+type SiteSettings = {
+  footer?: FooterData | null;
+};
+
+function isExternalHref(href: string) {
+  return /^https?:\/\//i.test(href) || /^\/\//.test(href);
+}
 
 function SocialIcon({
   platform,
   className,
 }: {
-  platform:
-    | 'facebook'
-    | 'instagram'
-    | 'youtube'
-    | 'tiktok'
-    | 'vimeo'
-    | 'linkedin'
-    | 'x';
+  platform: NonNullable<
+    NonNullable<FooterData['socialLinks']>[number]
+  >['platform'];
   className?: string;
 }) {
   const props = {
@@ -101,6 +114,92 @@ function SocialIcon({
   }
 }
 
+function FooterColumnBlock({ column }: { column: FooterColumn }) {
+  const title = (column.title ?? '').trim();
+  const links = (column.links ?? [])
+    .map((l) => ({
+      label: (l?.label ?? '').trim(),
+      url: (l?.url ?? '').trim(),
+    }))
+    .filter((l) => !!l.label && !!l.url);
+
+  const images = (column.images ?? [])
+    .map((img) => ({
+      url: (img?.url ?? '').trim(),
+      alt: (img?.alt ?? '').trim(),
+      link: (img?.link ?? '').trim(),
+    }))
+    .filter((img) => !!img.url);
+
+  return (
+    <div>
+      {title ? (
+        <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
+          {title}
+        </div>
+      ) : null}
+
+      {column.body ? (
+        <div className="mt-3 text-sm leading-relaxed text-[#d8cfc8] [&_a]:underline [&_a]:decoration-white/25 [&_a:hover]:decoration-white/60">
+          <PortableText value={column.body} />
+        </div>
+      ) : null}
+
+      {links.length ? (
+        <ul className="mt-4 space-y-2 text-sm text-[#d8cfc8]">
+          {links.map((l) => {
+            const external = isExternalHref(l.url);
+            return (
+              <li key={`${l.label}-${l.url}`}>
+                <a
+                  href={l.url}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
+                  className="inline-flex leading-relaxed underline decoration-white/25 underline-offset-4 transition hover:text-[#f5f0e8] hover:decoration-white/60"
+                >
+                  {l.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      {images.length ? (
+        <div className="mt-5 flex flex-wrap items-center gap-4">
+          {images.map((img) => {
+            const imageEl = (
+              <Image
+                src={img.url}
+                alt={img.alt || title || 'Footer image'}
+                width={160}
+                height={100}
+                className="h-10 w-auto object-contain opacity-90 hover:opacity-100"
+              />
+            );
+
+            return img.link ? (
+              <a
+                key={`${img.url}-${img.link}`}
+                href={img.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
+                {imageEl}
+              </a>
+            ) : (
+              <div key={img.url} className="inline-flex">
+                {imageEl}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Footer({
   settings,
 }: {
@@ -108,124 +207,151 @@ export default function Footer({
 }) {
   const t = useTranslations('Footer');
   const locale = useLocale();
-  const f = settings?.footer;
-
-  const footerLogos = (settings?.footerLogos ?? []).filter(
-    (l) => (l?.url ?? '').trim().length > 0,
-  );
 
   const year = new Intl.DateTimeFormat(locale, { year: 'numeric' }).format(
     new Date(),
   );
-  const name = settings?.schoolName ?? t('schoolFallback');
+  const f = settings?.footer ?? null;
+
+  const name = (f?.brandName ?? '').trim();
+
+  const logo = f?.brandLogo
+    ? {
+        url: (f.brandLogo.url ?? '').trim(),
+        alt: (f.brandLogo.alt ?? '').trim(),
+      }
+    : null;
 
   const socials = (f?.socialLinks ?? [])
-    .filter((s) => !!s?.url && !!s?.platform)
     .map((s) => ({
-      platform: s.platform!,
-      url: s.url!,
-    }));
+      platform: s?.platform ?? null,
+      url: (s?.url ?? '').trim(),
+    }))
+    .filter((s) => !!s.platform && !!s.url) as Array<{
+    platform: NonNullable<
+      NonNullable<NonNullable<FooterData['socialLinks']>[number]>['platform']
+    >;
+    url: string;
+  }>;
 
-  const connectLabel =
-    locale === 'ar'
-      ? 'تواصل معنا'
-      : locale === 'it'
-        ? 'Seguici'
-        : 'Connect with us';
+  const bottomLinks = (f?.bottomLinks ?? [])
+    .map((l) => ({
+      label: (l?.label ?? '').trim(),
+      url: (l?.url ?? '').trim(),
+    }))
+    .filter((l) => !!l.label && !!l.url);
+
+  const columnsFromSanity = (f?.columns ?? [])
+    .filter(Boolean)
+    .map((c) => c as FooterColumn)
+    .filter((c) => (c.title ?? '').trim().length > 0 || !!c.body);
+  const columnsToRender = columnsFromSanity;
 
   return (
     <footer className="border-t border-border bg-[#2b1b14] text-[#f5f0e8]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
-        <div>
-          <Link href={`/${locale}`} className="inline-flex items-center gap-3">
-            <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
-              {name}
+      <div className="mx-auto max-w-6xl px-4 py-12">
+        <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_1px_minmax(0,2fr)]">
+          {/* Left */}
+          <div>
+            <Link
+              href={`/${locale}`}
+              className="inline-flex items-center gap-3"
+            >
+              {logo?.url ? (
+                <Image
+                  src={logo.url}
+                  alt={logo.alt || name}
+                  width={200}
+                  height={120}
+                  className="h-12 w-auto object-contain"
+                  priority={false}
+                />
+              ) : (
+                <div className="text-base font-semibold tracking-wide text-[#f5f0e8]">
+                  {name}
+                </div>
+              )}
+            </Link>
+
+            <div className="mt-4 space-y-3">
+              <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
+                {name}
+              </div>
+
+              {f?.leftText ? (
+                <div className="text-sm leading-relaxed text-[#d8cfc8] [&_a]:underline [&_a]:decoration-white/25 [&_a:hover]:decoration-white/60">
+                  <PortableText value={f.leftText} />
+                </div>
+              ) : null}
+
+              {socials.length ? (
+                <div className="flex flex-wrap gap-3 pt-1">
+                  {socials.map((s) => (
+                    <a
+                      key={`${s.platform}-${s.url}`}
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.platform}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#f5f0e8] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                    >
+                      <SocialIcon
+                        platform={s.platform}
+                        className="h-4.5 w-4.5"
+                      />
+                    </a>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          </Link>
+          </div>
 
-          {footerLogos.length ? (
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              {footerLogos.map((l) => {
-                const img = (
-                  <Image
-                    src={l.url!}
-                    alt={l.alt ?? name}
-                    width={140}
-                    height={90}
-                    className="h-10 w-auto object-contain opacity-90 hover:opacity-100"
-                  />
-                );
+          {/* Divider */}
+          <div className="hidden md:block bg-white/10" />
 
-                const href = (l.link ?? '').trim();
-                const key = `${l.url}-${l.alt ?? ''}`;
-                return href ? (
+          {/* Right */}
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            {columnsToRender.map((c, idx) => (
+              <FooterColumnBlock
+                key={`${c.title ?? 'col'}-${idx}`}
+                column={c}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs font-semibold text-[#d8cfc8] md:flex-row md:items-center md:justify-between">
+          {bottomLinks.length ? (
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {bottomLinks.map((l) => {
+                const external = isExternalHref(l.url);
+                return (
                   <a
-                    key={key}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                    key={`${l.label}-${l.url}`}
+                    href={l.url}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    className="underline decoration-white/20 underline-offset-4 transition hover:text-[#f5f0e8] hover:decoration-white/60"
                   >
-                    {img}
+                    {l.label}
                   </a>
-                ) : (
-                  <div key={key} className="inline-flex">
-                    {img}
-                  </div>
                 );
               })}
             </div>
-          ) : null}
-          <p className="mt-3 text-sm leading-relaxed text-[#d8cfc8]">
-            {f?.addressLine1}
-            {f?.addressLine1 ? <br /> : null}
-            {f?.phone}
-          </p>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#d8cfc8]">
-            {f?.tagline}
-          </p>
-        </div>
+          ) : (
+            <span />
+          )}
 
-        <div>
-          <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
-            {t('hoursTitle')}
+          <div className="text-left md:text-right">
+            {t('copyrightTemplate', {
+              year,
+              name,
+              rights: f?.rights ?? t('rights'),
+            })}
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-[#d8cfc8]">
-            {f?.hoursLine1}
-            {f?.hoursLine1 ? <br /> : null}
-            {f?.hoursLine2}
-          </p>
         </div>
-
-        {socials.length ? (
-          <div>
-            <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
-              {connectLabel}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {socials.map((s) => (
-                <a
-                  key={`${s.platform}-${s.url}`}
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.platform}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#f5f0e8] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                >
-                  <SocialIcon platform={s.platform} className="h-4.5 w-4.5" />
-                </a>
-              ))}
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="border-t border-white/10 py-5 text-center text-xs font-semibold text-[#d8cfc8]">
-        {t('copyrightTemplate', {
-          year,
-          name,
-          rights: f?.rights ?? t('rights'),
-        })}
       </div>
     </footer>
   );

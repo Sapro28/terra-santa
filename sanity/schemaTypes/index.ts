@@ -9,7 +9,6 @@ import { linkObject } from './objects/link';
 import { pageSections } from './pageSections';
 import { pageType } from './pageType';
 import { headerElementType } from './headerElementType';
-import { footerType } from './footerType';
 import { childLinkObject } from './objects/childLink';
 import { siteSettingsType } from './siteSettingsType';
 import { siteAssetsType } from './siteAssetsType';
@@ -37,7 +36,6 @@ export const schema = {
     homePageType,
     pageType,
     headerElementType,
-    footerType,
     siteSettingsType,
     siteAssetsType,
   ],
@@ -52,7 +50,6 @@ export const schema = {
       value: () => ({}),
     },
 
-    singletonLangTemplate('footer'),
     singletonLangTemplate('newsPost'),
     singletonLangTemplate('event'),
     singletonLangTemplate('eventsPage'),

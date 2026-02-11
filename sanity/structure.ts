@@ -123,13 +123,13 @@ export const structure: StructureResolver = (S, context) => {
             .title('الموقع')
             .items([
               S.listItem()
-                .title('شعارات المدرسة')
+                .title('الهوية والأصول العامة')
                 .icon(ImageIcon)
                 .child(
                   S.document()
                     .schemaType('siteAssets')
                     .documentId(SINGLETON_ID.siteAssets())
-                    .title('شعارات المدرسة'),
+                    .title('الهوية والأصول العامة'),
                 ),
 
               S.divider(),
