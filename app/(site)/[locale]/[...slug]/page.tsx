@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import type { SanityClient } from 'next-sanity';
 
 import { locales, type Locale } from '@/i18n/config';
 
@@ -113,7 +114,7 @@ async function fetchEventListsForPage({
   lang,
   sections,
 }: {
-  client: any;
+  client: SanityClient;
   lang: Locale;
   sections: Array<{ _type: string; [key: string]: any }>;
 }) {
@@ -167,13 +168,15 @@ async function fetchEventListsForPage({
       })(),
       (async () => {
         const entries = await Promise.all(
-          [...latestSectionIdToLimit.entries()].map(async ([sectionId, limit]) => {
-            const items = await client.fetch<Announcement[]>(
-              latestEventsBySectionIdQuery,
-              { lang, sectionId, limit },
-            );
-            return [sectionId, items] as const;
-          }),
+          [...latestSectionIdToLimit.entries()].map(
+            async ([sectionId, limit]) => {
+              const items = await client.fetch<Announcement[]>(
+                latestEventsBySectionIdQuery,
+                { lang, sectionId, limit },
+              );
+              return [sectionId, items] as const;
+            },
+          ),
         );
         return Object.fromEntries(entries) as Record<string, Announcement[]>;
       })(),

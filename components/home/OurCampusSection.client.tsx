@@ -82,7 +82,6 @@ export default function OurCampusSection({
         </div>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:items-start">
-          {/* Left text */}
           <div
             key={fadeKey}
             className="transition-opacity duration-300 ease-out will-change-opacity"
@@ -142,11 +141,9 @@ export default function OurCampusSection({
             ) : null}
           </div>
 
-          {/* Right collage */}
           <div className="relative">
             <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-sm">
               <div className="grid grid-cols-6 grid-rows-6 gap-2 p-3 md:gap-3 md:p-4">
-                {/* Large image */}
                 <div className="col-span-6 row-span-4 overflow-hidden rounded-2xl">
                   {images[0]?.url ? (
                     <Image
@@ -187,7 +184,6 @@ export default function OurCampusSection({
               </div>
             </div>
 
-            {/* Overlay arrows (desktop) */}
             <div className="pointer-events-none absolute inset-0 hidden items-center justify-between px-3 lg:flex">
               <button
                 type="button"

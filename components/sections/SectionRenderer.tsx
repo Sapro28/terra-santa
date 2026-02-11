@@ -274,6 +274,7 @@ export default function SectionRenderer({
   upcomingEventsBySectionId,
   latestEvents,
   latestEventsBySectionId,
+  pageTitle,
 }: {
   locale: string;
   sections: Section[];
@@ -282,6 +283,7 @@ export default function SectionRenderer({
   upcomingEventsBySectionId: Record<string, Announcement[]>;
   latestEvents: Announcement[];
   latestEventsBySectionId: Record<string, Announcement[]>;
+  pageTitle?: string | undefined;
 }) {
   return (
     <div className="flex flex-col gap-14">
