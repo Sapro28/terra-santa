@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import { locales, type Locale } from '@/i18n/config';
 import { PortableText } from '@portabletext/react';
@@ -18,6 +19,8 @@ export default async function NewsPostPage({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
+  noStore();
+
   const { locale, slug } = await params;
   const lang = locale as Locale;
 

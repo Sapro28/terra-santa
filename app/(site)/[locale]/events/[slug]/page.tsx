@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
 import { locales, type Locale } from '@/i18n/config';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { eventBySlugQuery } from '@/sanity/lib/queries';
@@ -35,7 +36,9 @@ export default async function EventDetailPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>;
-}) {
+}): Promise<JSX.Element> {
+  noStore();
+
   const { locale, slug } = await params;
 
   if (!locales.includes(locale as Locale)) notFound();

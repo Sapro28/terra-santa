@@ -17,7 +17,6 @@ import {
 import { SanityLive } from '@/sanity/lib/live';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import VisualEditingComponent from '@/app/VisualEditing';
-import DraftModeIndicator from '@/components/DraftModeIndicator';
 
 import { locales, type Locale } from '@/i18n/config';
 
@@ -36,18 +35,9 @@ export default async function LocaleLayout({
   const dm = await draftMode();
   const isDraftMode = dm.isEnabled;
 
-  console.log('=== LAYOUT RENDER ===');
-  console.log('Draft Mode Enabled:', isDraftMode);
-  console.log('Locale:', locale);
-
   if (isDraftMode) noStore();
 
   const client = await getSanityClient();
-
-  console.log(
-    'Using client:',
-    isDraftMode ? 'PREVIEW CLIENT' : 'PUBLISHED CLIENT',
-  );
 
   const messages = await getMessages();
   const siteSettings = await client.fetch(siteSettingsQuery, {
@@ -60,6 +50,8 @@ export default async function LocaleLayout({
     lang: locale,
   });
 
+  const hasViewerToken = !!process.env.SANITY_VIEWER_TOKEN;
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -69,9 +61,7 @@ export default async function LocaleLayout({
 
         <AnnouncementsPopup announcement={popupAnnouncement} locale={locale} />
 
-        {process.env.NODE_ENV === 'development' && <DraftModeIndicator />}
-
-        {isDraftMode ? (
+        {isDraftMode && hasViewerToken ? (
           <>
             <SanityLive />
             <VisualEditingComponent />

@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
 import type { SanityClient } from 'next-sanity';
 
 import { locales, type Locale } from '@/i18n/config';
@@ -37,7 +38,9 @@ export default async function CatchAllCmsPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string[] }>;
-}) {
+}): Promise<JSX.Element> {
+  noStore();
+
   const { locale, slug } = await params;
 
   if (!locales.includes(locale as Locale)) notFound();

@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import { locales, type Locale } from '@/i18n/config';
 import { getSanityClient } from '@/sanity/lib/getClient';
@@ -21,6 +22,8 @@ export default async function EventsPage({
     page?: string;
   }>;
 }) {
+  noStore();
+
   const { locale } = await params;
 
   if (!locales.includes(locale as Locale)) notFound();

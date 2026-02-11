@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
 
 import { locales, type Locale } from '@/i18n/config';
 
@@ -38,6 +39,7 @@ export default async function HomePage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
+  noStore();
   const { locale } = await params;
 
   if (!locales.includes(locale as Locale)) notFound();
@@ -52,19 +54,16 @@ export default async function HomePage({
 
   if (!home) notFound();
 
-  // Filter out deprecated blocks if they still exist in content.
   const rawSections = home.sections || [];
   const sections = rawSections.filter(
     (s) => s?._type !== 'sectionColors' && s?._type !== 'sectionDivisions',
   );
 
-  // Split hero (fixed to the top) from the rest, to keep a consistent Home layout.
   const heroIdx = sections.findIndex((s) => s?._type === 'sectionVideoHero');
   const hero = heroIdx >= 0 ? [sections[heroIdx]] : [];
   const restSections =
     heroIdx >= 0 ? sections.filter((_, i) => i !== heroIdx) : sections;
 
-  // Section-aware event lists (optional per block)
   const upcomingSectionIds = new Set<string>();
   const latestSectionIdToLimit = new Map<string, number>();
   let needsGlobalUpcoming = false;

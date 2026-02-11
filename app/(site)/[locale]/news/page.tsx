@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import { newsListQuery } from '@/sanity/lib/queries';
 import type { Locale } from '@/i18n/config';
@@ -16,6 +17,8 @@ export default async function NewsPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
+  noStore();
+
   const { locale } = await params;
   const lang = locale as Locale;
 

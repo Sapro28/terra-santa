@@ -47,7 +47,7 @@ export const schoolSectionType = defineType({
           const v = String(value || '').trim();
           if (!v) return 'Slug is required.';
 
-          const client = ctx.getClient({ apiVersion: '2024-01-01' });
+          const client = ctx.getClient({ apiVersion: '2026-11-11' });
           const id = ctx.document?._id;
           const query = `count(*[_type == "schoolSection" && slug == $slug && _id != $id && _id != "drafts." + $id])`;
           const count = await client.fetch<number>(query, { slug: v, id });

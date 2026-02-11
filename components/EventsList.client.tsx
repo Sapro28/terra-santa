@@ -67,7 +67,6 @@ export default function EventsList({
 
   const PAGE_SIZE = 9;
 
-  // Keep URL query params in sync (shareable filters)
   useEffect(() => {
     const params = new URLSearchParams(searchParams?.toString());
 
@@ -89,7 +88,6 @@ export default function EventsList({
 
     const qs = params.toString();
     router.replace(qs ? `?${qs}` : '', { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section, from, to, page]);
 
   const filtered = useMemo(() => {
@@ -100,21 +98,17 @@ export default function EventsList({
     const toDate = to.trim() ? new Date(`${to.trim()}T23:59:59`) : null;
 
     return events.filter((e) => {
-      // Text search
       const haystack = [e.title, e.description, e.location]
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
 
       const matchesQuery = !query ? true : haystack.includes(query);
-
-      // Section filter
       const slugs = (e.sectionSlugs ?? []).map((s) => (s || '').trim());
       const matchesSection = normalizedSection
         ? slugs.includes(normalizedSection)
         : true;
 
-      // Date range filter (startAt)
       const d = e.eventDate ? new Date(e.eventDate) : null;
       const matchesDate = (() => {
         if (!d || Number.isNaN(d.getTime())) return true;
@@ -132,7 +126,6 @@ export default function EventsList({
 
   useEffect(() => {
     if (safePage !== page) setPage(safePage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safePage]);
 
   const paged = useMemo(() => {

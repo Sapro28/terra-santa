@@ -76,11 +76,16 @@ export default function Header({
   const isRtl = locale === 'ar';
   const items: HeaderElement[] = headerNav ?? [];
 
+  const schoolName = (settings?.schoolName ?? 'School').trim();
+  const nameWords = React.useMemo(
+    () => schoolName.split(/\s+/).filter(Boolean),
+    [schoolName],
+  );
+
   const logos = (settings?.headerLogos ?? []).filter(
     (l) => (l?.url ?? '').trim().length > 0,
   );
   const primaryLogo = logos[0] ?? null;
-  // Only show the first (primary) school logo in the header.
 
   const mobileItems: MobileNavItem[] = items
     .map((item) => {
@@ -115,9 +120,12 @@ export default function Header({
       };
     })
     .filter(Boolean) as MobileNavItem[];
-  const [overHero, setOverHero] = React.useState(false);
+  const [overHero, setOverHero] = React.useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.scrollY < 32;
+  });
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const hero = document.querySelector<HTMLElement>('[data-video-hero]');
     if (!hero) {
       setOverHero(false);
@@ -125,7 +133,7 @@ export default function Header({
     }
 
     const update = () => {
-      setOverHero(window.scrollY <= 0);
+      setOverHero(window.scrollY < 32);
     };
 
     let raf = 0;
@@ -144,42 +152,61 @@ export default function Header({
     };
   }, []);
 
-  // Keep header text consistently brown (improves legibility across hero variants).
   const chromeClass = overHero
-    ? 'border-transparent bg-transparent text-[#2b1b14]'
-    : 'border-[#23130e] bg-[#e7d6c3] text-[#2b1b14] shadow-sm';
+    ? 'bg-transparent text-white'
+    : 'bg-[#2b1b14] text-[#f5f0e8] shadow-sm';
 
-  const linkTextClass = 'text-[#2b1b14]/90 hover:text-[#2b1b14]';
+  const linkTextClass = overHero ? 'text-white/90' : 'text-[#f5f0e8]/90';
+  const brandTextClass = overHero ? 'text-white' : 'text-[#f5f0e8]';
+  const underlineColor = overHero ? 'after:bg-white' : 'after:bg-[#f5f0e8]';
 
-  const brandTextClass = 'text-[#2b1b14]';
+  const headerHeight = overHero ? '96px' : '72px';
+  const logoClass = overHero
+    ? 'h-14 w-14 object-contain sm:h-16 sm:w-16 md:h-[68px] md:w-[68px]'
+    : 'h-10 w-10 object-contain sm:h-11 sm:w-11 md:h-12 md:w-12';
 
-  const underlineColor = 'after:bg-[#2b1b14]';
+  const brandWrapClass = overHero
+    ? 'text-base sm:text-lg md:text-xl'
+    : 'text-sm sm:text-base';
 
   return (
     <header
-      className={`fixed top-0 z-50 w-full border-b transition-colors duration-200 ${chromeClass}`}
-      style={{ height: 'var(--site-header-height)' }}
+      className={`fixed top-0 z-50 w-full transition-colors duration-200 ${chromeClass}`}
+      style={{ height: headerHeight }}
     >
-      <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-4">
+      <div className="flex h-full w-full items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
         <Link
           href={`/${locale}`}
           className={`inline-flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}
-          aria-label={settings?.schoolName ?? 'Home'}
+          aria-label={schoolName || 'Home'}
         >
           {primaryLogo?.url ? (
             <Image
               src={primaryLogo.url}
-              alt={primaryLogo.alt ?? settings?.schoolName ?? 'School'}
+              alt={primaryLogo.alt ?? schoolName ?? 'School'}
               width={96}
               height={96}
-              className="h-12 w-12 object-contain md:h-16 md:w-16"
+              className={logoClass}
               priority
             />
           ) : null}
 
-          <div className={`hidden md:block ${brandTextClass}`}>
-            <div className="max-w-55 text-sm font-semibold uppercase tracking-[0.18em] leading-tight">
-              {settings?.schoolName ?? 'School'}
+          <div
+            className={`${brandTextClass} ${isRtl ? 'text-right' : 'text-left'}`}
+          >
+            <div
+              className={[
+                'flex flex-col',
+                isRtl ? 'items-end' : 'items-start',
+                'font-semibold uppercase',
+                'tracking-[0.22em]',
+                'leading-[1.05]',
+                brandWrapClass,
+              ].join(' ')}
+            >
+              {(nameWords.length ? nameWords : ['School']).map((w, idx) => (
+                <span key={`${w}-${idx}`}>{w}</span>
+              ))}
             </div>
           </div>
         </Link>

@@ -4,14 +4,6 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Globe } from '@mynaui/icons-react';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-
 const localeOptions = [
   { code: 'ar', label: 'العربية' },
   { code: 'en', label: 'English' },
@@ -59,47 +51,107 @@ export default function LocaleSwitcher({
   const makeTarget = (code: string) =>
     `/${code}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
 
+  const [open, setOpen] = React.useState(false);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const closeTimer = React.useRef<number | null>(null);
+
+  const clearTimer = () => {
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
+
+  const openNow = () => {
+    clearTimer();
+    setOpen(true);
+  };
+
+  const closeSoon = () => {
+    clearTimer();
+    closeTimer.current = window.setTimeout(() => setOpen(false), 160);
+  };
+
+  React.useEffect(() => {
+    if (!open) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  React.useEffect(() => () => clearTimer(), []);
+
   return (
     <ClientOnly>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-full border-0 bg-transparent text-current shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[state=open]:bg-transparent"
-            aria-label="Change language"
-          >
-            <Globe className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent
-          align="end"
-          className="min-w-28 border-[#23130e] bg-[#f5f0e8] text-[#2b1b14]"
+      <div
+        ref={rootRef}
+        className="relative"
+        onPointerEnter={openNow}
+        onPointerLeave={closeSoon}
+      >
+        <button
+          type="button"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-current hover:bg-transparent focus:outline-none"
+          aria-label="Change language"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
         >
-          {localeOptions.map((opt) => {
-            const active = opt.code === locale;
-            const href = makeTarget(opt.code);
+          <Globe className="h-5 w-5" />
+        </button>
 
-            return (
-              <DropdownMenuItem key={opt.code} asChild>
+        <div
+          role="menu"
+          aria-hidden={!open}
+          className={[
+            'absolute right-0 top-full z-50 mt-3 min-w-28',
+            'rounded-xl border border-[#23130e] bg-[#f5f0e8] p-2 shadow-lg',
+            'transition duration-150 ease-out',
+            open
+              ? 'pointer-events-auto translate-y-0 opacity-100'
+              : 'pointer-events-none -translate-y-1 opacity-0',
+          ].join(' ')}
+        >
+          <div className="grid gap-1">
+            {localeOptions.map((opt) => {
+              const active = opt.code === locale;
+              const href = makeTarget(opt.code);
+
+              return (
                 <Link
+                  key={opt.code}
                   href={href}
-                  className={`flex items-center justify-between text-[#2b1b14] ${
-                    active ? 'font-semibold' : ''
-                  }`}
+                  role="menuitem"
+                  className={[
+                    'flex items-center justify-between rounded-lg px-3 py-2 text-sm text-[#2b1b14]',
+                    'hover:bg-[#e7d6c3] focus:bg-[#e7d6c3] focus:outline-none',
+                    active ? 'font-semibold' : '',
+                  ].join(' ')}
+                  onClick={() => setOpen(false)}
                 >
                   <span>{opt.label}</span>
-                  {active ? (
-                    <span className="text-xs text-muted">✓</span>
-                  ) : null}
+                  {active ? <span className="text-xs">✓</span> : null}
                 </Link>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </ClientOnly>
   );
 }
