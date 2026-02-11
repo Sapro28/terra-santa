@@ -67,14 +67,17 @@ export default function LocaleSwitcher({
             type="button"
             variant="ghost"
             size="icon"
-            className="h-9 w-9 rounded-xl border border-border bg-white"
+            className="h-9 w-9 rounded-full border-0 bg-transparent text-current shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[state=open]:bg-transparent"
             aria-label="Change language"
           >
-            <Globe className="h-4 w-4" />
+            <Globe className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="end" className="min-w-28">
+        <DropdownMenuContent
+          align="end"
+          className="min-w-28 border-[#23130e] bg-[#f5f0e8] text-[#2b1b14]"
+        >
           {localeOptions.map((opt) => {
             const active = opt.code === locale;
             const href = makeTarget(opt.code);
@@ -83,7 +86,7 @@ export default function LocaleSwitcher({
               <DropdownMenuItem key={opt.code} asChild>
                 <Link
                   href={href}
-                  className={`flex items-center justify-between ${
+                  className={`flex items-center justify-between text-[#2b1b14] ${
                     active ? 'font-semibold' : ''
                   }`}
                 >

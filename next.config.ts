@@ -20,6 +20,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  env: {
+    NEXT_PUBLIC_SANITY_STUDIO_PREVIEW_SECRET:
+      process.env.NEXT_PUBLIC_SANITY_STUDIO_PREVIEW_SECRET,
+    NEXT_PUBLIC_SANITY_STUDIO_SITE_URL:
+      process.env.NEXT_PUBLIC_SANITY_STUDIO_SITE_URL,
+  },
 };
 
 export default withNextIntl(nextConfig);

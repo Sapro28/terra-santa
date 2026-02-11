@@ -32,8 +32,36 @@ export const siteAssetsType = defineType({
       validation: (Rule) => Rule.min(1).required(),
     }),
 
-    // Backward-compatibility: keep the previous single image field so existing datasets
-    // don't break if they haven't been updated yet.
+    defineField({
+      name: 'footerLogos',
+      title: 'شعارات الفوتر / Footer Logos',
+      description:
+        'Logos shown in the site footer (e.g., accreditations/partners) / شعارات تظهر في الفوتر مثل الاعتمادات',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt text',
+              type: 'string',
+              description:
+                'Alternative text for accessibility / النص البديل لإمكانية الوصول',
+            }),
+            defineField({
+              name: 'link',
+              title: 'Link (optional)',
+              type: 'url',
+              description:
+                'Optional URL when the logo is clicked / رابط اختياري عند النقر',
+            }),
+          ],
+        },
+      ],
+    }),
+
     defineField({
       name: 'headerLogo',
       title: 'شعار المدرسة (قديم)',

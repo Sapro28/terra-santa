@@ -1,5 +1,9 @@
+'use client';
+
+import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+
 import LocaleSwitcherClient from './LocaleSwitcherClient';
 import HeaderNavDropdownClient, {
   type HeaderDropdownChildLink,
@@ -60,7 +64,7 @@ function isExternalHref(href: string) {
   return /^https?:\/\//i.test(href) || /^\/\//.test(href);
 }
 
-export default async function Header({
+export default function Header({
   locale,
   settings,
   headerNav,
@@ -69,13 +73,14 @@ export default async function Header({
   settings: SiteSettings | null;
   headerNav?: HeaderElement[] | null;
 }) {
+  const isRtl = locale === 'ar';
   const items: HeaderElement[] = headerNav ?? [];
 
   const logos = (settings?.headerLogos ?? []).filter(
     (l) => (l?.url ?? '').trim().length > 0,
   );
   const primaryLogo = logos[0] ?? null;
-  const secondaryLogo = logos[1] ?? null;
+  // Only show the first (primary) school logo in the header.
 
   const mobileItems: MobileNavItem[] = items
     .map((item) => {
@@ -110,27 +115,78 @@ export default async function Header({
       };
     })
     .filter(Boolean) as MobileNavItem[];
+  const [overHero, setOverHero] = React.useState(false);
+
+  React.useEffect(() => {
+    const hero = document.querySelector<HTMLElement>('[data-video-hero]');
+    if (!hero) {
+      setOverHero(false);
+      return;
+    }
+
+    const update = () => {
+      setOverHero(window.scrollY <= 0);
+    };
+
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, []);
+
+  // Keep header text consistently brown (improves legibility across hero variants).
+  const chromeClass = overHero
+    ? 'border-transparent bg-transparent text-[#2b1b14]'
+    : 'border-[#23130e] bg-[#e7d6c3] text-[#2b1b14] shadow-sm';
+
+  const linkTextClass = 'text-[#2b1b14]/90 hover:text-[#2b1b14]';
+
+  const brandTextClass = 'text-[#2b1b14]';
+
+  const underlineColor = 'after:bg-[#2b1b14]';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href={`/${locale}`} className="inline-flex items-center gap-2">
+    <header
+      className={`fixed top-0 z-50 w-full border-b transition-colors duration-200 ${chromeClass}`}
+      style={{ height: 'var(--site-header-height)' }}
+    >
+      <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-3 px-4">
+        <Link
+          href={`/${locale}`}
+          className={`inline-flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}
+          aria-label={settings?.schoolName ?? 'Home'}
+        >
           {primaryLogo?.url ? (
             <Image
               src={primaryLogo.url}
               alt={primaryLogo.alt ?? settings?.schoolName ?? 'School'}
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-sm object-contain"
+              width={96}
+              height={96}
+              className="h-12 w-12 object-contain md:h-16 md:w-16"
               priority
             />
           ) : null}
-          <span className="font-semibold text-(--fg)">
-            {settings?.schoolName ?? 'School'}
-          </span>
+
+          <div className={`hidden md:block ${brandTextClass}`}>
+            <div className="max-w-55 text-sm font-semibold uppercase tracking-[0.18em] leading-tight">
+              {settings?.schoolName ?? 'School'}
+            </div>
+          </div>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div
+          className={`flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}
+        >
           <MobileNavDrawerClient
             items={mobileItems}
             localeSwitcher={<LocaleSwitcherClient locale={locale} />}
@@ -165,9 +221,11 @@ export default async function Header({
               const hasDropdown = childLinks.length > 0;
               const ParentClassName = [
                 'relative inline-flex items-center px-1 py-2',
-                'text-sm font-semibold text-muted hover:text-(--fg)',
+                'text-sm font-semibold',
+                linkTextClass,
                 'after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5',
-                'after:origin-left after:scale-x-0 after:bg-[#8B5A2B] after:transition-transform after:duration-200',
+                'after:origin-left after:scale-x-0 after:transition-transform after:duration-200',
+                underlineColor,
                 'hover:after:scale-x-100',
               ].join(' ');
 
@@ -199,6 +257,7 @@ export default async function Header({
                   label={label}
                   parentHref={href}
                   childrenLinks={childLinks}
+                  triggerClassName={ParentClassName}
                 />
               );
             })}
@@ -207,16 +266,6 @@ export default async function Header({
           <div className="hidden md:block">
             <LocaleSwitcherClient locale={locale} />
           </div>
-          {secondaryLogo?.url ? (
-            <Image
-              src={secondaryLogo.url}
-              alt={secondaryLogo.alt ?? settings?.schoolName ?? 'School'}
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-sm object-contain"
-              priority
-            />
-          ) : null}
         </div>
       </div>
     </header>

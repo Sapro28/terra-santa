@@ -698,13 +698,6 @@ export const homeOurCampusType = defineType({
       type: 'link',
       hidden: ({ parent }) => !parent?.ctaLabel,
     }),
-
-    defineField({
-      name: 'ctaHref',
-      title: 'Legacy href (optional)',
-      type: 'string',
-      hidden: ({ parent }) => !parent?.ctaLabel,
-    }),
   ],
 });
 

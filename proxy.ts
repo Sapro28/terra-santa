@@ -8,9 +8,14 @@ const intl = createMiddleware({ locales, defaultLocale });
 export const proxy = (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   const segs = pathname.split('/');
   const maybeLocale = segs[1];
   const maybeSpecial = segs[2];
+
   if (maybeLocale && locales.includes(maybeLocale as any)) {
     if (maybeSpecial === 'api' || maybeSpecial === '_next') {
       const url = request.nextUrl.clone();
@@ -46,20 +51,9 @@ export const proxy = (request: NextRequest) => {
     return NextResponse.redirect(url);
   }
 
-  const response = intl(request);
-  const draftModeCookie = request.cookies.get('__prerender_bypass');
-  if (draftModeCookie && response) {
-    response.cookies.set('__prerender_bypass', draftModeCookie.value, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      path: '/',
-    });
-  }
-
-  return response;
+  return intl(request);
 };
 
 export const config = {
-  matcher: ['/((?!api/|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 };

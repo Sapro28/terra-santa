@@ -24,8 +24,8 @@ type SectionOption = { title?: string; slug?: string };
 
 type InitialFilters = {
   section: string | null;
-  from: string | null; // YYYY-MM-DD
-  to: string | null; // YYYY-MM-DD
+  from: string | null;
+  to: string | null;
   page: number;
 };
 

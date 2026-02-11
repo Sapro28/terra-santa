@@ -25,6 +25,26 @@ export const siteSettingsQuery = groq`
         []
       )
     ),
+    // Footer logos are shared across all languages via the singleton (siteAssets).
+    // Back-compat: if footerLogos is empty considers any extra headerLogos beyond the first
+    // (so you can "move" the second header logo to the footer without re-uploading).
+    "footerLogos": coalesce(
+      *[_type == "siteAssets" && _id == "siteAssets"][0].footerLogos[]{
+        "url": asset->url,
+        "alt": coalesce(alt, ""),
+        "link": link
+      },
+      select(
+        count(*[_type == "siteAssets" && _id == "siteAssets"][0].headerLogos) > 1 =>
+          *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogos[1..100]{
+            "url": asset->url,
+            "alt": coalesce(alt, ""),
+            "link": null
+          },
+        []
+      ),
+      []
+    ),
     footer{
       addressLine1,
       phone,

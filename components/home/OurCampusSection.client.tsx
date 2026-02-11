@@ -159,7 +159,6 @@ export default function OurCampusSection({
                   )}
                 </div>
 
-                {/* Small tiles */}
                 {Array.from({ length: 4 }).map((_, idx) => {
                   const img = images[idx + 1];
                   return (

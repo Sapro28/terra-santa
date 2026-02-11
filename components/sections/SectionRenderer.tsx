@@ -174,7 +174,11 @@ function SectionVideoHeroBlock({
     : null;
 
   return (
-    <section className="relative overflow-hidden">
+    <section
+      className="relative overflow-hidden"
+      data-video-hero
+      style={{ marginTop: 'calc(var(--site-header-height) * -1)' }}
+    >
       <div className="relative aspect-video min-h-130 w-full">
         {s.videoUrl ? (
           <video
@@ -187,6 +191,12 @@ function SectionVideoHeroBlock({
             <source src={s.videoUrl} />
           </video>
         ) : null}
+
+        <div
+          id="hero-header-sentinel"
+          className="pointer-events-none absolute bottom-0 left-0 h-px w-full"
+          aria-hidden
+        />
 
         <div
           className="absolute inset-0"

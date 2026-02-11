@@ -15,10 +15,12 @@ export default function HeaderNavDropdownClient({
   label,
   parentHref,
   childrenLinks,
+  triggerClassName,
 }: {
   label: string;
   parentHref: string | null;
   childrenLinks: HeaderDropdownChildLink[];
+  triggerClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
@@ -80,13 +82,15 @@ export default function HeaderNavDropdownClient({
 
   React.useEffect(() => () => clearTimer(), []);
 
-  const TriggerClassName = [
-    'relative inline-flex items-center px-1 py-2',
-    'text-sm font-semibold text-muted hover:text-(--fg)',
-    'after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5',
-    'after:origin-left after:scale-x-0 after:bg-[#8B5A2B] after:transition-transform after:duration-200',
-    open ? 'after:scale-x-100' : 'hover:after:scale-x-100',
-  ].join(' ');
+  const TriggerClassName =
+    triggerClassName ??
+    [
+      'relative inline-flex items-center px-1 py-2',
+      'text-sm font-semibold text-muted hover:text-(--fg)',
+      'after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5',
+      'after:origin-left after:scale-x-0 after:bg-[#8B5A2B] after:transition-transform after:duration-200',
+      open ? 'after:scale-x-100' : 'hover:after:scale-x-100',
+    ].join(' ');
 
   const renderTrigger = () => {
     if (parentHref && !isExternalHref(parentHref)) {
@@ -141,7 +145,7 @@ export default function HeaderNavDropdownClient({
         aria-hidden={!open}
         className={[
           'absolute left-0 top-full z-50 mt-3 min-w-56',
-          'rounded-xl border border-border bg-white p-2 shadow-lg',
+          'rounded-xl border border-[#23130e] bg-[#f5f0e8] p-2 shadow-lg',
           'transition duration-150 ease-out',
           open
             ? 'pointer-events-auto translate-y-0 opacity-100'
@@ -156,7 +160,7 @@ export default function HeaderNavDropdownClient({
                   key={c.name}
                   href={c.href}
                   role="menuitem"
-                  className="rounded-lg px-3 py-2 text-sm text-(--fg) hover:bg-neutral-100 focus:bg-neutral-100 focus:outline-none"
+                  className="rounded-lg px-3 py-2 text-sm text-[#2b1b14] hover:bg-[#e7d6c3] focus:bg-[#e7d6c3] focus:outline-none"
                   onClick={() => setOpen(false)}
                 >
                   {c.name}
@@ -172,7 +176,7 @@ export default function HeaderNavDropdownClient({
                   target="_blank"
                   rel="noreferrer"
                   role="menuitem"
-                  className="block rounded-lg px-3 py-2 text-sm text-(--fg) hover:bg-neutral-100 focus:bg-neutral-100 focus:outline-none"
+                  className="block rounded-lg px-3 py-2 text-sm text-[#2b1b14] hover:bg-[#e7d6c3] focus:bg-[#e7d6c3] focus:outline-none"
                   onClick={() => setOpen(false)}
                 >
                   {c.name}

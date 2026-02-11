@@ -29,8 +29,14 @@ export default defineConfig({
       const baseUrl =
         process.env.SANITY_STUDIO_SITE_URL || 'http://localhost:3000';
 
-      const secret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
-      if (!secret) return prev;
+      const secret = process.env.NEXT_PUBLIC_SANITY_STUDIO_PREVIEW_SECRET;
+
+      if (!secret) {
+        console.warn(
+          'SANITY_STUDIO_PREVIEW_SECRET is not set. Preview links will not work.',
+        );
+        return prev;
+      }
 
       const doc = context.document as any;
       const locale = doc?.language || 'ar';

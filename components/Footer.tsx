@@ -1,7 +1,14 @@
 import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type SiteSettings = {
   schoolName?: string;
+  footerLogos?: Array<{
+    url?: string | null;
+    alt?: string | null;
+    link?: string | null;
+  }> | null;
   footer?: {
     addressLine1?: string;
     phone?: string;
@@ -103,6 +110,10 @@ export default function Footer({
   const locale = useLocale();
   const f = settings?.footer;
 
+  const footerLogos = (settings?.footerLogos ?? []).filter(
+    (l) => (l?.url ?? '').trim().length > 0,
+  );
+
   const year = new Intl.DateTimeFormat(locale, { year: 'numeric' }).format(
     new Date(),
   );
@@ -126,9 +137,45 @@ export default function Footer({
     <footer className="border-t border-border bg-[#2b1b14] text-[#f5f0e8]">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
         <div>
-          <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
-            {name}
-          </div>
+          <Link href={`/${locale}`} className="inline-flex items-center gap-3">
+            <div className="text-sm font-semibold tracking-wide text-[#f5f0e8]">
+              {name}
+            </div>
+          </Link>
+
+          {footerLogos.length ? (
+            <div className="mt-5 flex flex-wrap items-center gap-4">
+              {footerLogos.map((l) => {
+                const img = (
+                  <Image
+                    src={l.url!}
+                    alt={l.alt ?? name}
+                    width={140}
+                    height={90}
+                    className="h-10 w-auto object-contain opacity-90 hover:opacity-100"
+                  />
+                );
+
+                const href = (l.link ?? '').trim();
+                const key = `${l.url}-${l.alt ?? ''}`;
+                return href ? (
+                  <a
+                    key={key}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    {img}
+                  </a>
+                ) : (
+                  <div key={key} className="inline-flex">
+                    {img}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
           <p className="mt-3 text-sm leading-relaxed text-[#d8cfc8]">
             {f?.addressLine1}
             {f?.addressLine1 ? <br /> : null}

@@ -1,7 +1,6 @@
+# Terra Sancta School Website
 
-# Terra Santa School Website
-
-Website for Terra Santa School built with Next.js.
+Website for Terra Sancta School built with Next.js and Sanity.io
 
 ## Tech stack
 

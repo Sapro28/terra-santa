@@ -17,6 +17,7 @@ import {
 import { SanityLive } from '@/sanity/lib/live';
 import { getSanityClient } from '@/sanity/lib/getClient';
 import VisualEditingComponent from '@/app/VisualEditing';
+import DraftModeIndicator from '@/components/DraftModeIndicator';
 
 import { locales, type Locale } from '@/i18n/config';
 
@@ -33,12 +34,20 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const dm = await draftMode();
-  if (dm.isEnabled) noStore();
+  const isDraftMode = dm.isEnabled;
 
-  // Always fetch through the same client selection logic (draft vs published)
-  // to avoid situations where parts of the page are in preview while others
-  // are still using the published/CDN client.
+  console.log('=== LAYOUT RENDER ===');
+  console.log('Draft Mode Enabled:', isDraftMode);
+  console.log('Locale:', locale);
+
+  if (isDraftMode) noStore();
+
   const client = await getSanityClient();
+
+  console.log(
+    'Using client:',
+    isDraftMode ? 'PREVIEW CLIENT' : 'PUBLISHED CLIENT',
+  );
 
   const messages = await getMessages();
   const siteSettings = await client.fetch(siteSettingsQuery, {
@@ -55,12 +64,14 @@ export default async function LocaleLayout({
     <NextIntlClientProvider locale={locale} messages={messages}>
       <div lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         <Header locale={locale} settings={siteSettings} headerNav={headerNav} />
-        <main>{children}</main>
+        <main className="pt-(--site-header-height)">{children}</main>
         <Footer settings={siteSettings} />
 
         <AnnouncementsPopup announcement={popupAnnouncement} locale={locale} />
 
-        {dm.isEnabled ? (
+        {process.env.NODE_ENV === 'development' && <DraftModeIndicator />}
+
+        {isDraftMode ? (
           <>
             <SanityLive />
             <VisualEditingComponent />
