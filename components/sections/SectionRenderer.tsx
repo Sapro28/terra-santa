@@ -78,7 +78,6 @@ type SectionArrowDivider = SectionBase & {
   marginBottom?: number;
   offsetX?: number;
   offsetY?: number;
-  /** Optional: choose how the arrow curves. Defaults to a centered down arrow for backwards compatibility. */
   direction?: 'left' | 'right' | 'down';
 };
 
@@ -513,7 +512,6 @@ export default function SectionRenderer({
   upcomingEventsBySectionId,
   latestEvents,
   latestEventsBySectionId,
-  pageTitle,
 }: {
   locale: string;
   sections: Section[];
@@ -522,7 +520,6 @@ export default function SectionRenderer({
   upcomingEventsBySectionId: Record<string, Announcement[]>;
   latestEvents: Announcement[];
   latestEventsBySectionId: Record<string, Announcement[]>;
-  pageTitle?: string | undefined;
 }) {
   return (
     <div className="flex flex-col gap-14">
