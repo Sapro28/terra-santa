@@ -58,16 +58,7 @@ export default async function HomePage({
   const sections = rawSections.filter(
     (s) => s?._type !== 'sectionColors' && s?._type !== 'sectionDivisions',
   );
-
-  // The home template renders a couple of hard-coded sections (Divisions + Campus)
-  // between the hero and the rest of the page-builder sections.
-  //
-  // If the editor places an Arrow Divider directly under the Video Hero, they
-  // expect it to appear right under the hero (before the hard-coded sections).
-  // We therefore "attach" any contiguous Arrow Divider sections that come
-  // immediately after the hero to the hero block group.
   const heroIdx = sections.findIndex((s) => s?._type === 'sectionVideoHero');
-
   const heroGroup: typeof sections = [];
   const usedIdx = new Set<number>();
 

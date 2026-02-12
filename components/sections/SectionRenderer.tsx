@@ -302,18 +302,8 @@ function SectionArrowDividerBlock({
     typeof s.size === 'number' ? Math.min(3, Math.max(1, s.size)) : 2;
   const marginTop = typeof s.marginTop === 'number' ? s.marginTop : 0;
   const marginBottom = typeof s.marginBottom === 'number' ? s.marginBottom : 0;
-
   const offsetX = typeof s.offsetX === 'number' ? s.offsetX : 0;
   const offsetY = typeof s.offsetY === 'number' ? s.offsetY : 0;
-
-  // Backwards compatible default: centered down arrow.
-  // `direction` can come back from Sanity in a few shapes depending on i18n/legacy wrappers.
-  // We've seen:
-  // - "left" | "right" | "down" (plain string)
-  // - { value: "left" } or { current: "left" }
-  // - { en: "left", ar: "left", ... }
-  // - [{ _key: 'en', value: 'left' }, ...] (array-based i18n)
-  // Normalize defensively so left/right/down always work.
   const rawDirection: any = (s as any).direction;
   const normalizedDirection = (() => {
     const normalize = (v: any) => {
@@ -321,17 +311,14 @@ function SectionArrowDividerBlock({
         .trim()
         .toLowerCase();
 
-      // Sometimes the stored value can be the option title (e.g. "Left (curves left)").
       if (str.includes('left')) return 'left';
       if (str.includes('right')) return 'right';
       if (str.includes('down')) return 'down';
       return str;
     };
 
-    // 1) plain string
     if (typeof rawDirection === 'string') return normalize(rawDirection);
 
-    // 2) array-based i18n: [{_key:'en', value:'left'}]
     if (Array.isArray(rawDirection)) {
       const wanted = (locale ?? '').split('-')[0].toLowerCase();
       const match = rawDirection.find((x: any) => {
@@ -346,7 +333,6 @@ function SectionArrowDividerBlock({
       return normalize(first?.value ?? first?.current ?? first?.title ?? '');
     }
 
-    // 3) object wrappers / localized map
     if (rawDirection && typeof rawDirection === 'object') {
       const wanted = (locale ?? '').split('-')[0].toLowerCase();
       const candidate =
@@ -356,8 +342,6 @@ function SectionArrowDividerBlock({
         rawDirection.en ??
         rawDirection.default;
       if (candidate) return normalize(candidate);
-
-      // Fall back to first string-ish value we can find.
       for (const v of Object.values(rawDirection)) {
         if (typeof v === 'string' && v.trim()) return normalize(v);
       }
@@ -373,25 +357,14 @@ function SectionArrowDividerBlock({
       ? (normalizedDirection as any)
       : 'down';
 
-  // React's useId can include ':' characters; sanitize for SVG url(#id) usage.
   const markerId = `arrowhead-${useId().replace(/:/g, '')}`;
-
-  // Sizing based on the reference design - smooth curved arrow
   const px = size === 1 ? 100 : size === 3 ? 160 : 130;
   const stroke = size === 1 ? 5 : size === 3 ? 8 : 6.5;
   const dash = size === 1 ? '8 14' : size === 3 ? '12 18' : '10 16';
-
-  // Curved arrows are drawn in the viewBox. We provide explicit left/right paths (instead of mirroring)
-  // so the marker's auto orientation stays correct in all browsers.
-  //
-  // NOTE: The final control/end points are intentionally offset in X so the tangent at the end isn't
-  // perfectly vertical. This ensures the arrowhead visibly \"turns\" left/right.
   const leftCurvedPathD =
     'M 62 10 C 70 45, 58 66, 52 76 C 42 94, 30 102, 24 114';
   const rightCurvedPathD =
     'M 38 10 C 30 45, 42 66, 48 76 C 58 94, 70 102, 76 114';
-
-  // Straight down arrow (legacy default), using the same marker so the head size stays consistent.
   const centeredDownPathD = 'M 50 10 L 50 112';
 
   return (
@@ -412,13 +385,6 @@ function SectionArrowDividerBlock({
               xmlns="http://www.w3.org/2000/svg"
               style={{ overflow: 'visible' }}
             >
-              {/*
-                Arrowhead sizing:
-                - We use a marker with markerUnits="userSpaceOnUse" so the arrowhead doesn't blow up
-                  when the strokeWidth changes.
-                - orient="auto-start-reverse" makes it point in the direction of the curve automatically
-                  (and stays correct when a path is mirrored/reversed).
-              */}
               <defs>
                 <marker
                   id={markerId}
@@ -442,7 +408,6 @@ function SectionArrowDividerBlock({
               </defs>
 
               {direction === 'down' ? (
-                // Legacy centered arrow.
                 <path
                   d={centeredDownPathD}
                   stroke={color}
@@ -454,7 +419,6 @@ function SectionArrowDividerBlock({
                   markerEnd={`url(#${markerId})`}
                 />
               ) : (
-                // Left/right curved arrow matching the reference.
                 <path
                   d={direction === 'right' ? rightCurvedPathD : leftCurvedPathD}
                   stroke={color}
