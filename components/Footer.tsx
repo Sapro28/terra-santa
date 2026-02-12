@@ -251,7 +251,6 @@ export default function Footer({
     <footer className="border-t border-border bg-[#2b1b14] text-[#f5f0e8]">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_1px_minmax(0,2fr)]">
-          {/* Left */}
           <div>
             <Link
               href={`/${locale}`}
@@ -306,10 +305,7 @@ export default function Footer({
             </div>
           </div>
 
-          {/* Divider */}
           <div className="hidden md:block bg-white/10" />
-
-          {/* Right */}
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             {columnsToRender.map((c, idx) => (
               <FooterColumnBlock

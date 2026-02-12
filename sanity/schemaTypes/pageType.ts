@@ -70,6 +70,7 @@ export const pageType = defineType({
       type: 'array',
       of: [
         defineArrayMember({ type: 'sectionVideoHero' }),
+        defineArrayMember({ type: 'sectionArrowDivider' }),
         defineArrayMember({ type: 'sectionParentsTestimonials' }),
         defineArrayMember({ type: 'sectionAnnouncements' }),
         defineArrayMember({ type: 'sectionUpcomingEvents' }),

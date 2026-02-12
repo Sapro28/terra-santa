@@ -1,12 +1,10 @@
 import { groq } from 'next-sanity';
-
 export const latestAnnouncementsQuery = groq`
   *[
     _type == "newsPost" &&
     hidden != true &&
     ( !defined(placement) || placement in ["list", "both"] ) &&
-    language == $lang &&
-    ( !defined(publishedAt) || publishedAt <= now() )
+    language == $lang
   ]
   | order(urgent desc, publishedAt desc)[0...4]{
     _id,
@@ -26,9 +24,7 @@ export const popupAnnouncementQuery = groq`
     _type == "newsPost" &&
     hidden != true &&
     placement in ["popup", "both"] &&
-    language == $lang &&
-    (!defined(publishedAt) || publishedAt <= now()) &&
-    (!defined(expiresAt) || expiresAt > now())
+    language == $lang
   ]
   | order(urgent desc, publishedAt desc)[0]{
     _id,
@@ -49,8 +45,7 @@ export const newsListQuery = groq`
     _type == "newsPost" &&
     hidden != true &&
     ( !defined(placement) || placement != "none" ) &&
-    language == $lang &&
-    ( !defined(publishedAt) || publishedAt <= now() )
+    language == $lang
   ]
   | order(publishedAt desc) {
     _id,
@@ -69,8 +64,7 @@ export const newsPostBySlugQuery = groq`
     slug.current == $slug &&
     hidden != true &&
     ( !defined(placement) || placement != "none" ) &&
-    language == $lang &&
-    ( !defined(publishedAt) || publishedAt <= now() )
+    language == $lang
   ][0]{
     title,
     publishedAt,

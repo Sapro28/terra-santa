@@ -27,9 +27,10 @@ export default defineConfig({
   document: {
     productionUrl: async (prev, context) => {
       const baseUrl =
-        process.env.SANITY_STUDIO_SITE_URL || 'http://localhost:3000';
+        process.env.NEXT_PUBLIC_SANITY_STUDIO_SITE_URL ||
+        'http://localhost:3000';
 
-      const secret = process.env.SANITY_STUDIO_PREVIEW_SECRET;
+      const secret = process.env.NEXT_PUBLIC_SANITY_STUDIO_PREVIEW_SECRET;
 
       if (!secret) {
         console.warn(

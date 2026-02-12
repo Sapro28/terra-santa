@@ -23,7 +23,7 @@ export const liveClient = createClient({
   dataset,
   apiVersion,
   useCdn: false,
-  perspective: 'previewDrafts',
+  perspective: 'drafts',
 });
 
 export const previewClient = createClient({
@@ -32,7 +32,7 @@ export const previewClient = createClient({
   apiVersion,
   useCdn: false,
   token: process.env.SANITY_VIEWER_TOKEN,
-  perspective: 'previewDrafts',
+  perspective: 'drafts',
   stega: {
     enabled: true,
     studioUrl: '/studio',

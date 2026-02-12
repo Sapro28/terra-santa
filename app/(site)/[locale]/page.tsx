@@ -59,10 +59,35 @@ export default async function HomePage({
     (s) => s?._type !== 'sectionColors' && s?._type !== 'sectionDivisions',
   );
 
+  // The home template renders a couple of hard-coded sections (Divisions + Campus)
+  // between the hero and the rest of the page-builder sections.
+  //
+  // If the editor places an Arrow Divider directly under the Video Hero, they
+  // expect it to appear right under the hero (before the hard-coded sections).
+  // We therefore "attach" any contiguous Arrow Divider sections that come
+  // immediately after the hero to the hero block group.
   const heroIdx = sections.findIndex((s) => s?._type === 'sectionVideoHero');
-  const hero = heroIdx >= 0 ? [sections[heroIdx]] : [];
+
+  const heroGroup: typeof sections = [];
+  const usedIdx = new Set<number>();
+
+  if (heroIdx >= 0) {
+    heroGroup.push(sections[heroIdx]);
+    usedIdx.add(heroIdx);
+
+    for (let j = heroIdx + 1; j < sections.length; j++) {
+      const t = sections[j]?._type;
+      if (t === 'sectionArrowDivider') {
+        heroGroup.push(sections[j]);
+        usedIdx.add(j);
+        continue;
+      }
+      break;
+    }
+  }
+
   const restSections =
-    heroIdx >= 0 ? sections.filter((_, i) => i !== heroIdx) : sections;
+    heroIdx >= 0 ? sections.filter((_, i) => !usedIdx.has(i)) : sections;
 
   const upcomingSectionIds = new Set<string>();
   const latestSectionIdToLimit = new Map<string, number>();
@@ -144,7 +169,7 @@ export default async function HomePage({
     <>
       <SectionRenderer
         locale={locale}
-        sections={hero}
+        sections={heroGroup}
         announcements={announcements}
         upcomingEvents={upcomingEvents}
         upcomingEventsBySectionId={upcomingEventsBySectionId}

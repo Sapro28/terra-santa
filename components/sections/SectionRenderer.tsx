@@ -3,6 +3,7 @@ import {
   resolveCmsLink,
   type CMSLink,
 } from '@/components/lib/cmsLink';
+import { useId } from 'react';
 
 type Announcement = {
   _id: string;
@@ -19,8 +20,10 @@ type SectionBase = { _type: string };
 
 type SectionVideoHero = SectionBase & {
   _type: 'sectionVideoHero';
-  kicker?: string;
   title?: string;
+  titleLine1?: string;
+  titleLine2?: string;
+  emphasizeLine2?: boolean;
   subtitle?: string;
   overlayOpacity?: number;
   videoUrl?: string;
@@ -67,8 +70,21 @@ type SectionLatestEvents = SectionBase & {
   sectionSlug?: string;
 };
 
+type SectionArrowDivider = SectionBase & {
+  _type: 'sectionArrowDivider';
+  color?: string;
+  size?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  offsetX?: number;
+  offsetY?: number;
+  /** Optional: choose how the arrow curves. Defaults to a centered down arrow for backwards compatibility. */
+  direction?: 'left' | 'right' | 'down';
+};
+
 type Section =
   | SectionVideoHero
+  | SectionArrowDivider
   | SectionParentsTestimonials
   | SectionAnnouncements
   | SectionUpcomingEvents
@@ -153,6 +169,10 @@ function SectionVideoHeroBlock({
   s: SectionVideoHero;
 }) {
   const title = s.title ?? '';
+  const titleLine1 = (s.titleLine1 ?? '').trim();
+  const titleLine2 = (s.titleLine2 ?? '').trim();
+  const useSplitTitle = Boolean(titleLine2);
+  const emphasizeLine2 = s.emphasizeLine2 !== false;
   const subtitle = s.subtitle ?? '';
   const overlay =
     typeof s.overlayOpacity === 'number' ? s.overlayOpacity : 0.45;
@@ -204,20 +224,44 @@ function SectionVideoHeroBlock({
           aria-hidden
         />
 
-        <div className="absolute inset-0 flex items-center">
-          <div className="mx-auto w-full max-w-6xl px-4">
-            {s.kicker ? (
-              <p className="mb-3 text-sm font-semibold tracking-wide text-white/90">
-                {s.kicker}
-              </p>
-            ) : null}
-
-            <h1 className="max-w-2xl text-4xl font-semibold leading-tight text-white md:text-5xl">
-              {title}
-            </h1>
+        <div className="absolute inset-0 flex items-end">
+          <div className="mx-auto w-full max-w-6xl px-4 pb-10 md:pb-16">
+            {useSplitTitle ? (
+              <div className="max-w-3xl text-white">
+                {titleLine1 ? (
+                  <div className="text-2xl font-medium leading-tight md:text-3xl">
+                    {titleLine1}
+                  </div>
+                ) : null}
+                <div className="mt-2 text-4xl leading-tight md:text-6xl">
+                  {emphasizeLine2
+                    ? titleLine2.split(/\s+/).map((w, idx) => {
+                        const key = `${w}-${idx}`;
+                        const isAnd = w.toLowerCase() === 'and';
+                        return (
+                          <span
+                            key={key}
+                            className={
+                              isAnd
+                                ? 'mx-1 inline-block align-baseline font-serif text-3xl font-normal italic opacity-90 md:text-5xl'
+                                : 'mr-2 inline-block font-bold'
+                            }
+                          >
+                            {w}
+                          </span>
+                        );
+                      })
+                    : titleLine2}
+                </div>
+              </div>
+            ) : (
+              <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-white md:text-5xl">
+                {title}
+              </h1>
+            )}
 
             {subtitle ? (
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg">
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 md:text-lg">
                 {subtitle}
               </p>
             ) : null}
@@ -239,6 +283,191 @@ function SectionVideoHeroBlock({
                 />
               ) : null}
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionArrowDividerBlock({
+  s,
+  locale,
+}: {
+  s: SectionArrowDivider;
+  /** Current locale (e.g. "en", "ar", "it"). Used to read i18n-wrapped values safely. */
+  locale?: string;
+}) {
+  const color = (s.color ?? '#C9A227').trim();
+  const size =
+    typeof s.size === 'number' ? Math.min(3, Math.max(1, s.size)) : 2;
+  const marginTop = typeof s.marginTop === 'number' ? s.marginTop : 0;
+  const marginBottom = typeof s.marginBottom === 'number' ? s.marginBottom : 0;
+
+  const offsetX = typeof s.offsetX === 'number' ? s.offsetX : 0;
+  const offsetY = typeof s.offsetY === 'number' ? s.offsetY : 0;
+
+  // Backwards compatible default: centered down arrow.
+  // `direction` can come back from Sanity in a few shapes depending on i18n/legacy wrappers.
+  // We've seen:
+  // - "left" | "right" | "down" (plain string)
+  // - { value: "left" } or { current: "left" }
+  // - { en: "left", ar: "left", ... }
+  // - [{ _key: 'en', value: 'left' }, ...] (array-based i18n)
+  // Normalize defensively so left/right/down always work.
+  const rawDirection: any = (s as any).direction;
+  const normalizedDirection = (() => {
+    const normalize = (v: any) => {
+      const str = String(v ?? '')
+        .trim()
+        .toLowerCase();
+
+      // Sometimes the stored value can be the option title (e.g. "Left (curves left)").
+      if (str.includes('left')) return 'left';
+      if (str.includes('right')) return 'right';
+      if (str.includes('down')) return 'down';
+      return str;
+    };
+
+    // 1) plain string
+    if (typeof rawDirection === 'string') return normalize(rawDirection);
+
+    // 2) array-based i18n: [{_key:'en', value:'left'}]
+    if (Array.isArray(rawDirection)) {
+      const wanted = (locale ?? '').split('-')[0].toLowerCase();
+      const match = rawDirection.find((x: any) => {
+        const key = String(x?._key ?? x?.lang ?? x?.locale ?? '')
+          .trim()
+          .toLowerCase();
+        return wanted ? key === wanted : false;
+      });
+      const candidate = match?.value ?? match?.current ?? match?.title;
+      if (candidate) return normalize(candidate);
+      const first = rawDirection[0];
+      return normalize(first?.value ?? first?.current ?? first?.title ?? '');
+    }
+
+    // 3) object wrappers / localized map
+    if (rawDirection && typeof rawDirection === 'object') {
+      const wanted = (locale ?? '').split('-')[0].toLowerCase();
+      const candidate =
+        rawDirection.current ??
+        rawDirection.value ??
+        (wanted && rawDirection[wanted]) ??
+        rawDirection.en ??
+        rawDirection.default;
+      if (candidate) return normalize(candidate);
+
+      // Fall back to first string-ish value we can find.
+      for (const v of Object.values(rawDirection)) {
+        if (typeof v === 'string' && v.trim()) return normalize(v);
+      }
+    }
+
+    return '';
+  })();
+
+  const direction: 'left' | 'right' | 'down' =
+    normalizedDirection === 'left' ||
+    normalizedDirection === 'right' ||
+    normalizedDirection === 'down'
+      ? (normalizedDirection as any)
+      : 'down';
+
+  // React's useId can include ':' characters; sanitize for SVG url(#id) usage.
+  const markerId = `arrowhead-${useId().replace(/:/g, '')}`;
+
+  // Sizing based on the reference design - smooth curved arrow
+  const px = size === 1 ? 100 : size === 3 ? 160 : 130;
+  const stroke = size === 1 ? 5 : size === 3 ? 8 : 6.5;
+  const dash = size === 1 ? '8 14' : size === 3 ? '12 18' : '10 16';
+
+  // Curved arrows are drawn in the viewBox. We provide explicit left/right paths (instead of mirroring)
+  // so the marker's auto orientation stays correct in all browsers.
+  //
+  // NOTE: The final control/end points are intentionally offset in X so the tangent at the end isn't
+  // perfectly vertical. This ensures the arrowhead visibly \"turns\" left/right.
+  const leftCurvedPathD =
+    'M 62 10 C 70 45, 58 66, 52 76 C 42 94, 30 102, 24 114';
+  const rightCurvedPathD =
+    'M 38 10 C 30 45, 42 66, 48 76 C 58 94, 70 102, 76 114';
+
+  // Straight down arrow (legacy default), using the same marker so the head size stays consistent.
+  const centeredDownPathD = 'M 50 10 L 50 112';
+
+  return (
+    <section aria-hidden style={{ marginTop, marginBottom }}>
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="relative h-0">
+          <div
+            className="pointer-events-none absolute left-1/2 top-0"
+            style={{
+              transform: `translate(-50%, 0) translate(${offsetX}px, ${offsetY}px)`,
+            }}
+          >
+            <svg
+              width={px}
+              height={px * 1.3}
+              viewBox="0 0 100 130"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ overflow: 'visible' }}
+            >
+              {/*
+                Arrowhead sizing:
+                - We use a marker with markerUnits="userSpaceOnUse" so the arrowhead doesn't blow up
+                  when the strokeWidth changes.
+                - orient="auto-start-reverse" makes it point in the direction of the curve automatically
+                  (and stays correct when a path is mirrored/reversed).
+              */}
+              <defs>
+                <marker
+                  id={markerId}
+                  viewBox="0 0 10 10"
+                  refX="0"
+                  refY="5"
+                  markerWidth="14"
+                  markerHeight="14"
+                  markerUnits="userSpaceOnUse"
+                  orient="auto"
+                >
+                  <path
+                    d="M 2 1.5 L 9 5 L 2 8.5"
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </marker>
+              </defs>
+
+              {direction === 'down' ? (
+                // Legacy centered arrow.
+                <path
+                  d={centeredDownPathD}
+                  stroke={color}
+                  strokeWidth={stroke}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={dash}
+                  fill="none"
+                  markerEnd={`url(#${markerId})`}
+                />
+              ) : (
+                // Left/right curved arrow matching the reference.
+                <path
+                  d={direction === 'right' ? rightCurvedPathD : leftCurvedPathD}
+                  stroke={color}
+                  strokeWidth={stroke}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={dash}
+                  fill="none"
+                  markerEnd={`url(#${markerId})`}
+                />
+              )}
+            </svg>
           </div>
         </div>
       </div>
@@ -304,6 +533,11 @@ export default function SectionRenderer({
           case 'sectionVideoHero':
             return (
               <SectionVideoHeroBlock key={i} locale={locale} s={s as any} />
+            );
+
+          case 'sectionArrowDivider':
+            return (
+              <SectionArrowDividerBlock key={i} locale={locale} s={s as any} />
             );
 
           case 'sectionParentsTestimonials':

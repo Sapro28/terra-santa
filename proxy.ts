@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 
 const intl = createMiddleware({ locales, defaultLocale });
 
-export const proxy = (request: NextRequest) => {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (pathname.startsWith('/api/')) {
@@ -52,7 +52,9 @@ export const proxy = (request: NextRequest) => {
   }
 
   return intl(request);
-};
+}
+
+export default proxy;
 
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],

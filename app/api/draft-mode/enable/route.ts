@@ -24,12 +24,22 @@ export async function GET(request: NextRequest) {
     return new Response('Preview client not configured', { status: 500 });
   }
 
+  if (!process.env.SANITY_VIEWER_TOKEN) {
+    return new Response(
+      'SANITY_VIEWER_TOKEN not set. Please add it to your .env file.',
+      { status: 500 },
+    );
+  }
+
   try {
     const draft = await draftMode();
     draft.enable();
 
-    const url = new URL(redirect, request.url);
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(new URL(redirect, request.url));
+    response.headers.set('Cache-Control', 'no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+
+    return response;
   } catch (error) {
     console.error('Error enabling draft mode:', error);
     return new Response(

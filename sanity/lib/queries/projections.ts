@@ -3,8 +3,10 @@ export const sectionProjection = `
 
   // Video Hero
   _type == "sectionVideoHero" => {
-    kicker,
     "title": coalesce(title, caption),
+    titleLine1,
+    titleLine2,
+    emphasizeLine2,
     "subtitle": coalesce(subtitle, ""),
     overlayOpacity,
     useGlobalVideo,
@@ -23,9 +25,7 @@ export const sectionProjection = `
         internalRef->{
           _type,
           title,
-          // navHeader/sitePage slugs are stored as strings; schoolSectionPage uses slug.current.
           "slug": coalesce(slug.current, slug),
-          // Only sitePage has a header reference.
           "headerSlug": header->slug
         },
         routeKey,
@@ -53,6 +53,17 @@ export const sectionProjection = `
       },
       href
     }
+  },
+
+  // Decorative Arrow Divider
+  _type == "sectionArrowDivider" => {
+    direction,
+    color,
+    size,
+    marginTop,
+    marginBottom,
+    offsetX,
+    offsetY,
   },
 
   // Announcements

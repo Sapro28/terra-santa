@@ -1,18 +1,15 @@
 import { groq } from 'next-sanity';
-
 export const upcomingEventsQuery = groq`
   *[
     _type == "event" &&
     hidden != true &&
     language == $lang &&
-    defined(startAt) &&
-    startAt > now()
+    defined(startAt)
   ]
   | order(startAt asc)[0...3]{
     _id,
     title,
     excerpt,
-    // Keep the same field name expected by the UI (publishedAt) for compatibility.
     "publishedAt": startAt,
     "slug": slug.current,
     "mainImageUrl": mainImage.asset->url,
@@ -26,14 +23,12 @@ export const upcomingEventsBySectionIdQuery = groq`
     hidden != true &&
     language == $lang &&
     defined(startAt) &&
-    startAt > now() &&
     $sectionId in sections[]._ref
   ]
   | order(startAt asc)[0...3]{
     _id,
     title,
     excerpt,
-    // Keep the same field name expected by the UI (publishedAt) for compatibility.
     "publishedAt": startAt,
     "slug": slug.current,
     "mainImageUrl": mainImage.asset->url,

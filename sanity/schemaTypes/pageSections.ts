@@ -20,7 +20,6 @@ export const sectionVideoHeroType = defineType({
   title: 'Video Hero',
   type: 'object',
   fields: [
-    // Legacy field kept so existing content doesn't get lost.
     defineField({
       name: 'caption',
       title: 'Caption (legacy)',
@@ -31,21 +30,58 @@ export const sectionVideoHeroType = defineType({
     }),
 
     defineField({
-      name: 'kicker',
-      title: 'Kicker',
-      type: 'string',
-      description: 'Small text above the main title (optional).',
-      options: {
-        i18nTitle: { ar: 'عنوان صغير', en: 'Kicker', it: 'Soprattitolo' },
-      },
-    }),
-
-    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
       options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
       validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: 'titleLine1',
+      title: 'Title (line 1) (optional)',
+      type: 'string',
+      description:
+        'If you provide a Title (line 2), the hero title will render as two lines at the bottom of the video, similar to the reference site.',
+      options: {
+        i18nTitle: {
+          ar: 'العنوان (السطر 1) (اختياري)',
+          en: 'Title (line 1) (optional)',
+          it: 'Titolo (riga 1) (opzionale)',
+        },
+      },
+    }),
+
+    defineField({
+      name: 'titleLine2',
+      title: 'Title (line 2) (optional)',
+      type: 'string',
+      description:
+        'When set, this becomes the emphasized second line (e.g., "Rigor and Wonder").',
+      options: {
+        i18nTitle: {
+          ar: 'العنوان (السطر 2) (اختياري)',
+          en: 'Title (line 2) (optional)',
+          it: 'Titolo (riga 2) (opzionale)',
+        },
+      },
+    }),
+
+    defineField({
+      name: 'emphasizeLine2',
+      title: 'Emphasize line 2',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'When enabled, line 2 will bold the key words and render "and" in an italic, lighter style.',
+      options: {
+        i18nTitle: {
+          ar: 'تمييز السطر 2',
+          en: 'Emphasize line 2',
+          it: 'Evidenzia riga 2',
+        },
+      },
+      hidden: ({ parent }) => !parent?.titleLine2,
     }),
 
     defineField({
@@ -100,56 +136,6 @@ export const sectionVideoHeroType = defineType({
       initialValue: 0.45,
       validation: (Rule) => Rule.min(0).max(0.9),
     }),
-
-    defineField({
-      name: 'primaryCta',
-      title: 'Primary CTA',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'label',
-          title: 'Label',
-          type: 'string',
-        }),
-        defineField({
-          name: 'link',
-          title: 'Link',
-          type: 'link',
-        }),
-        defineField({
-          name: 'href',
-          title: 'Legacy href (deprecated)',
-          type: 'string',
-          hidden: true,
-          readOnly: true,
-        }),
-      ],
-    }),
-
-    defineField({
-      name: 'secondaryCta',
-      title: 'Secondary CTA',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'label',
-          title: 'Label',
-          type: 'string',
-        }),
-        defineField({
-          name: 'link',
-          title: 'Link',
-          type: 'link',
-        }),
-        defineField({
-          name: 'href',
-          title: 'Legacy href (deprecated)',
-          type: 'string',
-          hidden: true,
-          readOnly: true,
-        }),
-      ],
-    }),
   ],
   preview: {
     select: { title: 'title', useGlobalVideo: 'useGlobalVideo' },
@@ -158,6 +144,127 @@ export const sectionVideoHeroType = defineType({
         title: title || 'Video Hero',
         subtitle: useGlobalVideo ? 'Global video' : 'Custom video',
       };
+    },
+  },
+});
+
+export const sectionArrowDividerType = defineType({
+  name: 'sectionArrowDivider',
+  title: 'Arrow Divider (decorative)',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'direction',
+      title: 'Direction',
+      type: 'string',
+      initialValue: 'left',
+      description: 'Choose which way the arrow curves.',
+      options: {
+        list: [
+          { title: 'Left (curves left)', value: 'left' },
+          { title: 'Right (curves right)', value: 'right' },
+          { title: 'Down (centered legacy)', value: 'down' },
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+        i18nTitle: { ar: 'الاتجاه', en: 'Direction', it: 'Direzione' },
+      },
+    }),
+    defineField({
+      name: 'color',
+      title: 'Color',
+      type: 'string',
+      initialValue: '#C9A227',
+      description:
+        'Hex color for the arrow (default is a warm gold that pairs well with dark brown).',
+      options: {
+        i18nTitle: { ar: 'اللون', en: 'Color', it: 'Colore' },
+      },
+      validation: (Rule) =>
+        Rule.custom((v) => {
+          if (!v) return true;
+          const s = String(v).trim();
+          return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s)
+            ? true
+            : 'Please provide a hex color like #C9A227.';
+        }),
+    }),
+    defineField({
+      name: 'size',
+      title: 'Size (1-3)',
+      type: 'number',
+      initialValue: 2,
+      options: {
+        i18nTitle: {
+          ar: 'الحجم (1-3)',
+          en: 'Size (1-3)',
+          it: 'Dimensione (1-3)',
+        },
+      },
+      validation: (Rule) => Rule.min(1).max(3),
+    }),
+    defineField({
+      name: 'marginTop',
+      title: 'Extra space above (px)',
+      type: 'number',
+      initialValue: 0,
+      options: {
+        i18nTitle: {
+          ar: 'مسافة إضافية بالأعلى (px)',
+          en: 'Extra space above (px)',
+          it: 'Spazio extra sopra (px)',
+        },
+      },
+    }),
+    defineField({
+      name: 'marginBottom',
+      title: 'Extra space below (px)',
+      type: 'number',
+      initialValue: 0,
+      options: {
+        i18nTitle: {
+          ar: 'مسافة إضافية بالأسفل (px)',
+          en: 'Extra space below (px)',
+          it: 'Spazio extra sotto (px)',
+        },
+      },
+    }),
+
+    defineField({
+      name: 'offsetY',
+      title: 'Nudge up/down (px)',
+      type: 'number',
+      initialValue: 0,
+      description:
+        'Moves the arrow within its own space. Negative moves it up; positive moves it down.',
+      options: {
+        i18nTitle: {
+          ar: 'إزاحة عمودية (px)',
+          en: 'Vertical nudge (px)',
+          it: 'Spostamento verticale (px)',
+        },
+      },
+    }),
+
+    defineField({
+      name: 'offsetX',
+      title: 'Nudge left/right (px)',
+      type: 'number',
+      initialValue: 0,
+      description:
+        'Moves the arrow left/right. Negative moves it left; positive moves it right.',
+      options: {
+        i18nTitle: {
+          ar: 'إزاحة أفقية (px)',
+          en: 'Horizontal nudge (px)',
+          it: 'Spostamento orizzontale (px)',
+        },
+      },
+    }),
+  ],
+  preview: {
+    prepare() {
+      return { title: 'Arrow Divider' };
     },
   },
 });
@@ -792,6 +899,7 @@ export const homeOurCampusType = defineType({
 
 export const pageSections = [
   sectionVideoHeroType,
+  sectionArrowDividerType,
   sectionDivisionsType,
   sectionParentsTestimonialsType,
   sectionAnnouncementsType,
