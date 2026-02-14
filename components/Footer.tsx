@@ -248,7 +248,7 @@ export default function Footer({
   const columnsToRender = columnsFromSanity;
 
   return (
-    <footer className="border-t border-border bg-[#2b1b14] text-[#f5f0e8]">
+    <footer className="border-t border-border bg-[#6F4E37] text-[#f5f0e8]">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_1px_minmax(0,2fr)]">
           <div>

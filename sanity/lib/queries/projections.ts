@@ -3,10 +3,9 @@ export const sectionProjection = `
 
   // Video Hero
   _type == "sectionVideoHero" => {
-    "title": coalesce(title, caption),
-    titleLine1,
-    titleLine2,
-    emphasizeLine2,
+    // Titles
+    "titleLine1": coalesce(titleLine1, ""),
+    "titleLine2": coalesce(titleLine2, ""),
     "subtitle": coalesce(subtitle, ""),
     overlayOpacity,
     useGlobalVideo,

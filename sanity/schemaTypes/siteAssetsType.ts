@@ -33,37 +33,6 @@ export const siteAssetsType = defineType({
     }),
 
     defineField({
-      name: 'footerLogos',
-      title: 'شعارات الفوتر (قديم) / Footer logos (legacy)',
-      description:
-        'Legacy footer logos field. Prefer using Site Settings → Footer → Columns → Images for accreditations/partners. / حقل قديم. يفضّل استخدام (إعدادات الموقع → الفوتر → الأعمدة → الصور).',
-      type: 'array',
-      hidden: true,
-      of: [
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Alt text',
-              type: 'string',
-              description:
-                'Alternative text for accessibility / النص البديل لإمكانية الوصول',
-            }),
-            defineField({
-              name: 'link',
-              title: 'Link (optional)',
-              type: 'url',
-              description:
-                'Optional URL when the logo is clicked / رابط اختياري عند النقر',
-            }),
-          ],
-        },
-      ],
-    }),
-
-    defineField({
       name: 'heroVideo',
       title: 'فيديو الهيرو العام / Global hero video',
       description:
@@ -71,36 +40,17 @@ export const siteAssetsType = defineType({
       type: 'file',
       options: { accept: 'video/*' },
     }),
-
-    defineField({
-      name: 'headerLogo',
-      title: 'شعار المدرسة (قديم)',
-      description:
-        'Legacy single-logo field. Prefer using "شعارات المدرسة" / حقل قديم لشعار واحد. يفضل استخدام "شعارات المدرسة"',
-      type: 'image',
-      hidden: true,
-      readOnly: true,
-      options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alt text',
-          type: 'string',
-        }),
-      ],
-    }),
   ],
 
   preview: {
     select: {
       media: 'headerLogos.0',
-      legacyMedia: 'headerLogo',
     },
-    prepare({ media, legacyMedia }) {
+    prepare({ media }) {
       return {
         title: 'شعارات المدرسة',
         subtitle: 'Shared across all languages / مشترك عبر جميع اللغات',
-        media: media ?? legacyMedia,
+        media,
       };
     },
   },

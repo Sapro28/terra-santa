@@ -38,6 +38,7 @@ type HeaderElement = {
 type SiteSettings = {
   schoolName?: string;
   headerLogos?: Array<{ url?: string | null; alt?: string | null }> | null;
+  footer?: { brandName?: string | null } | null;
 };
 
 function resolveHref(
@@ -76,10 +77,14 @@ export default function Header({
 }) {
   const isRtl = locale === 'ar';
   const items: HeaderElement[] = headerNav ?? [];
-  const rawSchoolName = (settings?.schoolName ?? '').trim();
+  const rawSchoolName = (
+    settings?.schoolName ??
+    settings?.footer?.brandName ??
+    ''
+  ).trim();
   const schoolName = /^terra\s+santa$/i.test(rawSchoolName)
-    ? 'Terra Santa School'
-    : rawSchoolName || 'Terra Santa School';
+    ? 'Terra Santa College'
+    : rawSchoolName || 'Terra Santa College';
   const nameWords = React.useMemo(
     () => schoolName.split(/\s+/).filter(Boolean),
     [schoolName],
@@ -155,7 +160,7 @@ export default function Header({
 
   const chromeClass = overHero
     ? 'bg-transparent text-white'
-    : 'bg-[#2b1b14] text-[#f5f0e8] shadow-sm';
+    : 'bg-[#6F4E37] text-[#f5f0e8] shadow-sm';
 
   const linkTextClass = overHero ? 'text-white/90' : 'text-[#f5f0e8]/90';
   const brandTextClass = overHero ? 'text-white' : 'text-[#f5f0e8]';

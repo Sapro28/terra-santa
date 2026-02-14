@@ -10,6 +10,21 @@ export const siteSettingsType = defineType({
     languageFieldLocked,
 
     defineField({
+      name: 'schoolName',
+      title: 'School name',
+      description: 'The name shown in the header',
+      type: 'string',
+      options: {
+        i18nTitle: {
+          ar: 'اسم المدرسة',
+          en: 'School name',
+          it: 'Nome scuola',
+        },
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
       name: 'footer',
       title: 'Footer',
       description: 'Footer content in this language',

@@ -92,13 +92,13 @@ export default function DivisionCard({
           : undefined
       }
     >
-      <div className="relative w-full aspect-4/3 sm:aspect-5/4 lg:aspect-4/5">
+      <div className="relative w-full aspect-3/4">
         {d.imageUrl ? (
           <Image
             src={d.imageUrl}
             alt={d.imageAlt || title || 'Division'}
             fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, 100vw"
             quality={95}
             priority={false}
             className={[
@@ -113,12 +113,12 @@ export default function DivisionCard({
           <div className="absolute inset-x-0 bottom-0 h-[72%] bg-linear-to-t from-black/90 via-black/45 to-transparent" />
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-5 pt-5 text-center sm:px-6 sm:pb-6 sm:pt-6">
-          <div className="line-clamp-2 text-base font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-md lg:text-lg">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 px-4 pb-4 pt-4 text-center sm:px-5 sm:pb-5 sm:pt-5">
+          <div className="line-clamp-2 text-sm font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-base lg:text-base">
             {title}
           </div>
           {subtitle ? (
-            <div className="mt-1 line-clamp-2 text-xs font-semibold text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-sm">
+            <div className="mt-1 line-clamp-2 text-xs font-semibold text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-xs">
               {subtitle}
             </div>
           ) : null}
@@ -149,32 +149,32 @@ export default function DivisionCard({
             />
           </div>
 
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 py-8 text-center sm:px-7 sm:py-10">
-            <div className="text-xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-2xl">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-5 py-6 text-center sm:px-6 sm:py-7">
+            <div className="text-lg font-extrabold tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-xl">
               {title}
             </div>
             {subtitle ? (
-              <div className="mt-1 text-sm font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-base">
+              <div className="mt-1 text-xs font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-sm">
                 {subtitle}
               </div>
             ) : null}
 
             {hoverText ? (
-              <p className="mt-3 max-w-[42ch] text-[13px] leading-relaxed text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+              <p className="mt-2.5 max-w-[42ch] text-xs leading-relaxed text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] sm:text-[13px]">
                 {hoverText}
               </p>
             ) : null}
 
             {cta ? (
-              <div className="mt-6">
+              <div className="mt-5">
                 {href !== '#' ? (
                   <Link
                     href={href}
                     className={[
                       'division-cta',
                       'inline-flex items-center justify-center',
-                      'rounded-full px-6 py-2.5',
-                      'text-sm font-extrabold tracking-widest',
+                      'rounded-full px-5 py-2',
+                      'text-xs font-extrabold tracking-widest sm:text-sm',
                       'text-[#f6efe8]',
                       'border border-[#f6efe8]/70',
                       'shadow-[0_14px_30px_-18px_rgba(0,0,0,0.8)]',
@@ -197,8 +197,8 @@ export default function DivisionCard({
                     className={[
                       'division-cta',
                       'inline-flex items-center justify-center',
-                      'rounded-full px-6 py-2.5',
-                      'text-sm font-extrabold tracking-widest',
+                      'rounded-full px-5 py-2',
+                      'text-xs font-extrabold tracking-widest sm:text-sm',
                       'text-[#f6efe8]',
                       'border border-[#f6efe8]/70',
                       'shadow-[0_14px_30px_-18px_rgba(0,0,0,0.8)]',

@@ -21,67 +21,33 @@ export const sectionVideoHeroType = defineType({
   type: 'object',
   fields: [
     defineField({
-      name: 'caption',
-      title: 'Caption (legacy)',
-      type: 'text',
-      rows: 2,
-      hidden: true,
-      readOnly: true,
-    }),
-
-    defineField({
-      name: 'title',
-      title: 'Title',
+      name: 'titleLine1',
+      title: 'Title (line 1)',
       type: 'string',
-      options: { i18nTitle: { ar: 'العنوان', en: 'Title', it: 'Titolo' } },
+      description: 'First line of the hero title.',
+      options: {
+        i18nTitle: {
+          ar: 'العنوان (السطر 1)',
+          en: 'Title (line 1)',
+          it: 'Titolo (riga 1)',
+        },
+      },
       validation: (Rule) => Rule.required(),
     }),
 
     defineField({
-      name: 'titleLine1',
-      title: 'Title (line 1) (optional)',
-      type: 'string',
-      description:
-        'If you provide a Title (line 2), the hero title will render as two lines at the bottom of the video, similar to the reference site.',
-      options: {
-        i18nTitle: {
-          ar: 'العنوان (السطر 1) (اختياري)',
-          en: 'Title (line 1) (optional)',
-          it: 'Titolo (riga 1) (opzionale)',
-        },
-      },
-    }),
-
-    defineField({
       name: 'titleLine2',
-      title: 'Title (line 2) (optional)',
+      title: 'Title (line 2)',
       type: 'string',
-      description:
-        'When set, this becomes the emphasized second line (e.g., "Rigor and Wonder").',
+      description: 'Second line of the hero title.',
       options: {
         i18nTitle: {
-          ar: 'العنوان (السطر 2) (اختياري)',
-          en: 'Title (line 2) (optional)',
-          it: 'Titolo (riga 2) (opzionale)',
+          ar: 'العنوان (السطر 2)',
+          en: 'Title (line 2)',
+          it: 'Titolo (riga 2)',
         },
       },
-    }),
-
-    defineField({
-      name: 'emphasizeLine2',
-      title: 'Emphasize line 2',
-      type: 'boolean',
-      initialValue: true,
-      description:
-        'When enabled, line 2 will bold the key words and render "and" in an italic, lighter style.',
-      options: {
-        i18nTitle: {
-          ar: 'تمييز السطر 2',
-          en: 'Emphasize line 2',
-          it: 'Evidenzia riga 2',
-        },
-      },
-      hidden: ({ parent }) => !parent?.titleLine2,
+      validation: (Rule) => Rule.required(),
     }),
 
     defineField({
@@ -138,10 +104,18 @@ export const sectionVideoHeroType = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title', useGlobalVideo: 'useGlobalVideo' },
-    prepare({ title, useGlobalVideo }) {
+    select: {
+      titleLine1: 'titleLine1',
+      titleLine2: 'titleLine2',
+      useGlobalVideo: 'useGlobalVideo',
+    },
+    prepare({ titleLine1, titleLine2, useGlobalVideo }) {
+      const t1 = String(titleLine1 ?? '').trim();
+      const t2 = String(titleLine2 ?? '').trim();
+      const displayTitle =
+        t1 && t2 ? `${t1} — ${t2}` : t1 || t2 || 'Video Hero';
       return {
-        title: title || 'Video Hero',
+        title: displayTitle,
         subtitle: useGlobalVideo ? 'Global video' : 'Custom video',
       };
     },
@@ -806,18 +780,6 @@ export const homeOurCampusType = defineType({
                   ar: 'نص تعريفي (اختياري)',
                   en: 'Subtitle (optional)',
                   it: 'Sottotitolo (opzionale)',
-                },
-              },
-              type: 'string',
-            }),
-            defineField({
-              name: 'address',
-              title: 'Address (optional)',
-              options: {
-                i18nTitle: {
-                  ar: 'العنوان (اختياري)',
-                  en: 'Address (optional)',
-                  it: 'Indirizzo (opzionale)',
                 },
               },
               type: 'string',

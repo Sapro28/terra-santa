@@ -20,10 +20,8 @@ type SectionBase = { _type: string };
 
 type SectionVideoHero = SectionBase & {
   _type: 'sectionVideoHero';
-  title?: string;
-  titleLine1?: string;
-  titleLine2?: string;
-  emphasizeLine2?: boolean;
+  titleLine1: string;
+  titleLine2: string;
   subtitle?: string;
   overlayOpacity?: number;
   videoUrl?: string;
@@ -110,7 +108,12 @@ function NewsList({
   return (
     <section>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold">{title}</h2>
+        <h2
+          className="text-2xl font-semibold"
+          style={{ color: 'var(--foreground)' }}
+        >
+          {title}
+        </h2>
       </div>
 
       <div className="rounded-2xl border border-border bg-white p-6">
@@ -128,7 +131,10 @@ function NewsList({
                 >
                   <a href={href} className="block">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-lg font-semibold leading-snug">
+                      <h3
+                        className="text-lg font-semibold leading-snug"
+                        style={{ color: 'var(--foreground)' }}
+                      >
                         {p.title}
                       </h3>
                       {p.urgent ? (
@@ -151,7 +157,11 @@ function NewsList({
         )}
 
         <div className="mt-6">
-          <a href={viewAllHref} className="text-sm font-medium underline">
+          <a
+            href={viewAllHref}
+            className="text-sm font-medium underline"
+            style={{ color: 'var(--foreground)' }}
+          >
             {viewAllLabel}
           </a>
         </div>
@@ -167,11 +177,8 @@ function SectionVideoHeroBlock({
   locale: string;
   s: SectionVideoHero;
 }) {
-  const title = s.title ?? '';
-  const titleLine1 = (s.titleLine1 ?? '').trim();
-  const titleLine2 = (s.titleLine2 ?? '').trim();
-  const useSplitTitle = Boolean(titleLine2);
-  const emphasizeLine2 = s.emphasizeLine2 !== false;
+  const titleLine1 = String(s.titleLine1 ?? '').trim();
+  const titleLine2 = String(s.titleLine2 ?? '').trim();
   const subtitle = s.subtitle ?? '';
   const overlay =
     typeof s.overlayOpacity === 'number' ? s.overlayOpacity : 0.45;
@@ -224,63 +231,60 @@ function SectionVideoHeroBlock({
         />
 
         <div className="absolute inset-0 flex items-end">
-          <div className="mx-auto w-full max-w-6xl px-4 pb-10 md:pb-16">
-            {useSplitTitle ? (
-              <div className="max-w-3xl text-white">
-                {titleLine1 ? (
-                  <div className="text-2xl font-medium leading-tight md:text-3xl">
-                    {titleLine1}
-                  </div>
-                ) : null}
-                <div className="mt-2 text-4xl leading-tight md:text-6xl">
-                  {emphasizeLine2
-                    ? titleLine2.split(/\s+/).map((w, idx) => {
-                        const key = `${w}-${idx}`;
-                        const isAnd = w.toLowerCase() === 'and';
-                        return (
-                          <span
-                            key={key}
-                            className={
-                              isAnd
-                                ? 'mx-1 inline-block align-baseline font-serif text-3xl font-normal italic opacity-90 md:text-5xl'
-                                : 'mr-2 inline-block font-bold'
-                            }
-                          >
-                            {w}
-                          </span>
-                        );
-                      })
-                    : titleLine2}
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-4 pb-10 text-center md:pb-16">
+            <div className="max-w-4xl text-white">
+              {titleLine1 ? (
+                <div className="font-serif text-lg font-medium leading-tight tracking-wide md:text-2xl">
+                  {titleLine1}
                 </div>
-              </div>
-            ) : (
-              <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-white md:text-5xl">
-                {title}
-              </h1>
-            )}
-
-            {subtitle ? (
-              <p className="mt-4 max-w-3xl text-base leading-relaxed text-white/90 md:text-lg">
-                {subtitle}
-              </p>
-            ) : null}
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {primaryResolved && s.primaryCta?.label ? (
-                <CmsCtaLink
-                  resolved={primaryResolved}
-                  label={s.primaryCta.label}
-                  className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition hover:opacity-90"
-                />
               ) : null}
 
-              {secondaryResolved && s.secondaryCta?.label ? (
-                <CmsCtaLink
-                  resolved={secondaryResolved}
-                  label={s.secondaryCta.label}
-                  className="inline-flex items-center justify-center rounded-full border border-white/70 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/15"
-                />
+              {titleLine2 ? (
+                <div className="mt-2 text-3xl font-semibold leading-tight md:text-5xl">
+                  {titleLine2.split(/\s+/).map((w, idx, arr) => {
+                    const key = `${w}-${idx}`;
+                    const isAnd = w.toLowerCase() === 'and';
+                    const isLast = idx === arr.length - 1;
+                    return (
+                      <span
+                        key={key}
+                        className={
+                          isAnd
+                            ? `inline-block align-baseline font-serif text-2xl font-normal italic opacity-90 md:text-4xl ${!isLast ? 'mr-2' : ''}`
+                            : `inline-block font-semibold ${!isLast ? 'mr-2' : ''}`
+                        }
+                      >
+                        {w}
+                      </span>
+                    );
+                  })}
+                </div>
               ) : null}
+
+              {subtitle ? (
+                <p className="mt-5 text-base leading-relaxed opacity-95 md:text-lg">
+                  {subtitle}
+                </p>
+              ) : null}
+
+              {(primaryResolved || secondaryResolved) && (
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  {primaryResolved && (
+                    <CmsCtaLink
+                      resolved={primaryResolved}
+                      label={s.primaryCta!.label!}
+                      className="rounded-full bg-white px-6 py-3 font-semibold text-black transition-colors hover:bg-gray-100"
+                    />
+                  )}
+                  {secondaryResolved && (
+                    <CmsCtaLink
+                      resolved={secondaryResolved}
+                      label={s.secondaryCta!.label!}
+                      className="rounded-full border-2 border-white px-6 py-3 font-semibold text-white transition-colors hover:bg-white/10"
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -290,45 +294,32 @@ function SectionVideoHeroBlock({
 }
 
 function SectionArrowDividerBlock({
-  s,
   locale,
+  s,
 }: {
+  locale: string;
   s: SectionArrowDivider;
-  /** Current locale (e.g. "en", "ar", "it"). Used to read i18n-wrapped values safely. */
-  locale?: string;
 }) {
-  const color = (s.color ?? '#C9A227').trim();
-  const size =
-    typeof s.size === 'number' ? Math.min(3, Math.max(1, s.size)) : 2;
-  const marginTop = typeof s.marginTop === 'number' ? s.marginTop : 0;
-  const marginBottom = typeof s.marginBottom === 'number' ? s.marginBottom : 0;
-  const offsetX = typeof s.offsetX === 'number' ? s.offsetX : 0;
-  const offsetY = typeof s.offsetY === 'number' ? s.offsetY : 0;
-  const rawDirection: any = (s as any).direction;
+  const color = s.color ?? '#800020';
+  const size = s.size ?? 2;
+  const marginTop = s.marginTop ?? 0;
+  const marginBottom = s.marginBottom ?? 0;
+  const offsetX = s.offsetX ?? 0;
+  const offsetY = s.offsetY ?? 0;
+
+  const rawDirection = (s as any).direction;
+
   const normalizedDirection = (() => {
-    const normalize = (v: any) => {
-      const str = String(v ?? '')
-        .trim()
-        .toLowerCase();
+    if (typeof rawDirection === 'string') {
+      return rawDirection.toLowerCase().trim();
+    }
 
-      if (str.includes('left')) return 'left';
-      if (str.includes('right')) return 'right';
-      if (str.includes('down')) return 'down';
-      return str;
-    };
+    const normalize = (val: any): string =>
+      String(val ?? '')
+        .toLowerCase()
+        .trim();
 
-    if (typeof rawDirection === 'string') return normalize(rawDirection);
-
-    if (Array.isArray(rawDirection)) {
-      const wanted = (locale ?? '').split('-')[0].toLowerCase();
-      const match = rawDirection.find((x: any) => {
-        const key = String(x?._key ?? x?.lang ?? x?.locale ?? '')
-          .trim()
-          .toLowerCase();
-        return wanted ? key === wanted : false;
-      });
-      const candidate = match?.value ?? match?.current ?? match?.title;
-      if (candidate) return normalize(candidate);
+    if (Array.isArray(rawDirection) && rawDirection.length > 0) {
       const first = rawDirection[0];
       return normalize(first?.value ?? first?.current ?? first?.title ?? '');
     }
@@ -362,9 +353,9 @@ function SectionArrowDividerBlock({
   const stroke = size === 1 ? 5 : size === 3 ? 8 : 6.5;
   const dash = size === 1 ? '8 14' : size === 3 ? '12 18' : '10 16';
   const leftCurvedPathD =
-    'M 62 10 C 70 45, 58 66, 52 76 C 42 94, 30 102, 24 114';
+    'M 62 10 C 70 45, 58 66, 52 76 C 42 94, 32 108, 24 120';
   const rightCurvedPathD =
-    'M 38 10 C 30 45, 42 66, 48 76 C 58 94, 70 102, 76 114';
+    'M 38 10 C 30 45, 42 66, 48 76 C 58 94, 68 108, 76 120';
   const centeredDownPathD = 'M 50 10 L 50 112';
 
   return (
@@ -449,7 +440,12 @@ function SectionParentsTestimonialsBlock({
   return (
     <section className="py-14">
       <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-2xl font-semibold">{title}</h2>
+        <h2
+          className="text-2xl font-semibold"
+          style={{ color: 'var(--foreground)' }}
+        >
+          {title}
+        </h2>
 
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           {items.map((t, idx) => (
@@ -458,7 +454,7 @@ function SectionParentsTestimonialsBlock({
               className="rounded-2xl border border-border bg-white p-6 shadow-sm"
             >
               <p className="text-sm leading-relaxed text-muted-foreground">
-                “{t.text ?? ''}”
+                "{t.text ?? ''}"
               </p>
             </div>
           ))}

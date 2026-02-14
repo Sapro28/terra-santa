@@ -2,8 +2,7 @@ import { groq } from 'next-sanity';
 
 export const siteSettingsQuery = groq`
   *[_type == "siteSettings" && _id == $id][0]{
-    schoolName,
-
+    "schoolName": footer.brandName,
     "headerLogos": *[_type == "siteAssets" && _id == "siteAssets"][0].headerLogos[]{
       "url": asset->url,
       "alt": coalesce(alt, "")
