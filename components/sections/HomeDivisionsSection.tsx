@@ -1,5 +1,5 @@
 import DivisionCard from '@/components/sections/DivisionCard.client';
-import DivisionsAccordion from '@/components/home/DivisionsAccordion.client';
+import DivisionsAccordion from '@/components/sections/DivisionsAccordion.client';
 
 type DivisionsData = {
   title?: string;

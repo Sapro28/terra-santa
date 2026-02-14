@@ -5,6 +5,9 @@ import {
 } from '@/components/lib/cmsLink';
 import { useId } from 'react';
 
+import HomeDivisionsSection from '@/components/sections/HomeDivisionsSection';
+import OurCampusSection from '@/components/sections/OurCampusSection.client';
+
 type Announcement = {
   _id: string;
   title?: string;
@@ -579,6 +582,14 @@ export default function SectionRenderer({
               </div>
             );
           }
+
+          case 'sectionDivisions':
+            return (
+              <HomeDivisionsSection key={i} locale={locale} data={s as any} />
+            );
+
+          case 'homeOurCampus':
+            return <OurCampusSection key={i} locale={locale} data={s as any} />;
 
           default:
             return null;

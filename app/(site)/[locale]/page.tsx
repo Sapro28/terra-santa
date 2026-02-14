@@ -3,8 +3,6 @@ import { unstable_noStore as noStore } from 'next/cache';
 
 import { locales, type Locale } from '@/i18n/config';
 
-import HomeDivisionsSection from '@/components/home/HomeDivisionsSection';
-import OurCampusSection from '@/components/home/OurCampusSection.client';
 import SectionRenderer from '@/components/sections/SectionRenderer';
 
 import { getSanityClient } from '@/sanity/lib/getClient';
@@ -19,8 +17,6 @@ import {
 
 type HomePageDoc = {
   sections?: Array<{ _type: string; [key: string]: any }>;
-  divisions?: any;
-  ourCampus?: any;
 };
 
 type Announcement = {
@@ -55,9 +51,7 @@ export default async function HomePage({
   if (!home) notFound();
 
   const rawSections = home.sections || [];
-  const sections = rawSections.filter(
-    (s) => s?._type !== 'sectionColors' && s?._type !== 'sectionDivisions',
-  );
+  const sections = rawSections.filter((s) => s?._type !== 'sectionColors');
   const heroIdx = sections.findIndex((s) => s?._type === 'sectionVideoHero');
   const heroGroup: typeof sections = [];
   const usedIdx = new Set<number>();
@@ -155,25 +149,13 @@ export default async function HomePage({
       return Object.fromEntries(entries);
     })(),
   ]);
+  const finalSections = [...heroGroup, ...restSections];
 
   return (
     <>
       <SectionRenderer
         locale={locale}
-        sections={heroGroup}
-        announcements={announcements}
-        upcomingEvents={upcomingEvents}
-        upcomingEventsBySectionId={upcomingEventsBySectionId}
-        latestEvents={latestEvents}
-        latestEventsBySectionId={latestEventsBySectionId}
-      />
-
-      <HomeDivisionsSection locale={locale} data={home.divisions} />
-      <OurCampusSection locale={locale} data={home.ourCampus} />
-
-      <SectionRenderer
-        locale={locale}
-        sections={restSections}
+        sections={finalSections}
         announcements={announcements}
         upcomingEvents={upcomingEvents}
         upcomingEventsBySectionId={upcomingEventsBySectionId}

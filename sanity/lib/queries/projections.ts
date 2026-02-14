@@ -1,9 +1,7 @@
 export const sectionProjection = `
   _type,
 
-  // Video Hero
   _type == "sectionVideoHero" => {
-    // Titles
     "titleLine1": coalesce(titleLine1, ""),
     "titleLine2": coalesce(titleLine2, ""),
     "subtitle": coalesce(subtitle, ""),
@@ -16,7 +14,6 @@ export const sectionProjection = `
       video.asset->url,
       *[_type == "siteAssets" && _id == "siteAssets"][0].heroVideo.asset->url
     ),
-
     primaryCta{
       label,
       link{
@@ -34,7 +31,6 @@ export const sectionProjection = `
       },
       href
     },
-
     secondaryCta{
       label,
       link{
@@ -54,7 +50,6 @@ export const sectionProjection = `
     }
   },
 
-  // Decorative Arrow Divider
   _type == "sectionArrowDivider" => {
     direction,
     color,
@@ -62,13 +57,11 @@ export const sectionProjection = `
     marginTop,
     marginBottom,
     offsetX,
-    offsetY,
+    offsetY
   },
 
-  // Announcements
   _type == "sectionAnnouncements" => { title, emptyText, viewAllLabel, limit },
 
-  // Upcoming Events
   _type == "sectionUpcomingEvents" => {
     title,
     emptyText,
@@ -79,7 +72,6 @@ export const sectionProjection = `
     "sectionSlug": section->slug
   },
 
-  // Latest Events
   _type == "sectionLatestEvents" => {
     title,
     emptyText,
@@ -90,6 +82,51 @@ export const sectionProjection = `
     "sectionSlug": section->slug
   },
 
-  // Parents Testimonials
-  _type == "sectionParentsTestimonials" => { title, testimonials[]{text} }
+  _type == "sectionParentsTestimonials" => { title, testimonials[]{text} },
+
+  _type == "sectionDivisions" => {
+    title,
+    subtitle,
+    divisions[]{
+      title,
+      text,
+      hoverText,
+      ctaLabel,
+      "pageSlug": page->slug,
+      "pageTitle": page->title,
+      "imageUrl": image.asset->url,
+      "imageAlt": image.alt
+    }
+  },
+
+  _type == "homeOurCampus" => {
+    heading,
+    intro,
+    slides[]{
+      title,
+      subtitle,
+      address,
+      body,
+      "images": images[]{
+        "url": asset->url,
+        "alt": alt
+      }
+    },
+    ctaLabel,
+    ctaHref,
+    ctaLink{
+      linkType,
+      internalRef->{
+        _type,
+        title,
+        "slug": coalesce(slug.current, slug),
+        "headerSlug": header->slug
+      },
+      routeKey,
+      internalPath,
+      externalUrl,
+      openInNewTab
+    }
+  }
+
 `;
